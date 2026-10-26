@@ -4,51 +4,85 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Seismic Interrogation</title>
+    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="game-container">
         
+        <!-- CRT Overlay Effect -->
+        <div class="crt-overlay"></div>
+        
+        <!-- Background -->
         <div id="background" class="bg-blur"></div>
 
+        <!-- Intro Screen -->
         <div id="intro-screen" class="screen active">
             <div id="story-text-container"></div>
             <div class="intro-buttons">
-                <button id="skip-btn" class="hidden">Skip Intro</button>
-                <button id="ready-btn" class="hidden">I am ready</button>
+                <button id="skip-btn" class="hidden">[ SKIP_SEQUENCE ]</button>
+                <button id="ready-btn" class="hidden">[ INITIATE_INTERROGATION ]</button>
             </div>
         </div>
 
+        <!-- Dialogue Screen -->
         <div id="dialogue-screen" class="screen hidden">
-            <div class="dialogue-box">
+            <div class="dialogue-box hud-panel">
                 <p id="rocky-dialogue"></p>
-                <p class="click-hint">Click anywhere to continue...</p>
+                <p class="click-hint">> CLICK TO CONTINUE_</p>
             </div>
         </div>
 
+        <!-- Interrogation Screen -->
         <div id="interrogation-screen" class="screen hidden">
             
-            <div class="top-section fade-element" id="q-container">
-                <div class="timer-bar"><div id="time-left"></div></div>
-                <div class="question-box">
-                    <p id="question-text"></p>
-                    <img id="question-image" src="" alt="Question Image" class="hidden">
+            <!-- Digital Timer -->
+            <div class="timer-container hud-panel">
+                <span class="timer-label">TIME_REMAINING: </span>
+                <span id="digital-timer">00:15:00</span>
+            </div>
+            
+            <!-- Question HUD -->
+            <div class="question-container hud-panel fade-element" id="q-container">
+                <p id="question-text"></p>
+                
+                <div id="image-wrapper" class="hidden">
+                    <img id="question-image" src="" alt="Target Data">
+                    <div class="scanner-line"></div>
                 </div>
             </div>
             
             <div class="spacer"></div>
             
-            <div class="bottom-section fade-element" id="opt-container">
+            <!-- Options HUD -->
+            <div class="options-container fade-element" id="opt-container">
                 <div class="options-grid">
-                    <button class="option-btn"></button>
-                    <button class="option-btn"></button>
-                    <button class="option-btn"></button>
-                    <button class="option-btn"></button>
+                    <button class="option-btn hud-panel" data-index="0"></button>
+                    <button class="option-btn hud-panel" data-index="1"></button>
+                    <button class="option-btn hud-panel" data-index="2"></button>
+                    <button class="option-btn hud-panel" data-index="3"></button>
                 </div>
             </div>
-
         </div>
+
+        <!-- Endgame Screen -->
+        <div id="endgame-screen" class="screen hidden">
+            <div id="prison-bars" class="hidden">
+                <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+            </div>
+            
+            <div class="report-card hud-panel">
+                <h2>INTERROGATION REPORT</h2>
+                <div class="report-stats">
+                    <p>TARGET: <span class="highlight">UNKNOWN</span></p>
+                    <p>SCORE: <span id="final-score" class="highlight">0/8</span></p>
+                </div>
+                <div id="endgame-stamp" class="stamp hidden"></div>
+            </div>
+        </div>
+
     </div>
     <script src="script.js"></script>
 </body>
