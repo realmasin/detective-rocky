@@ -13,54 +13,55 @@
 <body>
     <div id="game-container">
         
-        <!-- CRT Overlay Effect (Fixed for full screen) -->
         <div class="crt-overlay"></div>
-        
-        <!-- Background -->
         <div id="background" class="bg-blur"></div>
 
-        <!-- Intro Screen -->
+        <!-- Live Status Bar -->
+        <div id="top-status-bar">
+            <span>SYS.OP: SEISMIC_OS_v2.4</span>
+            <span id="random-hash">HASH: 0x00000000</span>
+            <span class="blinking-dot">REC</span>
+        </div>
+
         <div id="intro-screen" class="screen active">
             <div id="story-text-container"></div>
             <div class="intro-buttons">
-                <button id="skip-btn" class="hidden">SKIP</button>
-                <!-- Creative Cyber Button -->
+                <button id="skip-btn" class="hidden">SKIP_SEQ</button>
                 <button id="ready-btn" class="cyber-btn hidden">INITIATE_CONNECTION</button>
             </div>
         </div>
 
-        <!-- Identity Screen -->
         <div id="identity-screen" class="screen hidden">
             <div class="hud-panel identity-form fade-element">
-                <h2>IDENTIFICATION</h2>
-                <p class="subtitle">Enter credentials for Room 7 access.</p>
-                
-                <div class="input-group">
-                    <label>AGENT ID:</label>
-                    <input type="text" id="username-input" placeholder="e.g. SeismicHacker" autocomplete="off" maxlength="15">
+                <div class="form-header">
+                    <h2>SECURE LOGIN</h2>
+                    <div class="glitch-line"></div>
                 </div>
                 
                 <div class="input-group">
-                    <label>BIOMETRIC SCAN (PFP):</label>
+                    <label>> INPUT_AGENT_ID:</label>
+                    <input type="text" id="username-input" placeholder="e.g. GhostProtocol" autocomplete="off" maxlength="15">
+                </div>
+                
+                <div class="input-group">
+                    <label>> BIOMETRIC_DATA (PFP):</label>
                     <input type="file" id="pfp-input" accept="image/*">
                 </div>
                 
-                <div id="identity-error" class="error-text hidden">CREDENTIALS MISSING!</div>
+                <div id="identity-error" class="error-text hidden">ERR: CREDENTIALS MISSING</div>
                 
-                <button id="submit-identity-btn" class="cyber-btn full-width-btn">VERIFY</button>
+                <button id="submit-identity-btn" class="cyber-btn full-width-btn">VERIFY & ENTER</button>
             </div>
         </div>
 
-        <!-- Dialogue Screen (Moved to center, hint removed) -->
         <div id="dialogue-screen" class="screen hidden">
             <div class="dialogue-box hud-panel">
                 <p id="rocky-dialogue"></p>
+                <span class="type-cursor">_</span>
             </div>
         </div>
 
-        <!-- Interrogation Screen -->
         <div id="interrogation-screen" class="screen hidden">
-            
             <div class="top-section fade-element" id="q-container">
                 <div class="timer-container">
                     <span class="timer-label">SYS_TIME: </span>
@@ -77,62 +78,70 @@
             
             <div class="bottom-section fade-element" id="opt-container">
                 <div class="options-grid">
-                    <button class="option-btn hud-panel" data-index="0"></button>
-                    <button class="option-btn hud-panel" data-index="1"></button>
-                    <button class="option-btn hud-panel" data-index="2"></button>
-                    <button class="option-btn hud-panel" data-index="3"></button>
+                    <button class="option-btn hud-panel cyber-hover" data-index="0"></button>
+                    <button class="option-btn hud-panel cyber-hover" data-index="1"></button>
+                    <button class="option-btn hud-panel cyber-hover" data-index="2"></button>
+                    <button class="option-btn hud-panel cyber-hover" data-index="3"></button>
                 </div>
             </div>
         </div>
 
-        <!-- Endgame Screen -->
         <div id="endgame-screen" class="screen hidden">
             <div id="prison-bars" class="hidden">
                 <div class="bar"></div><div class="bar"></div><div class="bar"></div>
                 <div class="bar"></div><div class="bar"></div><div class="bar"></div>
             </div>
             
-            <!-- Highly creative result card layout -->
-            <div id="result-card" class="classified-card hud-panel">
-                <div class="card-top-bar">CLASSIFIED DOSSIER</div>
-                
-                <div class="card-main">
-                    <div class="card-photo-wrapper">
-                        <img id="card-pfp" src="" alt="Subject Photo">
-                        <div class="photo-overlay"></div>
+            <!-- 3D Interactive Card -->
+            <div id="card-3d-wrapper">
+                <div id="result-card" class="classified-card hud-panel">
+                    <!-- Fingerprint Background Texture -->
+                    <div class="card-bg-texture"></div>
+                    
+                    <div class="card-top-bar">
+                        <span>CLASSIFIED DOSSIER</span>
+                        <span class="clearance">CLEARANCE: LEVEL 7</span>
                     </div>
                     
-                    <div class="card-info">
-                        <div class="info-row">
-                            <span class="label">SUBJECT:</span>
-                            <span id="card-name" class="value">UNKNOWN</span>
+                    <div class="card-main">
+                        <div class="card-photo-wrapper">
+                            <img id="card-pfp" src="" alt="Subject Photo">
+                            <div class="photo-scanner"></div>
+                            <div class="corner-tl"></div><div class="corner-tr"></div>
+                            <div class="corner-bl"></div><div class="corner-br"></div>
                         </div>
-                        <div class="info-row">
-                            <span class="label">ID NO:</span>
-                            <span id="card-id" class="value">SMC-0000</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="label">INTEL SCORE:</span>
-                            <span id="final-score" class="value highlight">0/8</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="label">THREAT LEVEL:</span>
-                            <span id="card-status" class="value">EVALUATING</span>
+                        
+                        <div class="card-info">
+                            <div class="info-row">
+                                <span class="label">AGENT ALIAS:</span>
+                                <span id="card-name" class="value">UNKNOWN</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="label">UNIQUE ID:</span>
+                                <span id="card-id" class="value">SMC-0000</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="label">INTEL ACCURACY:</span>
+                                <span id="final-score" class="value highlight glow-text">0/8</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="label">FINAL DIRECTIVE:</span>
+                                <span id="card-status" class="value">EVALUATING</span>
+                            </div>
                         </div>
                     </div>
+                    
+                    <div class="card-bottom">
+                        <div class="barcode"></div>
+                    </div>
+                    
+                    <div id="endgame-stamp" class="stamp hidden"></div>
                 </div>
-                
-                <div class="card-bottom">
-                    <div class="barcode"></div>
-                </div>
-                
-                <!-- Stamp moved to avoid overlapping text -->
-                <div id="endgame-stamp" class="stamp hidden"></div>
             </div>
 
-            <div class="endgame-actions hud-panel fade-element hidden" id="action-buttons">
-                <button id="download-btn">DOWNLOAD</button>
-                <button id="share-x-btn">SHARE ON X</button>
+            <div class="endgame-actions fade-element hidden" id="action-buttons">
+                <button id="download-btn" class="cyber-btn">DOWNLOAD SECURE COPY</button>
+                <button id="share-x-btn" class="cyber-btn x-btn">SHARE INTEL ON X</button>
             </div>
         </div>
 
