@@ -1,4 +1,7 @@
+// Immediately Invoked Function Expression to scope variables safely
 (function() {
+    
+    // --- DOM Elements ---
     const bgElement = document.getElementById('background');
     const introScreen = document.getElementById('intro-screen');
     const storyText = document.getElementById('story-text');
@@ -9,11 +12,14 @@
     const rockyDialogue = document.getElementById('rocky-dialogue');
     
     const interrogationScreen = document.getElementById('interrogation-screen');
+    const qContainer = document.getElementById('q-container');
+    const optContainer = document.getElementById('opt-container');
     const questionImage = document.getElementById('question-image');
     const questionText = document.getElementById('question-text');
     const optionBtns = document.querySelectorAll('.option-btn');
     const timeLeftBar = document.getElementById('time-left');
 
+    // --- State Variables ---
     let currentQuestionIndex = 0;
     let score = 0;
     let timerInterval;
@@ -23,6 +29,7 @@
     
     const TIME_PER_QUESTION = 15; 
 
+    // --- Content Data ---
     const introLines = [
         "Seismic Headquarters...",
         "System breached...",
@@ -63,6 +70,7 @@
         }
     ];
 
+    // Generate dummy questions for logic testing
     for(let i = 2; i <= 8; i++) {
         questionsDatabase.push({
             q: `This is test question ${i}. The correct answer is Option 1.`,
@@ -74,6 +82,7 @@
 
     let activeQuestions = [];
 
+    // --- Helper Functions ---
     function shuffleArray(array) {
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -105,15 +114,15 @@
         bgElement.style.backgroundImage = `url('images/rocky-${state}.jpg')`;
     }
 
+    // --- Intro Sequence ---
     function startIntro() {
-        // بطأنا سرعة الكتابة لـ 90 جزء من الثانية
-        typeWriterEffect(storyText, fullIntroText, 90, () => {
+        skipBtn.classList.remove('hidden');
+        typeWriterEffect(storyText, fullIntroText, 70, () => {
             readyBtn.classList.remove('hidden');
             skipBtn.classList.add('hidden');
         });
     }
 
-    // برمجة زر Skip
     skipBtn.addEventListener('click', () => {
         clearInterval(typingInterval);
         isTyping = false;
@@ -126,7 +135,6 @@
         introScreen.classList.remove('active');
         introScreen.classList.add('hidden');
         
-        // زدنا من قوة الضباب في شاشة القواعد
         bgElement.style.filter = "blur(12px) brightness(0.4)";
         changeRockyImage('reading');
         
@@ -136,6 +144,7 @@
         playNextDialogueLine();
     });
 
+    // --- Dialogue Sequence ---
     dialogueScreen.addEventListener('click', () => {
         if (isTyping) {
             clearInterval(typingInterval);
@@ -155,6 +164,7 @@
         typeWriterEffect(rockyDialogue, rulesLines[currentLineIndex], 50);
     }
 
+    // --- Interrogation Sequence ---
     function startInterrogation() {
         dialogueScreen.classList.remove('active');
         dialogueScreen.classList.add('hidden');
@@ -196,6 +206,10 @@
             btn.disabled = false;
         });
 
+        // Trigger Fade In animation
+        qContainer.classList.remove('fade-out');
+        optContainer.classList.remove('fade-out');
+        
         changeRockyImage('normal');
         startTimer();
     }
@@ -203,7 +217,7 @@
     function startTimer() {
         let timeLeft = TIME_PER_QUESTION;
         timeLeftBar.style.width = '100%';
-        timeLeftBar.style.backgroundColor = '#ffffff';
+        timeLeftBar.style.backgroundColor = 'var(--seismic-primary)';
 
         clearInterval(timerInterval);
         timerInterval = setInterval(() => {
@@ -212,7 +226,7 @@
             timeLeftBar.style.width = `${percentage}%`;
 
             if (percentage < 30) {
-                timeLeftBar.style.backgroundColor = '#ff0000'; 
+                timeLeftBar.style.backgroundColor = 'var(--seismic-danger)'; 
             }
 
             if (timeLeft <= 0) {
@@ -239,12 +253,19 @@
             bgElement.style.filter = "sepia(1) hue-rotate(-50deg) saturate(5) brightness(0.6)";
         }
 
-        // زدنا الوقت لـ 3.5 ثواني باش يبان التفاعل على خاطرو
+        // Wait to show reaction, then trigger Fade Out animation
         setTimeout(() => {
+            qContainer.classList.add('fade-out');
+            optContainer.classList.add('fade-out');
             bgElement.style.filter = "blur(0px) brightness(0.8)"; 
-            currentQuestionIndex++;
-            loadQuestion();
-        }, 3500);
+            
+            // Wait for fade out to complete before loading next question
+            setTimeout(() => {
+                currentQuestionIndex++;
+                loadQuestion();
+            }, 500);
+            
+        }, 2500); 
     }
 
     function endGame() {
@@ -258,6 +279,7 @@
         }
     }
 
+    // --- Init ---
     document.addEventListener('DOMContentLoaded', () => {
         startIntro();
     });
