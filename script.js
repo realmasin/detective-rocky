@@ -1,6 +1,10 @@
 (function() {
     
+    // --- DOM Elements ---
+    const body = document.body;
+    const gameContainer = document.getElementById('game-container');
     const bgElement = document.getElementById('background');
+    
     const introScreen = document.getElementById('intro-screen');
     const storyTextContainer = document.getElementById('story-text-container');
     const readyBtn = document.getElementById('ready-btn');
@@ -12,25 +16,34 @@
     const interrogationScreen = document.getElementById('interrogation-screen');
     const qContainer = document.getElementById('q-container');
     const optContainer = document.getElementById('opt-container');
+    const imageWrapper = document.getElementById('image-wrapper');
     const questionImage = document.getElementById('question-image');
     const questionText = document.getElementById('question-text');
     const optionBtns = document.querySelectorAll('.option-btn');
-    const timeLeftBar = document.getElementById('time-left');
+    const digitalTimer = document.getElementById('digital-timer');
+    
+    const endgameScreen = document.getElementById('endgame-screen');
+    const finalScoreEl = document.getElementById('final-score');
+    const endgameStamp = document.getElementById('endgame-stamp');
+    const prisonBars = document.getElementById('prison-bars');
 
+    // --- State Variables ---
     let currentQuestionIndex = 0;
     let score = 0;
-    let timerInterval;
+    let timerReq;
     let typingInterval;
+    let scrambleIntervals = [];
     let isTyping = false;
     let currentLineIndex = 0;
     
-    const TIME_PER_QUESTION = 15; 
+    const TIME_PER_QUESTION_MS = 15000; 
 
+    // --- Data ---
     const introLines = [
-        "Seismic Headquarters...",
-        "System breached...",
-        "Spies among us...",
-        "Detective Rocky summoned you to room 7..."
+        "ESTABLISHING SECURE CONNECTION...",
+        "SYSTEM BREACH DETECTED...",
+        "SPIES INFILTRATION SUSPECTED...",
+        "DETECTIVE ROCKY AWAITING IN ROOM 7..."
     ];
 
     const rulesLines = [
@@ -45,29 +58,29 @@
     ];
 
     const correctReactions = [
-        "Hmm, smart answer... but we are not done yet.",
-        "Point for you. Let's see the next one.",
-        "You got lucky. Next."
+        "LOG: Answer acceptable... Proceeding.",
+        "LOG: Data verified. Next sequence.",
+        "LOG: Lucky guess. Continuing scan."
     ];
 
     const wrongReactions = [
-        "Did you really think you could lie to me?",
-        "That answer will only dig you deeper... focus!",
-        "Pathetic. Let's move on."
+        "WARNING: Deception detected.",
+        "WARNING: Invalid response. Profile flagged.",
+        "WARNING: System anomaly. You are failing."
     ];
 
     const questionsDatabase = [
         {
-            q: "Who is this person?",
+            q: "Identify this target:",
             img: "images/founder.jpg",
-            opts: ["Founder of Seismic", "Leader", "A random person", "Admin"],
+            opts: ["Founder of Seismic", "Leader", "Unknown Entity", "System Admin"],
             ans: "Rm91bmRlciBvZiBTZWlzbWlj"
         }
     ];
 
     for(let i = 2; i <= 8; i++) {
         questionsDatabase.push({
-            q: `This is test question ${i}. The correct answer is Option 1.`,
+            q: `DATA FRAGMENT #${i} REQUIRED. SELECT OPTION 1.`,
             img: "", 
             opts: ["Option 1", "Option 2", "Option 3", "Option 4"],
             ans: "T3B0aW9uIDE="
@@ -78,6 +91,7 @@
     let isIntroTyping = false;
     let introTimeout;
 
+    // --- Core Mechanics ---
     function shuffleArray(array) {
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -86,11 +100,15 @@
         return array;
     }
 
+    function changeRockyImage(state) {
+        bgElement.style.backgroundImage = `url('images/rocky-${state}.jpg')`;
+    }
+
+    // --- Cinematic Effects ---
     function typeWriterEffect(element, text, speed, onComplete) {
         isTyping = true;
         element.textContent = ''; 
         let i = 0;
-        
         clearInterval(typingInterval);
         typingInterval = setInterval(() => {
             if (i < text.length) {
@@ -104,10 +122,60 @@
         }, speed);
     }
 
-    function changeRockyImage(state) {
-        bgElement.style.backgroundImage = `url('images/rocky-${state}.jpg')`;
+    // Hacker text scramble effect
+    function scrambleText(element, finalString, duration) {
+        const chars = '!<>-_\\/[]{}—=+*^?#_';
+        let frame = 0;
+        const maxFrames = duration / 30;
+        let queue = [];
+        
+        for(let i=0; i<finalString.length; i++) {
+            queue.push({
+                char: finalString[i],
+                start: Math.floor(Math.random() * (maxFrames/2)),
+                end: Math.floor(Math.random() * (maxFrames/2)) + (maxFrames/2)
+            });
+        }
+        
+        const scrambleTimer = setInterval(() => {
+            let output = '';
+            let complete = 0;
+            for(let i=0; i<queue.length; i++) {
+                let {char, start, end} = queue[i];
+                if(frame >= end) {
+                    output += char;
+                    complete++;
+                } else if(frame >= start) {
+                    if(char === ' ') output += ' ';
+                    else output += chars[Math.floor(Math.random() * chars.length)];
+                } else {
+                    output += ' ';
+                }
+            }
+            element.textContent = output;
+            if(complete === queue.length) {
+                clearInterval(scrambleTimer);
+            }
+            frame++;
+        }, 30);
+        scrambleIntervals.push(scrambleTimer);
     }
 
+    function clearScrambles() {
+        scrambleIntervals.forEach(clearInterval);
+        scrambleIntervals = [];
+    }
+
+    function triggerGlitchShake() {
+        gameContainer.classList.add('shake-effect');
+        bgElement.classList.add('glitch-filter');
+        setTimeout(() => {
+            gameContainer.classList.remove('shake-effect');
+            bgElement.classList.remove('glitch-filter');
+        }, 400);
+    }
+
+    // --- Sequences ---
     function startIntro() {
         skipBtn.classList.remove('hidden');
         storyTextContainer.innerHTML = '';
@@ -116,34 +184,29 @@
 
         function showNextLine() {
             if (!isIntroTyping) return;
-            
             storyTextContainer.style.opacity = '0';
-            
             setTimeout(() => {
                 if (!isIntroTyping) return;
-                
                 storyTextContainer.innerHTML = '';
                 const lineDiv = document.createElement('div');
                 lineDiv.className = 'intro-line';
                 storyTextContainer.appendChild(lineDiv);
-                
                 storyTextContainer.style.opacity = '1';
                 
-                typeWriterEffect(lineDiv, introLines[lineIndex], 60, () => {
+                typeWriterEffect(lineDiv, introLines[lineIndex], 40, () => {
                     lineIndex++;
                     if (lineIndex < introLines.length) {
-                        introTimeout = setTimeout(showNextLine, 1500); 
+                        introTimeout = setTimeout(showNextLine, 1000); 
                     } else {
                         introTimeout = setTimeout(() => {
                             isIntroTyping = false;
                             readyBtn.classList.remove('hidden');
                             skipBtn.classList.add('hidden');
-                        }, 1000);
+                        }, 800);
                     }
                 });
-            }, 800); 
+            }, 500); 
         }
-        
         showNextLine();
     }
 
@@ -151,10 +214,8 @@
         isIntroTyping = false;
         clearInterval(typingInterval);
         clearTimeout(introTimeout);
-        
         storyTextContainer.style.opacity = '1';
         storyTextContainer.innerHTML = `<div class="intro-line">${introLines[introLines.length - 1]}</div>`;
-        
         readyBtn.classList.remove('hidden');
         skipBtn.classList.add('hidden');
     });
@@ -162,13 +223,10 @@
     readyBtn.addEventListener('click', () => {
         introScreen.classList.remove('active');
         introScreen.classList.add('hidden');
-        
-        bgElement.style.filter = "blur(12px) brightness(0.4)";
+        bgElement.style.filter = "blur(8px) brightness(0.4)";
         changeRockyImage('reading');
-        
         dialogueScreen.classList.remove('hidden');
         dialogueScreen.classList.add('active');
-        
         playNextDialogueLine();
     });
 
@@ -188,13 +246,15 @@
     });
 
     function playNextDialogueLine() {
-        typeWriterEffect(rockyDialogue, rulesLines[currentLineIndex], 50);
+        rockyDialogue.textContent = '';
+        scrambleText(rockyDialogue, rulesLines[currentLineIndex], 600);
+        isTyping = true;
+        setTimeout(() => isTyping = false, 600); // sync mock typing state
     }
 
     function startInterrogation() {
         dialogueScreen.classList.remove('active');
         dialogueScreen.classList.add('hidden');
-        
         interrogationScreen.classList.remove('hidden');
         interrogationScreen.classList.add('active');
         
@@ -204,66 +264,82 @@
         activeQuestions = shuffleArray([...questionsDatabase]).slice(0, 8);
         currentQuestionIndex = 0;
         score = 0;
-        
         loadQuestion();
     }
 
     function loadQuestion() {
         if (currentQuestionIndex >= activeQuestions.length) {
-            endGame();
+            triggerEndgame();
             return;
         }
 
+        clearScrambles();
         const currentQ = activeQuestions[currentQuestionIndex];
-        questionText.textContent = currentQ.q;
+        
+        scrambleText(questionText, currentQ.q, 800);
         
         if (currentQ.img !== "") {
             questionImage.src = currentQ.img;
-            questionImage.classList.remove('hidden');
+            imageWrapper.classList.remove('hidden');
         } else {
-            questionImage.classList.add('hidden');
+            imageWrapper.classList.add('hidden');
             questionImage.src = "";
         }
 
         const shuffledOptions = shuffleArray([...currentQ.opts]);
         optionBtns.forEach((btn, index) => {
-            btn.textContent = shuffledOptions[index]; 
-            btn.onclick = () => handleAnswer(btn.textContent, currentQ.ans);
+            btn.textContent = ""; 
+            scrambleText(btn, shuffledOptions[index], 1000 + (index*200));
+            btn.onclick = () => handleAnswer(shuffledOptions[index], currentQ.ans);
             btn.disabled = false;
         });
 
         qContainer.classList.remove('fade-out');
         optContainer.classList.remove('fade-out');
+        digitalTimer.classList.remove('timer-danger');
         
         changeRockyImage('normal');
-        startTimer();
+        startDigitalTimer();
     }
 
-    function startTimer() {
-        let timeLeft = TIME_PER_QUESTION;
-        timeLeftBar.style.width = '100%';
-        timeLeftBar.style.backgroundColor = 'var(--seismic-primary)';
+    function formatTime(ms) {
+        if(ms <= 0) return "00:00:00";
+        let totalSeconds = ms / 1000;
+        let seconds = Math.floor(totalSeconds);
+        let hundreths = Math.floor((totalSeconds - seconds) * 100);
+        let strSec = seconds < 10 ? "0"+seconds : seconds;
+        let strHun = hundreths < 10 ? "0"+hundreths : hundreths;
+        return `00:${strSec}:${strHun}`;
+    }
 
-        clearInterval(timerInterval);
-        timerInterval = setInterval(() => {
-            timeLeft -= 0.1;
-            let percentage = (timeLeft / TIME_PER_QUESTION) * 100;
-            timeLeftBar.style.width = `${percentage}%`;
+    function startDigitalTimer() {
+        let startTime = Date.now();
+        cancelAnimationFrame(timerReq);
 
-            if (percentage < 30) {
-                timeLeftBar.style.backgroundColor = 'var(--seismic-danger)'; 
+        function update() {
+            let elapsed = Date.now() - startTime;
+            let timeLeft = TIME_PER_QUESTION_MS - elapsed;
+            
+            if (timeLeft <= 4000) {
+                digitalTimer.classList.add('timer-danger');
             }
-
-            if (timeLeft <= 0) {
-                clearInterval(timerInterval);
-                handleAnswer(null, activeQuestions[currentQuestionIndex].ans); 
+            
+            if(timeLeft <= 0) {
+                digitalTimer.textContent = "00:00:00";
+                handleAnswer(null, activeQuestions[currentQuestionIndex].ans);
+                return;
             }
-        }, 100);
+            
+            digitalTimer.textContent = formatTime(timeLeft);
+            timerReq = requestAnimationFrame(update);
+        }
+        timerReq = requestAnimationFrame(update);
     }
 
     function handleAnswer(selectedText, encodedCorrectAnswer) {
-        clearInterval(timerInterval);
+        cancelAnimationFrame(timerReq);
         optionBtns.forEach(btn => btn.disabled = true);
+        clearScrambles();
 
         const decodedCorrect = atob(encodedCorrectAnswer);
         let isCorrect = (selectedText === decodedCorrect);
@@ -271,37 +347,50 @@
         if (isCorrect) {
             score++;
             changeRockyImage('smiling');
-            questionText.textContent = correctReactions[Math.floor(Math.random() * correctReactions.length)];
+            scrambleText(questionText, correctReactions[Math.floor(Math.random() * correctReactions.length)], 500);
         } else {
             changeRockyImage('angry');
-            questionText.textContent = wrongReactions[Math.floor(Math.random() * wrongReactions.length)];
-            bgElement.style.filter = "sepia(1) hue-rotate(-50deg) saturate(5) brightness(0.6)";
+            scrambleText(questionText, wrongReactions[Math.floor(Math.random() * wrongReactions.length)], 500);
+            triggerGlitchShake();
         }
 
         setTimeout(() => {
             qContainer.classList.add('fade-out');
             optContainer.classList.add('fade-out');
-            bgElement.style.filter = "blur(0px) brightness(0.8)"; 
-            
             setTimeout(() => {
                 currentQuestionIndex++;
                 loadQuestion();
-            }, 500);
-            
+            }, 400);
         }, 2500); 
     }
 
-    function endGame() {
+    function triggerEndgame() {
         interrogationScreen.classList.remove('active');
         interrogationScreen.classList.add('hidden');
+        endgameScreen.classList.remove('hidden');
+        endgameScreen.classList.add('active');
         
-        if (score >= 4) {
-            alert(`Result: ${score}/8 - You are a REAL Seismic Member!`);
-        } else {
-            alert(`Result: ${score}/8 - You are a SPY! Off to prison.`);
-        }
+        finalScoreEl.textContent = `${score}/8`;
+        bgElement.style.filter = "blur(15px) brightness(0.2)";
+        
+        setTimeout(() => {
+            if (score >= 4) {
+                endgameStamp.textContent = "ACCESS GRANTED";
+                endgameStamp.className = "stamp stamp-success show";
+            } else {
+                prisonBars.classList.remove('hidden');
+                setTimeout(() => prisonBars.classList.add('drop'), 50);
+                
+                setTimeout(() => {
+                    endgameStamp.textContent = "SPY DETECTED";
+                    endgameStamp.className = "stamp stamp-danger show";
+                    triggerGlitchShake();
+                }, 800);
+            }
+        }, 500);
     }
 
+    // --- Init ---
     document.addEventListener('DOMContentLoaded', () => {
         startIntro();
     });
