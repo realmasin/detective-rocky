@@ -1,10 +1,8 @@
-// Immediately Invoked Function Expression to scope variables safely
 (function() {
     
-    // --- DOM Elements ---
     const bgElement = document.getElementById('background');
     const introScreen = document.getElementById('intro-screen');
-    const storyText = document.getElementById('story-text');
+    const storyTextContainer = document.getElementById('story-text-container');
     const readyBtn = document.getElementById('ready-btn');
     const skipBtn = document.getElementById('skip-btn');
     
@@ -19,7 +17,6 @@
     const optionBtns = document.querySelectorAll('.option-btn');
     const timeLeftBar = document.getElementById('time-left');
 
-    // --- State Variables ---
     let currentQuestionIndex = 0;
     let score = 0;
     let timerInterval;
@@ -29,14 +26,12 @@
     
     const TIME_PER_QUESTION = 15; 
 
-    // --- Content Data ---
     const introLines = [
         "Seismic Headquarters...",
         "System breached...",
         "Spies among us...",
-        "Detective Rocky summoned you to interrogation room 7..."
+        "Detective Rocky summoned you to room 7..."
     ];
-    const fullIntroText = introLines.join("\n\n");
 
     const rulesLines = [
         "Welcome... Have a seat.",
@@ -45,7 +40,7 @@
         "During my investigation, I suspected you might be a spy.",
         "I brought you here today to ask you a few questions.",
         "Your answers will tell me if my suspicions were right or wrong.",
-        "I will ask you 8 questions. Answer them correctly before the time runs out.",
+        "I will ask you 8 questions. Answer them correctly before time runs out.",
         "Let's begin. I have hundreds of spies waiting to be caught."
     ];
 
@@ -70,7 +65,6 @@
         }
     ];
 
-    // Generate dummy questions for logic testing
     for(let i = 2; i <= 8; i++) {
         questionsDatabase.push({
             q: `This is test question ${i}. The correct answer is Option 1.`,
@@ -81,8 +75,9 @@
     }
 
     let activeQuestions = [];
+    let isIntroTyping = false;
+    let introTimeout;
 
-    // --- Helper Functions ---
     function shuffleArray(array) {
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -94,7 +89,6 @@
     function typeWriterEffect(element, text, speed, onComplete) {
         isTyping = true;
         element.textContent = ''; 
-        element.style.whiteSpace = 'pre-wrap'; 
         let i = 0;
         
         clearInterval(typingInterval);
@@ -114,19 +108,47 @@
         bgElement.style.backgroundImage = `url('images/rocky-${state}.jpg')`;
     }
 
-    // --- Intro Sequence ---
+    // --- Intro Sequence (Line by Line) ---
     function startIntro() {
         skipBtn.classList.remove('hidden');
-        typeWriterEffect(storyText, fullIntroText, 70, () => {
-            readyBtn.classList.remove('hidden');
-            skipBtn.classList.add('hidden');
-        });
+        storyTextContainer.innerHTML = '';
+        let lineIndex = 0;
+        isIntroTyping = true;
+
+        function typeNextLine() {
+            if (!isIntroTyping) return;
+            
+            if (lineIndex < introLines.length) {
+                const lineDiv = document.createElement('div');
+                lineDiv.className = 'intro-line';
+                storyTextContainer.appendChild(lineDiv);
+                
+                typeWriterEffect(lineDiv, introLines[lineIndex], 50, () => {
+                    lineIndex++;
+                    introTimeout = setTimeout(typeNextLine, 500); 
+                });
+            } else {
+                isIntroTyping = false;
+                readyBtn.classList.remove('hidden');
+                skipBtn.classList.add('hidden');
+            }
+        }
+        typeNextLine();
     }
 
     skipBtn.addEventListener('click', () => {
+        isIntroTyping = false;
         clearInterval(typingInterval);
-        isTyping = false;
-        storyText.textContent = fullIntroText;
+        clearTimeout(introTimeout);
+        
+        storyTextContainer.innerHTML = '';
+        introLines.forEach(line => {
+            const lineDiv = document.createElement('div');
+            lineDiv.className = 'intro-line';
+            lineDiv.textContent = line;
+            storyTextContainer.appendChild(lineDiv);
+        });
+        
         readyBtn.classList.remove('hidden');
         skipBtn.classList.add('hidden');
     });
@@ -206,7 +228,6 @@
             btn.disabled = false;
         });
 
-        // Trigger Fade In animation
         qContainer.classList.remove('fade-out');
         optContainer.classList.remove('fade-out');
         
@@ -217,7 +238,7 @@
     function startTimer() {
         let timeLeft = TIME_PER_QUESTION;
         timeLeftBar.style.width = '100%';
-        timeLeftBar.style.backgroundColor = 'var(--seismic-primary)';
+        timeLeftBar.style.backgroundColor = '#ffffff';
 
         clearInterval(timerInterval);
         timerInterval = setInterval(() => {
@@ -226,7 +247,7 @@
             timeLeftBar.style.width = `${percentage}%`;
 
             if (percentage < 30) {
-                timeLeftBar.style.backgroundColor = 'var(--seismic-danger)'; 
+                timeLeftBar.style.backgroundColor = '#ff0000'; 
             }
 
             if (timeLeft <= 0) {
@@ -253,13 +274,11 @@
             bgElement.style.filter = "sepia(1) hue-rotate(-50deg) saturate(5) brightness(0.6)";
         }
 
-        // Wait to show reaction, then trigger Fade Out animation
         setTimeout(() => {
             qContainer.classList.add('fade-out');
             optContainer.classList.add('fade-out');
             bgElement.style.filter = "blur(0px) brightness(0.8)"; 
             
-            // Wait for fade out to complete before loading next question
             setTimeout(() => {
                 currentQuestionIndex++;
                 loadQuestion();
@@ -279,7 +298,6 @@
         }
     }
 
-    // --- Init ---
     document.addEventListener('DOMContentLoaded', () => {
         startIntro();
     });
