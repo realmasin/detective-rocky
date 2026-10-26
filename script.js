@@ -1,10 +1,9 @@
-// Wrap everything in an IIFE to prevent console cheating
 (function() {
-    // --- DOM Elements ---
     const bgElement = document.getElementById('background');
     const introScreen = document.getElementById('intro-screen');
     const storyText = document.getElementById('story-text');
     const readyBtn = document.getElementById('ready-btn');
+    const skipBtn = document.getElementById('skip-btn');
     
     const dialogueScreen = document.getElementById('dialogue-screen');
     const rockyDialogue = document.getElementById('rocky-dialogue');
@@ -15,7 +14,6 @@
     const optionBtns = document.querySelectorAll('.option-btn');
     const timeLeftBar = document.getElementById('time-left');
 
-    // --- Game Variables ---
     let currentQuestionIndex = 0;
     let score = 0;
     let timerInterval;
@@ -23,15 +21,15 @@
     let isTyping = false;
     let currentLineIndex = 0;
     
-    const TIME_PER_QUESTION = 15; // 15 seconds per question
+    const TIME_PER_QUESTION = 15; 
 
-    // --- Story & Dialogue Content ---
     const introLines = [
         "Seismic Headquarters...",
         "System breached...",
         "Spies among us...",
         "Detective Rocky summoned you to interrogation room 7..."
     ];
+    const fullIntroText = introLines.join("\n\n");
 
     const rulesLines = [
         "Welcome... Have a seat.",
@@ -56,17 +54,15 @@
         "Pathetic. Let's move on."
     ];
 
-    // --- Questions Database ---
     const questionsDatabase = [
         {
             q: "Who is this person?",
             img: "images/founder.jpg",
-            opts: ["Founder of Seismic", "Leader", "A random person with no relation to Seismic", "Admin in Seismic"],
+            opts: ["Founder of Seismic", "Leader", "A random person", "Admin"],
             ans: "Rm91bmRlciBvZiBTZWlzbWlj"
         }
     ];
 
-    // Generate 7 dummy questions for testing logic
     for(let i = 2; i <= 8; i++) {
         questionsDatabase.push({
             q: `This is test question ${i}. The correct answer is Option 1.`,
@@ -78,7 +74,6 @@
 
     let activeQuestions = [];
 
-    // --- Utility Functions ---
     function shuffleArray(array) {
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -89,8 +84,8 @@
 
     function typeWriterEffect(element, text, speed, onComplete) {
         isTyping = true;
-        element.textContent = ''; // Fixed HTML parsing bug
-        element.style.whiteSpace = 'pre-wrap'; // Keeps line breaks working
+        element.textContent = ''; 
+        element.style.whiteSpace = 'pre-wrap'; 
         let i = 0;
         
         clearInterval(typingInterval);
@@ -110,20 +105,29 @@
         bgElement.style.backgroundImage = `url('images/rocky-${state}.jpg')`;
     }
 
-    // --- Sequence: Intro ---
     function startIntro() {
-        let fullIntroText = introLines.join("\n\n"); // Fixed newline bug
-        typeWriterEffect(storyText, fullIntroText, 50, () => {
+        // بطأنا سرعة الكتابة لـ 90 جزء من الثانية
+        typeWriterEffect(storyText, fullIntroText, 90, () => {
             readyBtn.classList.remove('hidden');
+            skipBtn.classList.add('hidden');
         });
     }
 
-    // --- Sequence: Dialogue/Rules ---
+    // برمجة زر Skip
+    skipBtn.addEventListener('click', () => {
+        clearInterval(typingInterval);
+        isTyping = false;
+        storyText.textContent = fullIntroText;
+        readyBtn.classList.remove('hidden');
+        skipBtn.classList.add('hidden');
+    });
+
     readyBtn.addEventListener('click', () => {
         introScreen.classList.remove('active');
         introScreen.classList.add('hidden');
         
-        bgElement.style.filter = "blur(2px) brightness(0.6)";
+        // زدنا من قوة الضباب في شاشة القواعد
+        bgElement.style.filter = "blur(12px) brightness(0.4)";
         changeRockyImage('reading');
         
         dialogueScreen.classList.remove('hidden');
@@ -148,10 +152,9 @@
     });
 
     function playNextDialogueLine() {
-        typeWriterEffect(rockyDialogue, rulesLines[currentLineIndex], 40);
+        typeWriterEffect(rockyDialogue, rulesLines[currentLineIndex], 50);
     }
 
-    // --- Sequence: Interrogation Gameplay ---
     function startInterrogation() {
         dialogueScreen.classList.remove('active');
         dialogueScreen.classList.add('hidden');
@@ -188,7 +191,7 @@
 
         const shuffledOptions = shuffleArray([...currentQ.opts]);
         optionBtns.forEach((btn, index) => {
-            btn.textContent = shuffledOptions[index]; // Secure text insertion
+            btn.textContent = shuffledOptions[index]; 
             btn.onclick = () => handleAnswer(btn.textContent, currentQ.ans);
             btn.disabled = false;
         });
@@ -200,7 +203,7 @@
     function startTimer() {
         let timeLeft = TIME_PER_QUESTION;
         timeLeftBar.style.width = '100%';
-        timeLeftBar.style.backgroundColor = '#00ff00';
+        timeLeftBar.style.backgroundColor = '#ffffff';
 
         clearInterval(timerInterval);
         timerInterval = setInterval(() => {
@@ -236,11 +239,12 @@
             bgElement.style.filter = "sepia(1) hue-rotate(-50deg) saturate(5) brightness(0.6)";
         }
 
+        // زدنا الوقت لـ 3.5 ثواني باش يبان التفاعل على خاطرو
         setTimeout(() => {
             bgElement.style.filter = "blur(0px) brightness(0.8)"; 
             currentQuestionIndex++;
             loadQuestion();
-        }, 2500);
+        }, 3500);
     }
 
     function endGame() {
@@ -254,7 +258,6 @@
         }
     }
 
-    // --- Initialize safely ---
     document.addEventListener('DOMContentLoaded', () => {
         startIntro();
     });
