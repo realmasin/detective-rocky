@@ -1,14 +1,18 @@
 (function() {
     
     // --- DOM Elements ---
-    const body = document.body;
-    const gameContainer = document.getElementById('game-container');
     const bgElement = document.getElementById('background');
     
     const introScreen = document.getElementById('intro-screen');
     const storyTextContainer = document.getElementById('story-text-container');
     const readyBtn = document.getElementById('ready-btn');
     const skipBtn = document.getElementById('skip-btn');
+    
+    const identityScreen = document.getElementById('identity-screen');
+    const usernameInput = document.getElementById('username-input');
+    const pfpInput = document.getElementById('pfp-input');
+    const submitIdentityBtn = document.getElementById('submit-identity-btn');
+    const identityError = document.getElementById('identity-error');
     
     const dialogueScreen = document.getElementById('dialogue-screen');
     const rockyDialogue = document.getElementById('rocky-dialogue');
@@ -23,9 +27,17 @@
     const digitalTimer = document.getElementById('digital-timer');
     
     const endgameScreen = document.getElementById('endgame-screen');
+    const resultCard = document.getElementById('result-card');
+    const cardPfp = document.getElementById('card-pfp');
+    const cardName = document.getElementById('card-name');
     const finalScoreEl = document.getElementById('final-score');
+    const cardStatus = document.getElementById('card-status');
     const endgameStamp = document.getElementById('endgame-stamp');
     const prisonBars = document.getElementById('prison-bars');
+    
+    const actionButtons = document.getElementById('action-buttons');
+    const downloadBtn = document.getElementById('download-btn');
+    const shareXBtn = document.getElementById('share-x-btn');
 
     // --- State Variables ---
     let currentQuestionIndex = 0;
@@ -35,6 +47,9 @@
     let scrambleIntervals = [];
     let isTyping = false;
     let currentLineIndex = 0;
+    
+    let playerName = "UNKNOWN";
+    let playerPfpSrc = "images/rocky-normal.jpg"; // Default fallback
     
     const TIME_PER_QUESTION_MS = 15000; 
 
@@ -48,12 +63,11 @@
 
     const rulesLines = [
         "Welcome... Have a seat.",
-        "I would offer you coffee, but our machine is broken.",
-        "Anyway, I am Rocky. I am on a special mission to catch spies in Seismic.",
+        "I am Rocky. I am on a special mission to catch spies in Seismic.",
         "During my investigation, I suspected you might be a spy.",
         "I brought you here today to ask you a few questions.",
         "Your answers will tell me if my suspicions were right or wrong.",
-        "I will ask you 8 questions. Answer them correctly before time runs out.",
+        "I will ask you 8 questions. Answer correctly before time runs out.",
         "Let's begin. I have hundreds of spies waiting to be caught."
     ];
 
@@ -91,7 +105,7 @@
     let isIntroTyping = false;
     let introTimeout;
 
-    // --- Core Mechanics ---
+    // --- Helpers ---
     function shuffleArray(array) {
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -104,7 +118,6 @@
         bgElement.style.backgroundImage = `url('images/rocky-${state}.jpg')`;
     }
 
-    // --- Cinematic Effects ---
     function typeWriterEffect(element, text, speed, onComplete) {
         isTyping = true;
         element.textContent = ''; 
@@ -122,13 +135,11 @@
         }, speed);
     }
 
-    // Hacker text scramble effect
     function scrambleText(element, finalString, duration) {
         const chars = '!<>-_\\/[]{}—=+*^?#_';
         let frame = 0;
         const maxFrames = duration / 30;
         let queue = [];
-        
         for(let i=0; i<finalString.length; i++) {
             queue.push({
                 char: finalString[i],
@@ -136,7 +147,6 @@
                 end: Math.floor(Math.random() * (maxFrames/2)) + (maxFrames/2)
             });
         }
-        
         const scrambleTimer = setInterval(() => {
             let output = '';
             let complete = 0;
@@ -166,16 +176,7 @@
         scrambleIntervals = [];
     }
 
-    function triggerGlitchShake() {
-        gameContainer.classList.add('shake-effect');
-        bgElement.classList.add('glitch-filter');
-        setTimeout(() => {
-            gameContainer.classList.remove('shake-effect');
-            bgElement.classList.remove('glitch-filter');
-        }, 400);
-    }
-
-    // --- Sequences ---
+    // --- Sequence 1: Intro ---
     function startIntro() {
         skipBtn.classList.remove('hidden');
         storyTextContainer.innerHTML = '';
@@ -223,13 +224,41 @@
     readyBtn.addEventListener('click', () => {
         introScreen.classList.remove('active');
         introScreen.classList.add('hidden');
-        bgElement.style.filter = "blur(8px) brightness(0.4)";
+        identityScreen.classList.remove('hidden');
+        identityScreen.classList.add('active');
+    });
+
+    // --- Sequence 2: Identity Form ---
+    submitIdentityBtn.addEventListener('click', () => {
+        const nameVal = usernameInput.value.trim();
+        const file = pfpInput.files[0];
+
+        if (!nameVal || !file) {
+            identityError.classList.remove('hidden');
+            return;
+        }
+        
+        identityError.classList.add('hidden');
+        playerName = nameVal;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            playerPfpSrc = e.target.result;
+            proceedToDialogue();
+        }
+        reader.readAsDataURL(file);
+    });
+
+    function proceedToDialogue() {
+        identityScreen.classList.remove('active');
+        identityScreen.classList.add('hidden');
         changeRockyImage('reading');
         dialogueScreen.classList.remove('hidden');
         dialogueScreen.classList.add('active');
         playNextDialogueLine();
-    });
+    }
 
+    // --- Sequence 3: Dialogue ---
     dialogueScreen.addEventListener('click', () => {
         if (isTyping) {
             clearInterval(typingInterval);
@@ -249,9 +278,10 @@
         rockyDialogue.textContent = '';
         scrambleText(rockyDialogue, rulesLines[currentLineIndex], 600);
         isTyping = true;
-        setTimeout(() => isTyping = false, 600); // sync mock typing state
+        setTimeout(() => isTyping = false, 600); 
     }
 
+    // --- Sequence 4: Interrogation Gameplay ---
     function startInterrogation() {
         dialogueScreen.classList.remove('active');
         dialogueScreen.classList.add('hidden');
@@ -259,7 +289,6 @@
         interrogationScreen.classList.add('active');
         
         changeRockyImage('normal');
-        bgElement.style.filter = "blur(0px) brightness(0.8)"; 
 
         activeQuestions = shuffleArray([...questionsDatabase]).slice(0, 8);
         currentQuestionIndex = 0;
@@ -351,7 +380,6 @@
         } else {
             changeRockyImage('angry');
             scrambleText(questionText, wrongReactions[Math.floor(Math.random() * wrongReactions.length)], 500);
-            triggerGlitchShake();
         }
 
         setTimeout(() => {
@@ -364,31 +392,66 @@
         }, 2500); 
     }
 
+    // --- Sequence 5: Endgame & Card Generation ---
     function triggerEndgame() {
         interrogationScreen.classList.remove('active');
         interrogationScreen.classList.add('hidden');
         endgameScreen.classList.remove('hidden');
         endgameScreen.classList.add('active');
         
+        // Populate the card
+        cardPfp.src = playerPfpSrc;
+        cardName.textContent = playerName;
         finalScoreEl.textContent = `${score}/8`;
-        bgElement.style.filter = "blur(15px) brightness(0.2)";
         
         setTimeout(() => {
             if (score >= 4) {
-                endgameStamp.textContent = "ACCESS GRANTED";
+                cardStatus.textContent = "VERIFIED MEMBER";
+                cardStatus.style.color = "var(--success-color)";
+                endgameStamp.innerHTML = "ACCESS<br>GRANTED";
                 endgameStamp.className = "stamp stamp-success show";
             } else {
+                cardStatus.textContent = "SPY DETECTED";
+                cardStatus.style.color = "var(--danger-color)";
+                
                 prisonBars.classList.remove('hidden');
                 setTimeout(() => prisonBars.classList.add('drop'), 50);
                 
                 setTimeout(() => {
-                    endgameStamp.textContent = "SPY DETECTED";
+                    endgameStamp.innerHTML = "SPY<br>DETECTED";
                     endgameStamp.className = "stamp stamp-danger show";
-                    triggerGlitchShake();
                 }, 800);
             }
+            
+            setTimeout(() => {
+                actionButtons.classList.remove('hidden');
+                actionButtons.classList.remove('fade-out');
+            }, 1500);
+
         }, 500);
     }
+
+    // --- Share and Download Handlers ---
+    downloadBtn.addEventListener('click', () => {
+        // Use html2canvas to capture the result card div
+        html2canvas(resultCard, {
+            backgroundColor: "#000000",
+            scale: 2 // High quality
+        }).then(canvas => {
+            const link = document.createElement('a');
+            link.download = `Seismic_Report_${playerName}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        });
+    });
+
+    shareXBtn.addEventListener('click', () => {
+        const isSpy = score < 4;
+        let tweetText = `Detective Rocky interrogated me at the Seismic Headquarters... 🕵️‍♂️\n\nAgent: ${playerName}\nScore: ${score}/8\nResult: ${isSpy ? 'Imprisoned as a SPY! 🚨' : 'Verified Elite Member! ✅'}\n\nCan you survive the interrogation? Play here: [YOUR_GAME_URL_HERE] @SeismicSystem`;
+        
+        const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
+        window.open(twitterUrl, '_blank');
+    });
 
     // --- Init ---
     document.addEventListener('DOMContentLoaded', () => {
