@@ -6,7 +6,7 @@
     <title>Seismic Interrogation</title>
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
-    <!-- html2canvas Library for capturing the result card as an image -->
+    <!-- html2canvas Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -16,7 +16,7 @@
         <!-- CRT Overlay Effect -->
         <div class="crt-overlay"></div>
         
-        <!-- Background (Now heavily blurred) -->
+        <!-- Background -->
         <div id="background" class="bg-blur"></div>
 
         <!-- Intro Screen -->
@@ -28,7 +28,7 @@
             </div>
         </div>
 
-        <!-- Identity Screen (New!) -->
+        <!-- Identity Screen -->
         <div id="identity-screen" class="screen hidden">
             <div class="hud-panel identity-form fade-element">
                 <h2>IDENTIFICATION REQUIRED</h2>
@@ -58,7 +58,7 @@
             </div>
         </div>
 
-        <!-- Interrogation Screen -->
+        <!-- Interrogation Screen (Layout Fixed) -->
         <div id="interrogation-screen" class="screen hidden">
             
             <div class="top-section fade-element" id="q-container">
@@ -75,6 +75,8 @@
                 </div>
             </div>
             
+            <!-- Removed the huge spacer here to keep layout compact -->
+            
             <div class="bottom-section fade-element" id="opt-container">
                 <div class="options-grid">
                     <button class="option-btn hud-panel" data-index="0"></button>
@@ -85,14 +87,13 @@
             </div>
         </div>
 
-        <!-- Endgame Screen (Result Card) -->
+        <!-- Endgame Screen -->
         <div id="endgame-screen" class="screen hidden">
             <div id="prison-bars" class="hidden">
                 <div class="bar"></div><div class="bar"></div><div class="bar"></div>
                 <div class="bar"></div><div class="bar"></div><div class="bar"></div>
             </div>
             
-            <!-- This card will be converted to an image -->
             <div id="result-card" class="result-card hud-panel">
                 <div class="card-header">SEISMIC INTERROGATION REPORT</div>
                 <div class="card-body">
@@ -108,7 +109,6 @@
                 <div id="endgame-stamp" class="stamp hidden"></div>
             </div>
 
-            <!-- Share / Download Action Buttons -->
             <div class="endgame-actions hud-panel fade-element hidden" id="action-buttons">
                 <button id="download-btn">[ DOWNLOAD_CARD ]</button>
                 <button id="share-x-btn">[ SHARE_ON_X ]</button>
