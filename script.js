@@ -30,6 +30,7 @@
     const resultCard = document.getElementById('result-card');
     const cardPfp = document.getElementById('card-pfp');
     const cardName = document.getElementById('card-name');
+    const cardId = document.getElementById('card-id');
     const finalScoreEl = document.getElementById('final-score');
     const cardStatus = document.getElementById('card-status');
     const endgameStamp = document.getElementById('endgame-stamp');
@@ -116,6 +117,10 @@
 
     function changeRockyImage(state) {
         bgElement.style.backgroundImage = `url('images/rocky-${state}.jpg')`;
+    }
+
+    function generateAgentID() {
+        return "SMC-" + Math.floor(1000 + Math.random() * 9000);
     }
 
     function typeWriterEffect(element, text, speed, onComplete) {
@@ -240,6 +245,7 @@
         
         identityError.classList.add('hidden');
         playerName = nameVal;
+        cardId.textContent = generateAgentID(); 
 
         const reader = new FileReader();
         reader.onload = function(e) {
@@ -405,7 +411,7 @@
         
         setTimeout(() => {
             if (score >= 4) {
-                cardStatus.textContent = "VERIFIED MEMBER";
+                cardStatus.textContent = "VERIFIED";
                 cardStatus.style.color = "var(--success-color)";
                 endgameStamp.innerHTML = "ACCESS<br>GRANTED";
                 endgameStamp.className = "stamp stamp-success show";
@@ -433,7 +439,7 @@
     // --- Share and Download Handlers ---
     downloadBtn.addEventListener('click', () => {
         html2canvas(resultCard, {
-            backgroundColor: "#000000",
+            backgroundColor: "#050505",
             scale: 2 
         }).then(canvas => {
             const link = document.createElement('a');
