@@ -1,1 +1,222 @@
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #050505;
+    color: #00ff00; /* Seismic system hacker green */
+    font-family: 'Share Tech Mono', monospace;
+    overflow: hidden;
+    user-select: none;
+}
+
+/* Game Container Container */
+#game-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Background Image and Blur Effect */
+#background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* Default image is rocky-normal */
+    background-image: url('images/rocky-normal.jpg');
+    background-size: cover;
+    background-position: center;
+    transition: filter 2s ease-in-out, background-image 0.5s ease;
+    z-index: 1;
+}
+
+/* Initial heavily blurred state */
+.bg-blur {
+    filter: blur(15px) brightness(0.3);
+}
+
+/* Vignette and CRT Shadow Overlay */
+#game-container::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* Creates the dark creepy edges */
+    background: radial-gradient(circle, rgba(0,0,0,0) 40%, rgba(0,0,0,0.95) 100%);
+    pointer-events: none;
+    z-index: 10;
+}
+
+/* Screen Management */
+.screen {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.active {
+    display: flex;
+}
+
+/* Intro Screen Typography */
+#intro-screen {
+    background-color: rgba(0, 0, 0, 0.7);
+    text-align: center;
+    padding: 2rem;
+}
+
+#story-text {
+    font-size: 1.5rem;
+    line-height: 2;
+    margin-bottom: 2rem;
+    max-width: 800px;
+    text-shadow: 0 0 5px #00ff00;
+}
+
+/* Global Buttons Style */
+button {
+    background-color: rgba(0, 0, 0, 0.5);
+    color: #00ff00;
+    border: 2px solid #00ff00;
+    padding: 15px 30px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 1.2rem;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
+}
+
+button:hover {
+    background-color: #00ff00;
+    color: #000;
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.8);
+}
+
+/* Dialogue Box */
+.dialogue-box {
+    position: absolute;
+    bottom: 50px;
+    width: 90%;
+    max-width: 800px;
+    background-color: rgba(0, 0, 0, 0.85);
+    border: 2px solid #00ff00;
+    padding: 20px;
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+}
+
+#rocky-dialogue {
+    font-size: 1.3rem;
+    line-height: 1.6;
+    min-height: 80px; /* Prevents height jumping */
+}
+
+/* Blinking click hint */
+.click-hint {
+    font-size: 0.9rem;
+    color: #55ff55;
+    text-align: right;
+    margin-top: 15px;
+    animation: blink 1.5s infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+/* Interrogation Layout */
+#interrogation-screen {
+    justify-content: flex-start;
+    padding-top: 5vh;
+}
+
+/* Timer Bar */
+.timer-bar {
+    width: 80%;
+    max-width: 700px;
+    height: 10px;
+    border: 1px solid #00ff00;
+    margin-bottom: 20px;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+#time-left {
+    height: 100%;
+    width: 100%;
+    background-color: #00ff00;
+    /* Smooth shrinking transition */
+    transition: width 1s linear, background-color 0.3s ease;
+}
+
+/* Question Area */
+.question-box {
+    background-color: rgba(0, 0, 0, 0.8);
+    border: 1px solid #00ff00;
+    padding: 20px;
+    width: 90%;
+    max-width: 700px;
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+#question-image {
+    max-width: 100%;
+    height: 200px;
+    object-fit: contain;
+    margin-bottom: 15px;
+    border: 1px solid #333;
+}
+
+#question-text {
+    font-size: 1.3rem;
+    text-shadow: 0 0 5px #00ff00;
+}
+
+/* Options Grid Layout */
+.options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    width: 90%;
+    max-width: 700px;
+}
+
+.option-btn {
+    padding: 15px;
+    font-size: 1.1rem;
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+/* Responsive adjustments for phones */
+@media (max-width: 600px) {
+    .options-grid {
+        grid-template-columns: 1fr; /* Stacks options vertically */
+    }
+    #story-text {
+        font-size: 1.2rem;
+    }
+    .dialogue-box {
+        bottom: 20px;
+    }
+}
 
