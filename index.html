@@ -4,18 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Seismic Interrogation</title>
+    <!-- External Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="game-container">
+        <!-- Background element -->
         <div id="background" class="bg-blur"></div>
 
         <!-- Intro Screen -->
         <div id="intro-screen" class="screen active">
             <div id="story-text"></div>
             <div class="intro-buttons">
-                <button id="skip-btn">Skip Intro</button>
+                <button id="skip-btn" class="hidden">Skip Intro</button>
                 <button id="ready-btn" class="hidden">I am ready for the interrogation</button>
             </div>
         </div>
@@ -30,15 +32,18 @@
 
         <!-- Interrogation Screen -->
         <div id="interrogation-screen" class="screen hidden">
-            <div class="top-section">
+            
+            <div class="timer-container">
                 <div class="timer-bar"><div id="time-left"></div></div>
-                <div class="question-box">
-                    <p id="question-text"></p>
-                    <img id="question-image" src="" alt="Question Image" class="hidden">
-                </div>
             </div>
             
-            <div class="bottom-section">
+            <!-- Added fade-element classes for smooth transitions -->
+            <div class="question-container fade-element" id="q-container">
+                <p id="question-text"></p>
+                <img id="question-image" src="" alt="Question Image" class="hidden">
+            </div>
+            
+            <div class="options-container fade-element" id="opt-container">
                 <div class="options-grid">
                     <button class="option-btn"></button>
                     <button class="option-btn"></button>
@@ -46,6 +51,7 @@
                     <button class="option-btn"></button>
                 </div>
             </div>
+
         </div>
     </div>
     <script src="script.js"></script>
