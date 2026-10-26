@@ -6,6 +6,8 @@
     <title>Seismic Interrogation</title>
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <!-- html2canvas Library for capturing the result card as an image -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -14,7 +16,7 @@
         <!-- CRT Overlay Effect -->
         <div class="crt-overlay"></div>
         
-        <!-- Background -->
+        <!-- Background (Now heavily blurred) -->
         <div id="background" class="bg-blur"></div>
 
         <!-- Intro Screen -->
@@ -22,7 +24,29 @@
             <div id="story-text-container"></div>
             <div class="intro-buttons">
                 <button id="skip-btn" class="hidden">[ SKIP_SEQUENCE ]</button>
-                <button id="ready-btn" class="hidden">[ INITIATE_INTERROGATION ]</button>
+                <button id="ready-btn" class="hidden">[ INITIATE_CONNECTION ]</button>
+            </div>
+        </div>
+
+        <!-- Identity Screen (New!) -->
+        <div id="identity-screen" class="screen hidden">
+            <div class="hud-panel identity-form fade-element">
+                <h2>IDENTIFICATION REQUIRED</h2>
+                <p class="subtitle">Please provide your credentials before entering room 7.</p>
+                
+                <div class="input-group">
+                    <label>AGENT NAME (USERNAME):</label>
+                    <input type="text" id="username-input" placeholder="e.g. SeismicHacker99" autocomplete="off" maxlength="15">
+                </div>
+                
+                <div class="input-group">
+                    <label>UPLOAD PFP (AVATAR):</label>
+                    <input type="file" id="pfp-input" accept="image/*">
+                </div>
+                
+                <div id="identity-error" class="error-text hidden">ALL FIELDS ARE REQUIRED!</div>
+                
+                <button id="submit-identity-btn" class="full-width-btn">[ VERIFY_IDENTITY ]</button>
             </div>
         </div>
 
@@ -37,26 +61,21 @@
         <!-- Interrogation Screen -->
         <div id="interrogation-screen" class="screen hidden">
             
-            <!-- Digital Timer -->
-            <div class="timer-container hud-panel">
-                <span class="timer-label">TIME_REMAINING: </span>
-                <span id="digital-timer">00:15:00</span>
-            </div>
-            
-            <!-- Question HUD -->
-            <div class="question-container hud-panel fade-element" id="q-container">
-                <p id="question-text"></p>
-                
-                <div id="image-wrapper" class="hidden">
-                    <img id="question-image" src="" alt="Target Data">
-                    <div class="scanner-line"></div>
+            <div class="top-section fade-element" id="q-container">
+                <div class="timer-container">
+                    <span class="timer-label">TIME: </span>
+                    <span id="digital-timer">00:15:00</span>
+                </div>
+                <div class="question-box hud-panel">
+                    <p id="question-text"></p>
+                    <div id="image-wrapper" class="hidden">
+                        <img id="question-image" src="" alt="Target Data">
+                        <div class="scanner-line"></div>
+                    </div>
                 </div>
             </div>
             
-            <div class="spacer"></div>
-            
-            <!-- Options HUD -->
-            <div class="options-container fade-element" id="opt-container">
+            <div class="bottom-section fade-element" id="opt-container">
                 <div class="options-grid">
                     <button class="option-btn hud-panel" data-index="0"></button>
                     <button class="option-btn hud-panel" data-index="1"></button>
@@ -66,20 +85,33 @@
             </div>
         </div>
 
-        <!-- Endgame Screen -->
+        <!-- Endgame Screen (Result Card) -->
         <div id="endgame-screen" class="screen hidden">
             <div id="prison-bars" class="hidden">
                 <div class="bar"></div><div class="bar"></div><div class="bar"></div>
                 <div class="bar"></div><div class="bar"></div><div class="bar"></div>
             </div>
             
-            <div class="report-card hud-panel">
-                <h2>INTERROGATION REPORT</h2>
-                <div class="report-stats">
-                    <p>TARGET: <span class="highlight">UNKNOWN</span></p>
-                    <p>SCORE: <span id="final-score" class="highlight">0/8</span></p>
+            <!-- This card will be converted to an image -->
+            <div id="result-card" class="result-card hud-panel">
+                <div class="card-header">SEISMIC INTERROGATION REPORT</div>
+                <div class="card-body">
+                    <div class="card-avatar">
+                        <img id="card-pfp" src="" alt="Agent PFP">
+                    </div>
+                    <div class="card-details">
+                        <p><strong>NAME:</strong> <span id="card-name">UNKNOWN</span></p>
+                        <p><strong>SCORE:</strong> <span id="final-score" class="highlight">0/8</span></p>
+                        <p><strong>STATUS:</strong> <span id="card-status">PENDING</span></p>
+                    </div>
                 </div>
                 <div id="endgame-stamp" class="stamp hidden"></div>
+            </div>
+
+            <!-- Share / Download Action Buttons -->
+            <div class="endgame-actions hud-panel fade-element hidden" id="action-buttons">
+                <button id="download-btn">[ DOWNLOAD_CARD ]</button>
+                <button id="share-x-btn">[ SHARE_ON_X ]</button>
             </div>
         </div>
 
