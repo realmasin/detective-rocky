@@ -13,7 +13,7 @@
 <body>
     <div id="game-container">
         
-        <!-- CRT Overlay Effect -->
+        <!-- CRT Overlay Effect (Fixed for full screen) -->
         <div class="crt-overlay"></div>
         
         <!-- Background -->
@@ -23,47 +23,47 @@
         <div id="intro-screen" class="screen active">
             <div id="story-text-container"></div>
             <div class="intro-buttons">
-                <button id="skip-btn" class="hidden">[ SKIP_SEQUENCE ]</button>
-                <button id="ready-btn" class="hidden">[ INITIATE_CONNECTION ]</button>
+                <button id="skip-btn" class="hidden">SKIP</button>
+                <!-- Creative Cyber Button -->
+                <button id="ready-btn" class="cyber-btn hidden">INITIATE_CONNECTION</button>
             </div>
         </div>
 
         <!-- Identity Screen -->
         <div id="identity-screen" class="screen hidden">
             <div class="hud-panel identity-form fade-element">
-                <h2>IDENTIFICATION REQUIRED</h2>
-                <p class="subtitle">Please provide your credentials before entering room 7.</p>
+                <h2>IDENTIFICATION</h2>
+                <p class="subtitle">Enter credentials for Room 7 access.</p>
                 
                 <div class="input-group">
-                    <label>AGENT NAME (USERNAME):</label>
-                    <input type="text" id="username-input" placeholder="e.g. SeismicHacker99" autocomplete="off" maxlength="15">
+                    <label>AGENT ID:</label>
+                    <input type="text" id="username-input" placeholder="e.g. SeismicHacker" autocomplete="off" maxlength="15">
                 </div>
                 
                 <div class="input-group">
-                    <label>UPLOAD PFP (AVATAR):</label>
+                    <label>BIOMETRIC SCAN (PFP):</label>
                     <input type="file" id="pfp-input" accept="image/*">
                 </div>
                 
-                <div id="identity-error" class="error-text hidden">ALL FIELDS ARE REQUIRED!</div>
+                <div id="identity-error" class="error-text hidden">CREDENTIALS MISSING!</div>
                 
-                <button id="submit-identity-btn" class="full-width-btn">[ VERIFY_IDENTITY ]</button>
+                <button id="submit-identity-btn" class="cyber-btn full-width-btn">VERIFY</button>
             </div>
         </div>
 
-        <!-- Dialogue Screen -->
+        <!-- Dialogue Screen (Moved to center, hint removed) -->
         <div id="dialogue-screen" class="screen hidden">
             <div class="dialogue-box hud-panel">
                 <p id="rocky-dialogue"></p>
-                <p class="click-hint">> CLICK TO CONTINUE_</p>
             </div>
         </div>
 
-        <!-- Interrogation Screen (Layout Fixed) -->
+        <!-- Interrogation Screen -->
         <div id="interrogation-screen" class="screen hidden">
             
             <div class="top-section fade-element" id="q-container">
                 <div class="timer-container">
-                    <span class="timer-label">TIME: </span>
+                    <span class="timer-label">SYS_TIME: </span>
                     <span id="digital-timer">00:15:00</span>
                 </div>
                 <div class="question-box hud-panel">
@@ -74,8 +74,6 @@
                     </div>
                 </div>
             </div>
-            
-            <!-- Removed the huge spacer here to keep layout compact -->
             
             <div class="bottom-section fade-element" id="opt-container">
                 <div class="options-grid">
@@ -94,24 +92,47 @@
                 <div class="bar"></div><div class="bar"></div><div class="bar"></div>
             </div>
             
-            <div id="result-card" class="result-card hud-panel">
-                <div class="card-header">SEISMIC INTERROGATION REPORT</div>
-                <div class="card-body">
-                    <div class="card-avatar">
-                        <img id="card-pfp" src="" alt="Agent PFP">
+            <!-- Highly creative result card layout -->
+            <div id="result-card" class="classified-card hud-panel">
+                <div class="card-top-bar">CLASSIFIED DOSSIER</div>
+                
+                <div class="card-main">
+                    <div class="card-photo-wrapper">
+                        <img id="card-pfp" src="" alt="Subject Photo">
+                        <div class="photo-overlay"></div>
                     </div>
-                    <div class="card-details">
-                        <p><strong>NAME:</strong> <span id="card-name">UNKNOWN</span></p>
-                        <p><strong>SCORE:</strong> <span id="final-score" class="highlight">0/8</span></p>
-                        <p><strong>STATUS:</strong> <span id="card-status">PENDING</span></p>
+                    
+                    <div class="card-info">
+                        <div class="info-row">
+                            <span class="label">SUBJECT:</span>
+                            <span id="card-name" class="value">UNKNOWN</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">ID NO:</span>
+                            <span id="card-id" class="value">SMC-0000</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">INTEL SCORE:</span>
+                            <span id="final-score" class="value highlight">0/8</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">THREAT LEVEL:</span>
+                            <span id="card-status" class="value">EVALUATING</span>
+                        </div>
                     </div>
                 </div>
+                
+                <div class="card-bottom">
+                    <div class="barcode"></div>
+                </div>
+                
+                <!-- Stamp moved to avoid overlapping text -->
                 <div id="endgame-stamp" class="stamp hidden"></div>
             </div>
 
             <div class="endgame-actions hud-panel fade-element hidden" id="action-buttons">
-                <button id="download-btn">[ DOWNLOAD_CARD ]</button>
-                <button id="share-x-btn">[ SHARE_ON_X ]</button>
+                <button id="download-btn">DOWNLOAD</button>
+                <button id="share-x-btn">SHARE ON X</button>
             </div>
         </div>
 
