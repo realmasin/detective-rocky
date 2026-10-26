@@ -49,7 +49,7 @@
     let currentLineIndex = 0;
     
     let playerName = "UNKNOWN";
-    let playerPfpSrc = "images/rocky-normal.jpg"; // Default fallback
+    let playerPfpSrc = "images/rocky-normal.jpg"; 
     
     const TIME_PER_QUESTION_MS = 15000; 
 
@@ -399,7 +399,6 @@
         endgameScreen.classList.remove('hidden');
         endgameScreen.classList.add('active');
         
-        // Populate the card
         cardPfp.src = playerPfpSrc;
         cardName.textContent = playerName;
         finalScoreEl.textContent = `${score}/8`;
@@ -433,10 +432,9 @@
 
     // --- Share and Download Handlers ---
     downloadBtn.addEventListener('click', () => {
-        // Use html2canvas to capture the result card div
         html2canvas(resultCard, {
             backgroundColor: "#000000",
-            scale: 2 // High quality
+            scale: 2 
         }).then(canvas => {
             const link = document.createElement('a');
             link.download = `Seismic_Report_${playerName}.png`;
