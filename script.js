@@ -2,6 +2,7 @@
     
     // --- DOM Elements ---
     const bgElement = document.getElementById('background');
+    const randomHash = document.getElementById('random-hash');
     
     const introScreen = document.getElementById('intro-screen');
     const storyTextContainer = document.getElementById('story-text-container');
@@ -40,7 +41,7 @@
     const downloadBtn = document.getElementById('download-btn');
     const shareXBtn = document.getElementById('share-x-btn');
 
-    // --- State Variables ---
+    // --- Variables ---
     let currentQuestionIndex = 0;
     let score = 0;
     let timerReq;
@@ -48,6 +49,7 @@
     let scrambleIntervals = [];
     let isTyping = false;
     let currentLineIndex = 0;
+    let glitchInterval;
     
     let playerName = "UNKNOWN";
     let playerPfpSrc = "images/rocky-normal.jpg"; 
@@ -106,7 +108,7 @@
     let isIntroTyping = false;
     let introTimeout;
 
-    // --- Helpers ---
+    // --- Utility & FX Functions ---
     function shuffleArray(array) {
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -121,6 +123,21 @@
 
     function generateAgentID() {
         return "SMC-" + Math.floor(1000 + Math.random() * 9000);
+    }
+
+    // Top bar hash generator
+    setInterval(() => {
+        randomHash.textContent = "HASH: 0x" + Math.floor(Math.random()*16777215).toString(16).toUpperCase();
+    }, 2000);
+
+    // Random Micro Glitches for Rocky's background
+    function startMicroGlitches() {
+        glitchInterval = setInterval(() => {
+            if(Math.random() > 0.7) { // 30% chance every 3s
+                bgElement.classList.add('random-glitch');
+                setTimeout(() => bgElement.classList.remove('random-glitch'), 200);
+            }
+        }, 3000);
     }
 
     function typeWriterEffect(element, text, speed, onComplete) {
@@ -181,7 +198,7 @@
         scrambleIntervals = [];
     }
 
-    // --- Sequence 1: Intro ---
+    // --- Sequences ---
     function startIntro() {
         skipBtn.classList.remove('hidden');
         storyTextContainer.innerHTML = '';
@@ -190,28 +207,23 @@
 
         function showNextLine() {
             if (!isIntroTyping) return;
-            storyTextContainer.style.opacity = '0';
-            setTimeout(() => {
-                if (!isIntroTyping) return;
-                storyTextContainer.innerHTML = '';
-                const lineDiv = document.createElement('div');
-                lineDiv.className = 'intro-line';
-                storyTextContainer.appendChild(lineDiv);
-                storyTextContainer.style.opacity = '1';
-                
-                typeWriterEffect(lineDiv, introLines[lineIndex], 40, () => {
-                    lineIndex++;
-                    if (lineIndex < introLines.length) {
-                        introTimeout = setTimeout(showNextLine, 1000); 
-                    } else {
-                        introTimeout = setTimeout(() => {
-                            isIntroTyping = false;
-                            readyBtn.classList.remove('hidden');
-                            skipBtn.classList.add('hidden');
-                        }, 800);
-                    }
-                });
-            }, 500); 
+            storyTextContainer.innerHTML = '';
+            const lineDiv = document.createElement('div');
+            lineDiv.className = 'intro-line';
+            storyTextContainer.appendChild(lineDiv);
+            
+            typeWriterEffect(lineDiv, introLines[lineIndex], 40, () => {
+                lineIndex++;
+                if (lineIndex < introLines.length) {
+                    introTimeout = setTimeout(showNextLine, 1000); 
+                } else {
+                    introTimeout = setTimeout(() => {
+                        isIntroTyping = false;
+                        readyBtn.classList.remove('hidden');
+                        skipBtn.classList.add('hidden');
+                    }, 800);
+                }
+            });
         }
         showNextLine();
     }
@@ -220,7 +232,6 @@
         isIntroTyping = false;
         clearInterval(typingInterval);
         clearTimeout(introTimeout);
-        storyTextContainer.style.opacity = '1';
         storyTextContainer.innerHTML = `<div class="intro-line">${introLines[introLines.length - 1]}</div>`;
         readyBtn.classList.remove('hidden');
         skipBtn.classList.add('hidden');
@@ -233,16 +244,13 @@
         identityScreen.classList.add('active');
     });
 
-    // --- Sequence 2: Identity Form ---
     submitIdentityBtn.addEventListener('click', () => {
         const nameVal = usernameInput.value.trim();
         const file = pfpInput.files[0];
-
         if (!nameVal || !file) {
             identityError.classList.remove('hidden');
             return;
         }
-        
         identityError.classList.add('hidden');
         playerName = nameVal;
         cardId.textContent = generateAgentID(); 
@@ -262,9 +270,9 @@
         dialogueScreen.classList.remove('hidden');
         dialogueScreen.classList.add('active');
         playNextDialogueLine();
+        startMicroGlitches(); // Start eerie glitches
     }
 
-    // --- Sequence 3: Dialogue ---
     dialogueScreen.addEventListener('click', () => {
         if (isTyping) {
             clearInterval(typingInterval);
@@ -282,12 +290,11 @@
 
     function playNextDialogueLine() {
         rockyDialogue.textContent = '';
-        scrambleText(rockyDialogue, rulesLines[currentLineIndex], 600);
+        scrambleText(rockyDialogue, rulesLines[currentLineIndex], 500);
         isTyping = true;
-        setTimeout(() => isTyping = false, 600); 
+        setTimeout(() => isTyping = false, 500); 
     }
 
-    // --- Sequence 4: Interrogation Gameplay ---
     function startInterrogation() {
         dialogueScreen.classList.remove('active');
         dialogueScreen.classList.add('hidden');
@@ -295,7 +302,6 @@
         interrogationScreen.classList.add('active');
         
         changeRockyImage('normal');
-
         activeQuestions = shuffleArray([...questionsDatabase]).slice(0, 8);
         currentQuestionIndex = 0;
         score = 0;
@@ -307,7 +313,6 @@
             triggerEndgame();
             return;
         }
-
         clearScrambles();
         const currentQ = activeQuestions[currentQuestionIndex];
         
@@ -324,7 +329,7 @@
         const shuffledOptions = shuffleArray([...currentQ.opts]);
         optionBtns.forEach((btn, index) => {
             btn.textContent = ""; 
-            scrambleText(btn, shuffledOptions[index], 1000 + (index*200));
+            scrambleText(btn, shuffledOptions[index], 1000 + (index*100));
             btn.onclick = () => handleAnswer(shuffledOptions[index], currentQ.ans);
             btn.disabled = false;
         });
@@ -350,21 +355,17 @@
     function startDigitalTimer() {
         let startTime = Date.now();
         cancelAnimationFrame(timerReq);
-
         function update() {
             let elapsed = Date.now() - startTime;
             let timeLeft = TIME_PER_QUESTION_MS - elapsed;
             
-            if (timeLeft <= 4000) {
-                digitalTimer.classList.add('timer-danger');
-            }
+            if (timeLeft <= 4000) digitalTimer.classList.add('timer-danger');
             
             if(timeLeft <= 0) {
                 digitalTimer.textContent = "00:00:00";
                 handleAnswer(null, activeQuestions[currentQuestionIndex].ans);
                 return;
             }
-            
             digitalTimer.textContent = formatTime(timeLeft);
             timerReq = requestAnimationFrame(update);
         }
@@ -386,6 +387,8 @@
         } else {
             changeRockyImage('angry');
             scrambleText(questionText, wrongReactions[Math.floor(Math.random() * wrongReactions.length)], 500);
+            bgElement.classList.add('random-glitch'); // Force glitch on wrong
+            setTimeout(() => bgElement.classList.remove('random-glitch'), 300);
         }
 
         setTimeout(() => {
@@ -395,11 +398,12 @@
                 currentQuestionIndex++;
                 loadQuestion();
             }, 400);
-        }, 2500); 
+        }, 2000); 
     }
 
-    // --- Sequence 5: Endgame & Card Generation ---
+    // --- Sequence 5: 3D Endgame ---
     function triggerEndgame() {
+        clearInterval(glitchInterval);
         interrogationScreen.classList.remove('active');
         interrogationScreen.classList.add('hidden');
         endgameScreen.classList.remove('hidden');
@@ -418,7 +422,6 @@
             } else {
                 cardStatus.textContent = "SPY DETECTED";
                 cardStatus.style.color = "var(--danger-color)";
-                
                 prisonBars.classList.remove('hidden');
                 setTimeout(() => prisonBars.classList.add('drop'), 50);
                 
@@ -436,28 +439,46 @@
         }, 500);
     }
 
-    // --- Share and Download Handlers ---
+    // 3D Card Mouse Parallax Effect
+    document.addEventListener('mousemove', (e) => {
+        if (endgameScreen.classList.contains('active')) {
+            // Calculate mouse position relative to center of screen
+            let xAxis = (window.innerWidth / 2 - e.pageX) / 25;
+            let yAxis = (window.innerHeight / 2 - e.pageY) / 25;
+            resultCard.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+        }
+    });
+
+    // Reset 3D effect temporarily before saving image
     downloadBtn.addEventListener('click', () => {
-        html2canvas(resultCard, {
-            backgroundColor: "#050505",
-            scale: 2 
-        }).then(canvas => {
-            const link = document.createElement('a');
-            link.download = `Seismic_Report_${playerName}.png`;
-            link.href = canvas.toDataURL('image/png');
-            link.click();
-        });
+        // Save current transform to restore later
+        const currentTransform = resultCard.style.transform;
+        // Flatten card for clean screenshot
+        resultCard.style.transform = 'rotateY(0deg) rotateX(0deg)';
+        
+        setTimeout(() => {
+            html2canvas(resultCard, {
+                backgroundColor: "#0c0c0c",
+                scale: 2 
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `Seismic_Report_${playerName}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                
+                // Restore 3D
+                resultCard.style.transform = currentTransform;
+            });
+        }, 100); // Small delay to let CSS update
     });
 
     shareXBtn.addEventListener('click', () => {
         const isSpy = score < 4;
         let tweetText = `Detective Rocky interrogated me at the Seismic Headquarters... 🕵️‍♂️\n\nAgent: ${playerName}\nScore: ${score}/8\nResult: ${isSpy ? 'Imprisoned as a SPY! 🚨' : 'Verified Elite Member! ✅'}\n\nCan you survive the interrogation? Play here: [YOUR_GAME_URL_HERE] @SeismicSystem`;
-        
         const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
         window.open(twitterUrl, '_blank');
     });
 
-    // --- Init ---
     document.addEventListener('DOMContentLoaded', () => {
         startIntro();
     });
