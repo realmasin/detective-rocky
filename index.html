@@ -1,1 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seismic Interrogation</title>
+    <!-- خطوط بستايل الأنظمة (Terminal/Hacker vibe) -->
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <!-- ربط ملف التصميم -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    
+    <!-- الحاوية الرئيسية للعبة -->
+    <div id="game-container">
+        
+        <!-- خلفية روكي (غتكون مضببة في الأول) -->
+        <div id="background" class="bg-blur"></div>
+
+        <!-- شاشة البداية (القصة السينمائية) -->
+        <div id="intro-screen" class="screen active">
+            <div id="story-text"></div>
+            <button id="ready-btn" class="hidden">I am ready for the interrogation</button>
+        </div>
+
+        <!-- شاشة حوار روكي والقواعد -->
+        <div id="dialogue-screen" class="screen hidden">
+            <div class="dialogue-box">
+                <p id="rocky-dialogue"></p>
+                <p class="click-hint">Click anywhere to continue...</p>
+            </div>
+        </div>
+
+        <!-- شاشة الاستجواب (الأسئلة) -->
+        <div id="interrogation-screen" class="screen hidden">
+            <div class="timer-bar"><div id="time-left"></div></div>
+            <div class="question-box">
+                <img id="question-image" src="" alt="Question Image" class="hidden">
+                <p id="question-text"></p>
+            </div>
+            <div class="options-grid">
+                <button class="option-btn"></button>
+                <button class="option-btn"></button>
+                <button class="option-btn"></button>
+                <button class="option-btn"></button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ربط ملف البرمجة -->
+    <script src="script.js"></script>
+</body>
+</html>
 
