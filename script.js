@@ -108,32 +108,43 @@
         bgElement.style.backgroundImage = `url('images/rocky-${state}.jpg')`;
     }
 
-    // --- Intro Sequence (Line by Line) ---
     function startIntro() {
         skipBtn.classList.remove('hidden');
         storyTextContainer.innerHTML = '';
         let lineIndex = 0;
         isIntroTyping = true;
 
-        function typeNextLine() {
+        function showNextLine() {
             if (!isIntroTyping) return;
             
-            if (lineIndex < introLines.length) {
+            storyTextContainer.style.opacity = '0';
+            
+            setTimeout(() => {
+                if (!isIntroTyping) return;
+                
+                storyTextContainer.innerHTML = '';
                 const lineDiv = document.createElement('div');
                 lineDiv.className = 'intro-line';
                 storyTextContainer.appendChild(lineDiv);
                 
-                typeWriterEffect(lineDiv, introLines[lineIndex], 50, () => {
+                storyTextContainer.style.opacity = '1';
+                
+                typeWriterEffect(lineDiv, introLines[lineIndex], 60, () => {
                     lineIndex++;
-                    introTimeout = setTimeout(typeNextLine, 500); 
+                    if (lineIndex < introLines.length) {
+                        introTimeout = setTimeout(showNextLine, 1500); 
+                    } else {
+                        introTimeout = setTimeout(() => {
+                            isIntroTyping = false;
+                            readyBtn.classList.remove('hidden');
+                            skipBtn.classList.add('hidden');
+                        }, 1000);
+                    }
                 });
-            } else {
-                isIntroTyping = false;
-                readyBtn.classList.remove('hidden');
-                skipBtn.classList.add('hidden');
-            }
+            }, 800); 
         }
-        typeNextLine();
+        
+        showNextLine();
     }
 
     skipBtn.addEventListener('click', () => {
@@ -141,13 +152,8 @@
         clearInterval(typingInterval);
         clearTimeout(introTimeout);
         
-        storyTextContainer.innerHTML = '';
-        introLines.forEach(line => {
-            const lineDiv = document.createElement('div');
-            lineDiv.className = 'intro-line';
-            lineDiv.textContent = line;
-            storyTextContainer.appendChild(lineDiv);
-        });
+        storyTextContainer.style.opacity = '1';
+        storyTextContainer.innerHTML = `<div class="intro-line">${introLines[introLines.length - 1]}</div>`;
         
         readyBtn.classList.remove('hidden');
         skipBtn.classList.add('hidden');
@@ -166,7 +172,6 @@
         playNextDialogueLine();
     });
 
-    // --- Dialogue Sequence ---
     dialogueScreen.addEventListener('click', () => {
         if (isTyping) {
             clearInterval(typingInterval);
@@ -186,7 +191,6 @@
         typeWriterEffect(rockyDialogue, rulesLines[currentLineIndex], 50);
     }
 
-    // --- Interrogation Sequence ---
     function startInterrogation() {
         dialogueScreen.classList.remove('active');
         dialogueScreen.classList.add('hidden');
@@ -238,7 +242,7 @@
     function startTimer() {
         let timeLeft = TIME_PER_QUESTION;
         timeLeftBar.style.width = '100%';
-        timeLeftBar.style.backgroundColor = '#ffffff';
+        timeLeftBar.style.backgroundColor = 'var(--seismic-primary)';
 
         clearInterval(timerInterval);
         timerInterval = setInterval(() => {
@@ -247,7 +251,7 @@
             timeLeftBar.style.width = `${percentage}%`;
 
             if (percentage < 30) {
-                timeLeftBar.style.backgroundColor = '#ff0000'; 
+                timeLeftBar.style.backgroundColor = 'var(--seismic-danger)'; 
             }
 
             if (timeLeft <= 0) {
