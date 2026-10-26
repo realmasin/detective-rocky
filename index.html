@@ -4,17 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Seismic Interrogation</title>
-    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="game-container">
         
-        <!-- Animated Background -->
         <div id="background" class="bg-blur"></div>
 
-        <!-- Intro Screen -->
         <div id="intro-screen" class="screen active">
             <div id="story-text-container"></div>
             <div class="intro-buttons">
@@ -23,7 +20,6 @@
             </div>
         </div>
 
-        <!-- Dialogue Screen -->
         <div id="dialogue-screen" class="screen hidden">
             <div class="dialogue-box">
                 <p id="rocky-dialogue"></p>
@@ -31,10 +27,8 @@
             </div>
         </div>
 
-        <!-- Interrogation Screen -->
         <div id="interrogation-screen" class="screen hidden">
             
-            <!-- Top part: Timer and Question -->
             <div class="top-section fade-element" id="q-container">
                 <div class="timer-bar"><div id="time-left"></div></div>
                 <div class="question-box">
@@ -43,10 +37,8 @@
                 </div>
             </div>
             
-            <!-- Empty space to show Rocky's face -->
             <div class="spacer"></div>
             
-            <!-- Bottom part: 2x2 Options Grid -->
             <div class="bottom-section fade-element" id="opt-container">
                 <div class="options-grid">
                     <button class="option-btn"></button>
