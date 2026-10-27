@@ -1,6 +1,6 @@
 (function() {
     
-    // --- DOM Elements ---
+    // DOM Cache
     const transitionOverlay = document.getElementById('transition-overlay');
     const bgElement = document.getElementById('background');
     const randomHash = document.getElementById('random-hash');
@@ -42,7 +42,6 @@
     const endgameStamp = document.getElementById('endgame-stamp');
     const prisonBars = document.getElementById('prison-bars');
     
-    const actionButtons = document.getElementById('action-buttons');
     const downloadBtn = document.getElementById('download-btn');
     const shareXBtn = document.getElementById('share-x-btn');
 
@@ -59,7 +58,6 @@
     
     const TIME_PER_QUESTION_MS = 15000; 
 
-    // Story
     const introLines = [
         "> CONNECTING TO SEISMIC MAINFRAME...",
         "> AUTHENTICATION: SUCCESS.",
@@ -113,7 +111,6 @@
     let isIntroTyping = false;
     let introTimeout;
 
-    // Core Helpers
     function shuffleArray(array) {
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -146,24 +143,21 @@
         glitchOverlay.classList.add('flash-glitch');
     }
 
-    // --- Cinematic Screen Transition Function ---
-    // This solves the "dead / sudden jump" feeling
+    // Cinematic Overlay Transition
     async function transitionScreen(fromElement, toElement) {
-        // 1. Fade to black
         transitionOverlay.classList.add('transition-active');
-        await new Promise(r => setTimeout(r, 800)); // wait for fade to finish
+        await new Promise(r => setTimeout(r, 600)); 
         
-        // 2. Swap screens silently
         fromElement.classList.remove('active');
         fromElement.classList.add('hidden');
         toElement.classList.remove('hidden');
         toElement.classList.add('active');
         
-        // 3. Fade from black
-        await new Promise(r => setTimeout(r, 200)); // small buffer
+        await new Promise(r => setTimeout(r, 200)); 
         transitionOverlay.classList.remove('transition-active');
     }
 
+    // Advanced Typewriter
     function typeWriterEffect(element, text, speed, onComplete) {
         isTyping = true;
         element.textContent = ''; 
@@ -181,7 +175,11 @@
         }, speed);
     }
 
-    // Sequence 1: Boot Intro
+    function safeInjectText(element, text) {
+        element.textContent = text;
+    }
+
+    // Sequence 1: Boot
     function startIntro() {
         skipBtn.classList.remove('hidden');
         storyTextContainer.innerHTML = '';
@@ -194,16 +192,18 @@
             lineDiv.className = 'intro-line';
             storyTextContainer.appendChild(lineDiv);
             
-            typeWriterEffect(lineDiv, introLines[lineIndex], 40, () => {
+            // Speed up slightly for realism, add pause between lines
+            typeWriterEffect(lineDiv, introLines[lineIndex], 30, () => {
                 lineIndex++;
                 if (lineIndex < introLines.length) {
-                    introTimeout = setTimeout(showNextLine, 800); 
+                    introTimeout = setTimeout(showNextLine, 600); 
                 } else {
                     introTimeout = setTimeout(() => {
                         isIntroTyping = false;
                         readyBtn.classList.remove('hidden');
+                        readyBtn.classList.add('decode-reveal'); // Cinematic button entry
                         skipBtn.classList.add('hidden');
-                    }, 500);
+                    }, 800);
                 }
             });
         }
@@ -222,17 +222,18 @@
             storyTextContainer.appendChild(div);
         });
         readyBtn.classList.remove('hidden');
+        readyBtn.classList.add('decode-reveal');
         skipBtn.classList.add('hidden');
     });
 
     readyBtn.addEventListener('click', async () => {
-        readyBtn.textContent = 'CONNECTING...';
+        readyBtn.innerHTML = '<span class="btn-text">ESTABLISHING...</span>';
         readyBtn.classList.add('processing');
-        await new Promise(r => setTimeout(r, 1000));
+        await new Promise(r => setTimeout(r, 1200));
         await transitionScreen(introScreen, identityScreen);
     });
 
-    // Sequence 2: Identity
+    // Sequence 2: Form
     submitIdentityBtn.addEventListener('click', async () => {
         const nameVal = usernameInput.value.trim();
         const file = pfpInput.files[0];
@@ -248,9 +249,9 @@
         const reader = new FileReader();
         reader.onload = async function(e) {
             playerPfpSrc = e.target.result;
-            submitIdentityBtn.textContent = 'PROCESSING DATA...';
+            submitIdentityBtn.textContent = 'ENCRYPTING DATA...';
             submitIdentityBtn.classList.add('processing');
-            await new Promise(r => setTimeout(r, 1200));
+            await new Promise(r => setTimeout(r, 1500));
             proceedToDialogue();
         }
         reader.readAsDataURL(file);
@@ -273,7 +274,6 @@
             if (currentLineIndex < rulesLines.length) {
                 playNextDialogueLine();
             } else {
-                // Fade out before game starts
                 await transitionScreen(dialogueScreen, interrogationScreen);
                 changeRockyImage('normal');
                 activeQuestions = shuffleArray([...questionsDatabase]).slice(0, 8);
@@ -288,7 +288,7 @@
         typeWriterEffect(rockyDialogue, rulesLines[currentLineIndex], 40);
     }
 
-    // Sequence 3: Gameplay
+    // Sequence 3: Quiz
     function loadQuestion() {
         if (currentQuestionIndex >= activeQuestions.length) {
             triggerEndgame();
@@ -296,7 +296,7 @@
         }
         
         const currentQ = activeQuestions[currentQuestionIndex];
-        questionText.textContent = currentQ.q;
+        safeInjectText(questionText, currentQ.q);
         
         if (currentQ.img !== "") {
             questionImage.src = currentQ.img;
@@ -308,8 +308,8 @@
 
         const shuffledOptions = shuffleArray([...currentQ.opts]);
         optionBtns.forEach((btn, index) => {
-            btn.textContent = shuffledOptions[index];
-            btn.className = 'option-btn hud-panel cyber-hover'; // Reset classes
+            safeInjectText(btn, shuffledOptions[index]);
+            btn.className = 'option-btn hud-panel cyber-hover'; 
             btn.disabled = false;
             btn.onclick = () => handleAnswer(btn, shuffledOptions[index], currentQ.ans);
         });
@@ -356,27 +356,25 @@
         const decodedCorrect = atob(encodedCorrectAnswer);
         let isCorrect = (selectedText === decodedCorrect);
 
-        // Immediate visual feedback on the button
         if(clickedBtn) {
             if(isCorrect) clickedBtn.classList.add('selected-correct');
             else clickedBtn.classList.add('selected-wrong');
         }
 
-        await new Promise(r => setTimeout(r, 600)); // Pause to let user see their choice
+        await new Promise(r => setTimeout(r, 800)); 
 
         if (isCorrect) {
             score++;
             changeRockyImage('smiling');
-            questionText.textContent = correctReactions[Math.floor(Math.random() * correctReactions.length)];
+            safeInjectText(questionText, correctReactions[Math.floor(Math.random() * correctReactions.length)]);
         } else {
             changeRockyImage('angry');
-            questionText.textContent = wrongReactions[Math.floor(Math.random() * wrongReactions.length)];
+            safeInjectText(questionText, wrongReactions[Math.floor(Math.random() * wrongReactions.length)]);
             triggerFlash(); 
         }
 
-        await new Promise(r => setTimeout(r, 2500)); // Let them read Rocky's reaction
+        await new Promise(r => setTimeout(r, 2200)); 
         
-        // Fade to black to load next question smoothly
         transitionOverlay.classList.add('transition-active');
         await new Promise(r => setTimeout(r, 600));
         
@@ -387,11 +385,10 @@
         transitionOverlay.classList.remove('transition-active');
     }
 
-    // Sequence 4: Endgame
+    // Sequence 4: Card
     async function triggerEndgame() {
         clearInterval(lightGlitchInterval);
         
-        // Final Fade to Black
         await transitionScreen(interrogationScreen, endgameScreen);
         
         cardPfp.src = playerPfpSrc;
@@ -432,10 +429,9 @@
         downloadBtn.textContent = 'GENERATING...';
         downloadBtn.classList.add('processing');
         
-        // Render exact 800x450 card regardless of screen scale
         html2canvas(resultCard, {
             backgroundColor: "#080808",
-            scale: 2 // High Res
+            scale: 2 
         }).then(canvas => {
             const link = document.createElement('a');
             link.download = `Seismic_Dossier_${playerName}.png`;
