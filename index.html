@@ -4,43 +4,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Seismic Interrogation</title>
-    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     
-    <!-- Cinematic Fade Overlay -->
     <div id="transition-overlay"></div>
 
     <div id="game-container">
         
-        <!-- Environment -->
         <div class="crt-overlay"></div>
         <div id="glitch-overlay"></div>
         <div id="background" class="bg-blur"></div>
 
-        <!-- Top Status Bar -->
         <div id="top-status-bar">
             <span>SEISMIC_SYS // DEPT-7</span>
             <span id="random-hash">AUTH: 0x0000</span>
             <span class="blinking-dot">LIVE</span>
         </div>
 
-        <!-- WOW Intro Screen (Terminal Boot) -->
+        <!-- Intro Screen -->
         <div id="intro-screen" class="screen active">
-            <div class="terminal-window hud-panel">
-                <div class="terminal-header">
-                    <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
-                    <span class="terminal-title">BOOT_SEQ_V3.0</span>
-                </div>
+            <div class="terminal-window">
                 <div class="terminal-body" id="story-text-container"></div>
             </div>
             
-            <button id="skip-btn" class="hidden">SKIP_BOOT_SEQ >></button>
+            <button id="skip-btn" class="hidden">SKIP >></button>
             <div class="intro-buttons">
-                <button id="ready-btn" class="cyber-btn hidden">ESTABLISH_CONNECTION</button>
+                <button id="ready-btn" class="cyber-btn hidden">
+                    <span class="btn-text">CONNECT_TO_TERMINAL</span>
+                </button>
             </div>
         </div>
 
@@ -56,7 +50,7 @@
                     <input type="text" id="username-input" placeholder="Enter codename" autocomplete="off" maxlength="15">
                 </div>
                 <div class="input-group">
-                    <label>> UPLOAD_BIOMETRICS (PFP):</label>
+                    <label>> BIOMETRIC_SCAN (UPLOAD):</label>
                     <input type="file" id="pfp-input" accept="image/*">
                 </div>
                 <div id="identity-error" class="error-text hidden">ERR: ALL FIELDS REQUIRED</div>
@@ -64,11 +58,13 @@
             </div>
         </div>
 
-        <!-- Dialogue Screen -->
+        <!-- Dialogue Screen (Redesigned) -->
         <div id="dialogue-screen" class="screen hidden">
-            <div class="dialogue-box hud-panel">
+            <div class="cinematic-subtitle">
+                <span class="bracket">[</span>
                 <p id="rocky-dialogue"></p>
                 <span class="type-cursor">_</span>
+                <span class="bracket">]</span>
             </div>
         </div>
 
@@ -105,63 +101,58 @@
                 <div class="bar"></div><div class="bar"></div><div class="bar"></div>
             </div>
             
-            <!-- X-Optimized 16:9 Cinematic Result Card -->
-            <!-- The wrapper scales down for mobile, but the card remains 800x450 for HD exports -->
             <div id="card-scale-wrapper" class="hidden">
-                <div id="result-card" class="twitter-card">
-                    
-                    <!-- Background Layers -->
-                    <div class="tc-bg-texture"></div>
-                    <div class="tc-radar-grid"></div>
-                    <div class="tc-watermark">SEISMIC DEPT.7</div>
-                    
-                    <!-- Top Bar -->
-                    <div class="tc-header">
-                        <div class="tc-logo"></div>
-                        <span>OFFICIAL INTELLIGENCE DOSSIER</span>
-                        <div class="tc-date" id="tc-hash">ID: 00000000</div>
-                    </div>
-                    
-                    <!-- Main Content -->
-                    <div class="tc-body">
-                        <!-- Profile Area -->
-                        <div class="tc-profile-col">
-                            <div class="tc-frame">
-                                <img id="card-pfp" src="" alt="Subject">
-                                <div class="tc-crosshair"></div>
-                                <div class="tc-scan"></div>
-                            </div>
-                            <div class="tc-barcode"></div>
+                <div class="twitter-card-container">
+                    <div id="result-card" class="twitter-card">
+                        
+                        <div class="tc-bg-texture"></div>
+                        <div class="tc-radar-grid"></div>
+                        <div class="tc-watermark">SEISMIC DEPT.7</div>
+                        
+                        <div class="tc-header">
+                            <div class="tc-logo"></div>
+                            <span>OFFICIAL INTELLIGENCE DOSSIER</span>
+                            <div class="tc-date" id="tc-hash">ID: 00000000</div>
                         </div>
                         
-                        <!-- Data Area -->
-                        <div class="tc-data-col">
-                            <div class="tc-data-row">
-                                <span class="tc-label">SUBJECT ALIAS:</span>
-                                <span id="card-name" class="tc-value tc-highlight">UNKNOWN</span>
+                        <div class="tc-body">
+                            <div class="tc-profile-col">
+                                <div class="tc-frame">
+                                    <img id="card-pfp" src="" alt="Subject">
+                                    <div class="tc-crosshair"></div>
+                                    <div class="tc-scan"></div>
+                                </div>
+                                <div class="tc-barcode"></div>
                             </div>
                             
-                            <div class="tc-data-row">
-                                <span class="tc-label">AGENT ID:</span>
-                                <span id="card-id" class="tc-value">SMC-0000</span>
-                            </div>
-                            
-                            <div class="tc-data-row">
-                                <span class="tc-label">INTELLIGENCE ACCURACY:</span>
-                                <div class="tc-score-wrap">
-                                    <span id="final-score" class="tc-value">0/8</span>
-                                    <div class="tc-bar-bg"><div id="score-progress" class="tc-bar-fill"></div></div>
+                            <div class="tc-data-col">
+                                <div class="tc-data-row">
+                                    <span class="tc-label">SUBJECT ALIAS:</span>
+                                    <span id="card-name" class="tc-value tc-highlight">UNKNOWN</span>
+                                </div>
+                                
+                                <div class="tc-data-row">
+                                    <span class="tc-label">AGENT ID:</span>
+                                    <span id="card-id" class="tc-value">SMC-0000</span>
+                                </div>
+                                
+                                <div class="tc-data-row">
+                                    <span class="tc-label">INTELLIGENCE ACCURACY:</span>
+                                    <div class="tc-score-wrap">
+                                        <span id="final-score" class="tc-value">0/8</span>
+                                        <div class="tc-bar-bg"><div id="score-progress" class="tc-bar-fill"></div></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="tc-data-row">
+                                    <span class="tc-label">FINAL DIRECTIVE:</span>
+                                    <span id="card-status" class="tc-value">EVALUATING...</span>
                                 </div>
                             </div>
-                            
-                            <div class="tc-data-row">
-                                <span class="tc-label">FINAL DIRECTIVE:</span>
-                                <span id="card-status" class="tc-value">EVALUATING...</span>
-                            </div>
                         </div>
+                        
+                        <div id="endgame-stamp" class="tc-stamp"></div>
                     </div>
-                    
-                    <div id="endgame-stamp" class="tc-stamp"></div>
                 </div>
 
                 <div class="endgame-actions" id="action-buttons">
@@ -171,7 +162,6 @@
             </div>
         </div>
         
-        <!-- Footer -->
         <div id="copyright-footer">
             &copy; masinonline
         </div>
