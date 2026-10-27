@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Seismic Interrogation</title>
-    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
-    <!-- html2canvas Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -16,44 +14,42 @@
         <div class="crt-overlay"></div>
         <div id="background" class="bg-blur"></div>
 
-        <!-- Live Status Bar -->
         <div id="top-status-bar">
-            <span>SYS.OP: SEISMIC_OS_v2.4</span>
+            <span>SYS.OP: SEISMIC_OS_v3.0</span>
             <span id="random-hash">HASH: 0x00000000</span>
-            <span class="blinking-dot">REC</span>
+            <span class="blinking-dot">SECURE_LINK</span>
         </div>
 
+        <!-- Intro Screen -->
         <div id="intro-screen" class="screen active">
             <div id="story-text-container"></div>
+            <button id="skip-btn" class="hidden">SKIP >></button>
             <div class="intro-buttons">
-                <button id="skip-btn" class="hidden">SKIP_SEQ</button>
                 <button id="ready-btn" class="cyber-btn hidden">INITIATE_CONNECTION</button>
             </div>
         </div>
 
+        <!-- Identity Screen -->
         <div id="identity-screen" class="screen hidden">
             <div class="hud-panel identity-form fade-element">
                 <div class="form-header">
                     <h2>SECURE LOGIN</h2>
                     <div class="glitch-line"></div>
                 </div>
-                
                 <div class="input-group">
-                    <label>> INPUT_AGENT_ID:</label>
+                    <label>> INPUT_AGENT_ALIAS:</label>
                     <input type="text" id="username-input" placeholder="e.g. GhostProtocol" autocomplete="off" maxlength="15">
                 </div>
-                
                 <div class="input-group">
-                    <label>> BIOMETRIC_DATA (PFP):</label>
+                    <label>> BIOMETRIC_DATA (UPLOAD PFP):</label>
                     <input type="file" id="pfp-input" accept="image/*">
                 </div>
-                
-                <div id="identity-error" class="error-text hidden">ERR: CREDENTIALS MISSING</div>
-                
+                <div id="identity-error" class="error-text hidden">ERR: CREDENTIALS REQUIRED</div>
                 <button id="submit-identity-btn" class="cyber-btn full-width-btn">VERIFY & ENTER</button>
             </div>
         </div>
 
+        <!-- Dialogue Screen -->
         <div id="dialogue-screen" class="screen hidden">
             <div class="dialogue-box hud-panel">
                 <p id="rocky-dialogue"></p>
@@ -61,10 +57,11 @@
             </div>
         </div>
 
+        <!-- Interrogation Screen -->
         <div id="interrogation-screen" class="screen hidden">
             <div class="top-section fade-element" id="q-container">
                 <div class="timer-container">
-                    <span class="timer-label">SYS_TIME: </span>
+                    <span class="timer-label">TIME_REMAINING: </span>
                     <span id="digital-timer">00:15:00</span>
                 </div>
                 <div class="question-box hud-panel">
@@ -86,63 +83,70 @@
             </div>
         </div>
 
+        <!-- Endgame Screen -->
         <div id="endgame-screen" class="screen hidden">
             <div id="prison-bars" class="hidden">
                 <div class="bar"></div><div class="bar"></div><div class="bar"></div>
                 <div class="bar"></div><div class="bar"></div><div class="bar"></div>
             </div>
             
-            <!-- 3D Interactive Card -->
-            <div id="card-3d-wrapper">
+            <!-- Horizontal Twitter-Optimized ID Card -->
+            <div id="card-wrapper" class="hidden">
                 <div id="result-card" class="classified-card hud-panel">
-                    <!-- Fingerprint Background Texture -->
+                    <div class="card-left-accent"></div>
                     <div class="card-bg-texture"></div>
                     
-                    <div class="card-top-bar">
-                        <span>CLASSIFIED DOSSIER</span>
-                        <span class="clearance">CLEARANCE: LEVEL 7</span>
-                    </div>
-                    
-                    <div class="card-main">
-                        <div class="card-photo-wrapper">
-                            <img id="card-pfp" src="" alt="Subject Photo">
-                            <div class="photo-scanner"></div>
-                            <div class="corner-tl"></div><div class="corner-tr"></div>
-                            <div class="corner-bl"></div><div class="corner-br"></div>
+                    <div class="card-content-horizontal">
+                        <!-- Left Side: Photo -->
+                        <div class="card-left-side">
+                            <div class="card-photo-wrapper">
+                                <img id="card-pfp" src="" alt="Subject Photo">
+                                <div class="photo-scanner"></div>
+                            </div>
+                            <div class="barcode"></div>
                         </div>
                         
-                        <div class="card-info">
-                            <div class="info-row">
-                                <span class="label">AGENT ALIAS:</span>
-                                <span id="card-name" class="value">UNKNOWN</span>
+                        <!-- Right Side: Details -->
+                        <div class="card-right-side">
+                            <div class="card-header-hr">
+                                <h2>SEISMIC INTELLIGENCE</h2>
+                                <span>OFFICIAL DOSSIER</span>
                             </div>
-                            <div class="info-row">
-                                <span class="label">UNIQUE ID:</span>
-                                <span id="card-id" class="value">SMC-0000</span>
-                            </div>
-                            <div class="info-row">
-                                <span class="label">INTEL ACCURACY:</span>
-                                <span id="final-score" class="value highlight glow-text">0/8</span>
-                            </div>
-                            <div class="info-row">
-                                <span class="label">FINAL DIRECTIVE:</span>
-                                <span id="card-status" class="value">EVALUATING</span>
+                            
+                            <div class="card-info-grid">
+                                <div class="info-block">
+                                    <span class="label">ALIAS</span>
+                                    <span id="card-name" class="value">UNKNOWN</span>
+                                </div>
+                                <div class="info-block">
+                                    <span class="label">ID NO.</span>
+                                    <span id="card-id" class="value">SMC-0000</span>
+                                </div>
+                                <div class="info-block">
+                                    <span class="label">ACCURACY</span>
+                                    <span id="final-score" class="value highlight glow-text">0/8</span>
+                                </div>
+                                <div class="info-block">
+                                    <span class="label">STATUS</span>
+                                    <span id="card-status" class="value">EVALUATING</span>
+                                </div>
                             </div>
                         </div>
+                        
+                        <div id="endgame-stamp" class="stamp"></div>
                     </div>
-                    
-                    <div class="card-bottom">
-                        <div class="barcode"></div>
-                    </div>
-                    
-                    <div id="endgame-stamp" class="stamp hidden"></div>
+                </div>
+
+                <div class="endgame-actions" id="action-buttons">
+                    <button id="download-btn" class="cyber-btn">DOWNLOAD INTEL</button>
+                    <button id="share-x-btn" class="cyber-btn x-btn">SHARE ON X</button>
                 </div>
             </div>
-
-            <div class="endgame-actions fade-element hidden" id="action-buttons">
-                <button id="download-btn" class="cyber-btn">DOWNLOAD SECURE COPY</button>
-                <button id="share-x-btn" class="cyber-btn x-btn">SHARE INTEL ON X</button>
-            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div id="copyright-footer">
+            &copy; 2026 masinonline. All rights reserved.
         </div>
 
     </div>
