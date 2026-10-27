@@ -1,6 +1,5 @@
 (function() {
     
-    // DOM Cache
     const transitionOverlay = document.getElementById('transition-overlay');
     const bgElement = document.getElementById('background');
     const randomHash = document.getElementById('random-hash');
@@ -143,21 +142,21 @@
         glitchOverlay.classList.add('flash-glitch');
     }
 
-    // Cinematic Overlay Transition
+    // Dynamic Panel Transition (Cyber Wipe)
     async function transitionScreen(fromElement, toElement) {
         transitionOverlay.classList.add('transition-active');
-        await new Promise(r => setTimeout(r, 600)); 
+        await new Promise(r => setTimeout(r, 600)); // Wait for panels to close
         
         fromElement.classList.remove('active');
         fromElement.classList.add('hidden');
         toElement.classList.remove('hidden');
         toElement.classList.add('active');
         
-        await new Promise(r => setTimeout(r, 200)); 
+        await new Promise(r => setTimeout(r, 150)); 
         transitionOverlay.classList.remove('transition-active');
+        await new Promise(r => setTimeout(r, 400)); // Wait for panels to open
     }
 
-    // Advanced Typewriter
     function typeWriterEffect(element, text, speed, onComplete) {
         isTyping = true;
         element.textContent = ''; 
@@ -192,18 +191,17 @@
             lineDiv.className = 'intro-line';
             storyTextContainer.appendChild(lineDiv);
             
-            // Speed up slightly for realism, add pause between lines
-            typeWriterEffect(lineDiv, introLines[lineIndex], 30, () => {
+            typeWriterEffect(lineDiv, introLines[lineIndex], 40, () => {
                 lineIndex++;
                 if (lineIndex < introLines.length) {
-                    introTimeout = setTimeout(showNextLine, 600); 
+                    introTimeout = setTimeout(showNextLine, 800); 
                 } else {
                     introTimeout = setTimeout(() => {
                         isIntroTyping = false;
                         readyBtn.classList.remove('hidden');
-                        readyBtn.classList.add('decode-reveal'); // Cinematic button entry
+                        readyBtn.classList.add('decode-reveal'); 
                         skipBtn.classList.add('hidden');
-                    }, 800);
+                    }, 500);
                 }
             });
         }
@@ -227,9 +225,9 @@
     });
 
     readyBtn.addEventListener('click', async () => {
-        readyBtn.innerHTML = '<span class="btn-text">ESTABLISHING...</span>';
+        readyBtn.querySelector('.btn-text').textContent = 'ESTABLISHING...';
         readyBtn.classList.add('processing');
-        await new Promise(r => setTimeout(r, 1200));
+        await new Promise(r => setTimeout(r, 1000));
         await transitionScreen(introScreen, identityScreen);
     });
 
@@ -361,7 +359,7 @@
             else clickedBtn.classList.add('selected-wrong');
         }
 
-        await new Promise(r => setTimeout(r, 800)); 
+        await new Promise(r => setTimeout(r, 600)); 
 
         if (isCorrect) {
             score++;
@@ -375,14 +373,10 @@
 
         await new Promise(r => setTimeout(r, 2200)); 
         
-        transitionOverlay.classList.add('transition-active');
-        await new Promise(r => setTimeout(r, 600));
+        await transitionScreen(interrogationScreen, interrogationScreen); // Visual reset trick
         
         currentQuestionIndex++;
         loadQuestion();
-        
-        await new Promise(r => setTimeout(r, 200));
-        transitionOverlay.classList.remove('transition-active');
     }
 
     // Sequence 4: Card
@@ -425,19 +419,38 @@
         }, 1000);
     }
 
+    // FIX FOR HTML2CANVAS DISTORTION
     downloadBtn.addEventListener('click', () => {
         downloadBtn.textContent = 'GENERATING...';
         downloadBtn.classList.add('processing');
         
-        html2canvas(resultCard, {
+        // 1. Create a hidden container off-screen
+        const cloneContainer = document.createElement('div');
+        cloneContainer.id = 'clone-container';
+        document.body.appendChild(cloneContainer);
+        
+        // 2. Clone the card exactly
+        const clone = resultCard.cloneNode(true);
+        // Force dimensions to avoid scale CSS interference
+        clone.style.width = '800px';
+        clone.style.height = '450px';
+        clone.style.transform = 'none'; // Critical to fix html2canvas scale bugs
+        
+        cloneContainer.appendChild(clone);
+        
+        // 3. Render the clone
+        html2canvas(clone, {
             backgroundColor: "#080808",
-            scale: 2 
+            scale: 2,
+            useCORS: true
         }).then(canvas => {
             const link = document.createElement('a');
             link.download = `Seismic_Dossier_${playerName}.png`;
             link.href = canvas.toDataURL('image/png');
             link.click();
             
+            // 4. Cleanup
+            document.body.removeChild(cloneContainer);
             downloadBtn.textContent = 'DOWNLOAD DOSSIER';
             downloadBtn.classList.remove('processing');
         });
