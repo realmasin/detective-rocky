@@ -1,5 +1,6 @@
 (function() {
     
+    // DOM Initializations
     const transitionOverlay = document.getElementById('transition-overlay');
     const bgElement = document.getElementById('background');
     const randomHash = document.getElementById('random-hash');
@@ -57,23 +58,25 @@
     
     const TIME_PER_QUESTION_MS = 15000; 
 
+    // Deep Tech Story
     const introLines = [
-        "> CONNECTING TO SEISMIC MAINFRAME...",
-        "> AUTHENTICATION: SUCCESS.",
-        "> WARNING: UNAUTHORIZED DATA BREACH DETECTED IN DEPT-7.",
-        "> PROBABILITY OF INTERNAL INSURGENT: 99.8%.",
-        "> DETECTIVE ROCKY HAS INITIATED CLEARANCE PROTOCOL.",
-        "> STAND BY FOR INTERROGATION."
+        "> INITIALIZING SEISMIC KERNEL V9.4...",
+        "> MEMORY CHECK: OK.",
+        "> DECRYPTING AUDIO LOGS...",
+        "<span class='system-alert'>[!] WARNING: CRITICAL BREACH DETECTED IN SECTOR 7.</span>",
+        "> ALGORITHM SUGGESTS INTERNAL INSURGENT ACTIVITY.",
+        "> DETECTIVE ROCKY DEMANDS IMMEDIATE CLEARANCE EVALUATION.",
+        "> PROCEED WITH CAUTION."
     ];
 
     const rulesLines = [
         "Take a seat.",
-        "A critical breach has occurred at Seismic.",
-        "My algorithm points to you.",
-        "I have 8 questions. Answer them correctly.",
-        "If you are loyal, you walk free.",
-        "If you are a spy... well, you won't leave this room.",
-        "Timer starts now. Do not lie to me."
+        "Our networks have been compromised.",
+        "My profiling system flagged your signature.",
+        "I have 8 encrypted fragments. Decode them correctly.",
+        "If you are loyal, your clearance is reinstated.",
+        "If you are a spy... this room will be your last stop.",
+        "The timer is absolute. Do not lie to me."
     ];
 
     const correctReactions = [
@@ -127,12 +130,12 @@
     }
 
     setInterval(() => {
-        randomHash.textContent = "AUTH: 0x" + Math.floor(Math.random()*16777215).toString(16).toUpperCase();
+        randomHash.textContent = "NODE: 0x" + Math.floor(Math.random()*16777215).toString(16).toUpperCase();
     }, 1500);
 
     function startLightGlitches() {
         lightGlitchInterval = setInterval(() => {
-            if(Math.random() > 0.6) triggerFlash();
+            if(Math.random() > 0.65) triggerFlash();
         }, 4000);
     }
 
@@ -142,30 +145,43 @@
         glitchOverlay.classList.add('flash-glitch');
     }
 
-    // Dynamic Panel Transition (Cyber Wipe)
+    // Smooth Cinematic Fade Transition
     async function transitionScreen(fromElement, toElement) {
         transitionOverlay.classList.add('transition-active');
-        await new Promise(r => setTimeout(r, 600)); // Wait for panels to close
+        await new Promise(r => setTimeout(r, 700)); 
         
         fromElement.classList.remove('active');
         fromElement.classList.add('hidden');
         toElement.classList.remove('hidden');
         toElement.classList.add('active');
         
-        await new Promise(r => setTimeout(r, 150)); 
+        await new Promise(r => setTimeout(r, 100)); 
         transitionOverlay.classList.remove('transition-active');
-        await new Promise(r => setTimeout(r, 400)); // Wait for panels to open
+        await new Promise(r => setTimeout(r, 700)); // Buffer to prevent double clicking
     }
 
     function typeWriterEffect(element, text, speed, onComplete) {
         isTyping = true;
-        element.textContent = ''; 
+        element.innerHTML = ''; // innerHTML to support HTML tags in intro
         let i = 0;
+        let isTag = false;
+        let currentText = '';
+        
         clearInterval(typingInterval);
         typingInterval = setInterval(() => {
             if (i < text.length) {
-                element.textContent += text.charAt(i);
-                i++;
+                let char = text.charAt(i);
+                currentText += char;
+                element.innerHTML = currentText;
+                if(char === '<') isTag = true;
+                if(char === '>') isTag = false;
+                
+                if(!isTag) {
+                    // Small random delay for realistic typing
+                    i++;
+                } else {
+                    i++;
+                }
             } else {
                 clearInterval(typingInterval);
                 isTyping = false;
@@ -178,7 +194,7 @@
         element.textContent = text;
     }
 
-    // Sequence 1: Boot
+    // Sequence 1: Boot Intro
     function startIntro() {
         skipBtn.classList.remove('hidden');
         storyTextContainer.innerHTML = '';
@@ -191,10 +207,10 @@
             lineDiv.className = 'intro-line';
             storyTextContainer.appendChild(lineDiv);
             
-            typeWriterEffect(lineDiv, introLines[lineIndex], 40, () => {
+            typeWriterEffect(lineDiv, introLines[lineIndex], 30, () => {
                 lineIndex++;
                 if (lineIndex < introLines.length) {
-                    introTimeout = setTimeout(showNextLine, 800); 
+                    introTimeout = setTimeout(showNextLine, 600); 
                 } else {
                     introTimeout = setTimeout(() => {
                         isIntroTyping = false;
@@ -216,7 +232,7 @@
         introLines.forEach(line => {
             const div = document.createElement('div');
             div.className = 'intro-line';
-            div.textContent = line;
+            div.innerHTML = line; // innerHTML for tags
             storyTextContainer.appendChild(div);
         });
         readyBtn.classList.remove('hidden');
@@ -225,9 +241,8 @@
     });
 
     readyBtn.addEventListener('click', async () => {
-        readyBtn.querySelector('.btn-text').textContent = 'ESTABLISHING...';
+        readyBtn.querySelector('.btn-text').textContent = 'EXECUTING...';
         readyBtn.classList.add('processing');
-        await new Promise(r => setTimeout(r, 1000));
         await transitionScreen(introScreen, identityScreen);
     });
 
@@ -242,14 +257,14 @@
         identityError.classList.add('hidden');
         playerName = nameVal;
         cardId.textContent = generateAgentID(); 
-        tcHash.textContent = "ID: " + Math.floor(Math.random()*999999).toString(16).toUpperCase();
+        tcHash.textContent = "UID: " + Math.floor(Math.random()*999999).toString(16).toUpperCase();
 
         const reader = new FileReader();
         reader.onload = async function(e) {
             playerPfpSrc = e.target.result;
-            submitIdentityBtn.textContent = 'ENCRYPTING DATA...';
+            submitIdentityBtn.textContent = 'ENCRYPTING...';
             submitIdentityBtn.classList.add('processing');
-            await new Promise(r => setTimeout(r, 1500));
+            await new Promise(r => setTimeout(r, 600)); // Small visual delay
             proceedToDialogue();
         }
         reader.readAsDataURL(file);
@@ -283,7 +298,7 @@
     });
 
     function playNextDialogueLine() {
-        typeWriterEffect(rockyDialogue, rulesLines[currentLineIndex], 40);
+        typeWriterEffect(rockyDialogue, rulesLines[currentLineIndex], 35);
     }
 
     // Sequence 3: Quiz
@@ -371,15 +386,19 @@
             triggerFlash(); 
         }
 
-        await new Promise(r => setTimeout(r, 2200)); 
+        await new Promise(r => setTimeout(r, 2000)); 
         
-        await transitionScreen(interrogationScreen, interrogationScreen); // Visual reset trick
+        transitionOverlay.classList.add('transition-active');
+        await new Promise(r => setTimeout(r, 600));
         
         currentQuestionIndex++;
         loadQuestion();
+        
+        await new Promise(r => setTimeout(r, 100));
+        transitionOverlay.classList.remove('transition-active');
     }
 
-    // Sequence 4: Card
+    // Sequence 4: Endgame
     async function triggerEndgame() {
         clearInterval(lightGlitchInterval);
         
@@ -419,26 +438,21 @@
         }, 1000);
     }
 
-    // FIX FOR HTML2CANVAS DISTORTION
+    // FIX FOR HTML2CANVAS: Hidden clone strategy for perfect 800x450 export
     downloadBtn.addEventListener('click', () => {
         downloadBtn.textContent = 'GENERATING...';
         downloadBtn.classList.add('processing');
         
-        // 1. Create a hidden container off-screen
         const cloneContainer = document.createElement('div');
         cloneContainer.id = 'clone-container';
         document.body.appendChild(cloneContainer);
         
-        // 2. Clone the card exactly
         const clone = resultCard.cloneNode(true);
-        // Force dimensions to avoid scale CSS interference
         clone.style.width = '800px';
         clone.style.height = '450px';
-        clone.style.transform = 'none'; // Critical to fix html2canvas scale bugs
-        
+        clone.style.transform = 'none'; // Overrides responsive scaling
         cloneContainer.appendChild(clone);
         
-        // 3. Render the clone
         html2canvas(clone, {
             backgroundColor: "#080808",
             scale: 2,
@@ -449,7 +463,6 @@
             link.href = canvas.toDataURL('image/png');
             link.click();
             
-            // 4. Cleanup
             document.body.removeChild(cloneContainer);
             downloadBtn.textContent = 'DOWNLOAD DOSSIER';
             downloadBtn.classList.remove('processing');
