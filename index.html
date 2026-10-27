@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Seismic Interrogation</title>
+    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     
-    <!-- Smooth Cinematic Transition -->
     <div id="transition-overlay"></div>
 
     <div id="game-container">
@@ -25,7 +25,7 @@
             <span class="blinking-dot">ENCRYPTED_LINK</span>
         </div>
 
-        <!-- Redesigned WOW Intro -->
+        <!-- Intro Screen -->
         <div id="intro-screen" class="screen active">
             <div class="terminal-window">
                 <div class="terminal-header">
@@ -34,9 +34,7 @@
                     </div>
                     <span class="terminal-title">SYS_BOOT_SEQUENCE</span>
                 </div>
-                <div class="terminal-body" id="story-text-container">
-                    <!-- Text injected via JS -->
-                </div>
+                <div class="terminal-body" id="story-text-container"></div>
             </div>
             
             <button id="skip-btn" class="hidden">FORCE_OVERRIDE >></button>
@@ -79,26 +77,28 @@
 
         <!-- Interrogation Screen -->
         <div id="interrogation-screen" class="screen hidden">
-            <div class="top-section fade-element" id="q-container">
-                <div class="timer-container">
-                    <span class="timer-label">ENCRYPTION_DECAY: </span>
-                    <span id="digital-timer">00:15:00</span>
-                </div>
-                <div class="question-box hud-panel">
-                    <p id="question-text"></p>
-                    <div id="image-wrapper" class="hidden">
-                        <img id="question-image" src="" alt="Classified Intel">
-                        <div class="scanner-line"></div>
+            <div class="interrogation-wrapper">
+                <div class="top-section fade-element" id="q-container">
+                    <div class="timer-container">
+                        <span class="timer-label">ENCRYPTION_DECAY: </span>
+                        <span id="digital-timer">00:15:00</span>
+                    </div>
+                    <div class="question-box hud-panel">
+                        <p id="question-text"></p>
+                        <div id="image-wrapper" class="hidden">
+                            <img id="question-image" src="" alt="Classified Intel">
+                            <div class="scanner-line"></div>
+                        </div>
                     </div>
                 </div>
-            </div>
-            
-            <div class="bottom-section fade-element" id="opt-container">
-                <div class="options-grid">
-                    <button class="option-btn hud-panel cyber-hover" data-index="0"></button>
-                    <button class="option-btn hud-panel cyber-hover" data-index="1"></button>
-                    <button class="option-btn hud-panel cyber-hover" data-index="2"></button>
-                    <button class="option-btn hud-panel cyber-hover" data-index="3"></button>
+                
+                <div class="bottom-section fade-element" id="opt-container">
+                    <div class="options-grid">
+                        <button class="option-btn hud-panel cyber-hover" data-index="0"></button>
+                        <button class="option-btn hud-panel cyber-hover" data-index="1"></button>
+                        <button class="option-btn hud-panel cyber-hover" data-index="2"></button>
+                        <button class="option-btn hud-panel cyber-hover" data-index="3"></button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -110,60 +110,58 @@
                 <div class="bar"></div><div class="bar"></div><div class="bar"></div>
             </div>
             
-            <div id="card-scale-wrapper" class="hidden">
-                <div class="twitter-card-container">
-                    <!-- The exact layout structure for cloning -->
-                    <div id="result-card" class="twitter-card">
-                        <div class="tc-bg-texture"></div>
-                        <div class="tc-radar-grid"></div>
-                        <div class="tc-watermark">SEISMIC DEPT.7</div>
-                        
-                        <div class="tc-header">
-                            <div class="tc-logo"></div>
-                            <span>OFFICIAL INTELLIGENCE DOSSIER</span>
-                            <div class="tc-date" id="tc-hash">UID: 00000000</div>
-                        </div>
-                        
-                        <div class="tc-body">
-                            <div class="tc-profile-col">
-                                <div class="tc-frame">
-                                    <img id="card-pfp" src="" alt="Subject Asset">
-                                    <div class="tc-crosshair"></div>
-                                    <div class="tc-scan"></div>
-                                </div>
-                                <div class="tc-barcode"></div>
-                            </div>
-                            
-                            <div class="tc-data-col">
-                                <div class="tc-data-row">
-                                    <span class="tc-label">OPERATIVE ALIAS:</span>
-                                    <span id="card-name" class="tc-value tc-highlight">UNKNOWN</span>
-                                </div>
-                                <div class="tc-data-row">
-                                    <span class="tc-label">SYSTEM ID NO:</span>
-                                    <span id="card-id" class="tc-value">SMC-0000</span>
-                                </div>
-                                <div class="tc-data-row">
-                                    <span class="tc-label">INTERROGATION YIELD:</span>
-                                    <div class="tc-score-wrap">
-                                        <span id="final-score" class="tc-value">0/8</span>
-                                        <div class="tc-bar-bg"><div id="score-progress" class="tc-bar-fill"></div></div>
-                                    </div>
-                                </div>
-                                <div class="tc-data-row">
-                                    <span class="tc-label">COMMAND DIRECTIVE:</span>
-                                    <span id="card-status" class="tc-value">EVALUATING...</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div id="endgame-stamp" class="tc-stamp"></div>
+            <div id="card-wrapper" class="hidden">
+                <!-- Native Responsive Card for UI -->
+                <div id="result-card" class="twitter-card">
+                    <div class="tc-bg-texture"></div>
+                    <div class="tc-radar-grid"></div>
+                    <div class="tc-watermark">SEISMIC DEPT.7</div>
+                    
+                    <div class="tc-header">
+                        <div class="tc-logo"></div>
+                        <span>OFFICIAL INTELLIGENCE DOSSIER</span>
+                        <div class="tc-date" id="tc-hash">UID: 00000000</div>
                     </div>
+                    
+                    <div class="tc-body">
+                        <div class="tc-profile-col">
+                            <div class="tc-frame">
+                                <img id="card-pfp" src="" alt="Subject Asset">
+                                <div class="tc-crosshair"></div>
+                                <div class="tc-scan"></div>
+                            </div>
+                            <div class="tc-barcode"></div>
+                        </div>
+                        
+                        <div class="tc-data-col">
+                            <div class="tc-data-row">
+                                <span class="tc-label">OPERATIVE ALIAS:</span>
+                                <span id="card-name" class="tc-value tc-highlight">UNKNOWN</span>
+                            </div>
+                            <div class="tc-data-row">
+                                <span class="tc-label">SYSTEM ID NO:</span>
+                                <span id="card-id" class="tc-value">SMC-0000</span>
+                            </div>
+                            <div class="tc-data-row">
+                                <span class="tc-label">INTERROGATION YIELD:</span>
+                                <div class="tc-score-wrap">
+                                    <span id="final-score" class="tc-value">0/8</span>
+                                    <div class="tc-bar-bg"><div id="score-progress" class="tc-bar-fill"></div></div>
+                                </div>
+                            </div>
+                            <div class="tc-data-row">
+                                <span class="tc-label">COMMAND DIRECTIVE:</span>
+                                <span id="card-status" class="tc-value">EVALUATING...</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="endgame-stamp" class="tc-stamp"></div>
                 </div>
 
                 <div class="endgame-actions" id="action-buttons">
-                    <button id="download-btn" class="cyber-btn">EXTRACT_ENCRYPTED_FILE</button>
-                    <button id="share-x-btn" class="cyber-btn x-btn">BROADCAST_TO_NETWORK</button>
+                    <button id="download-btn" class="cyber-btn">EXTRACT_FILE</button>
+                    <button id="share-x-btn" class="cyber-btn x-btn">BROADCAST_ON_X</button>
                 </div>
             </div>
         </div>
@@ -173,6 +171,8 @@
         </div>
 
     </div>
+    <!-- Hidden container used for generating perfect HD image -->
+    <div id="export-container"></div>
     <script src="script.js"></script>
 </body>
 </html>
