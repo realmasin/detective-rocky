@@ -1,6 +1,7 @@
 (function() {
     
     // --- DOM Elements ---
+    const transitionOverlay = document.getElementById('transition-overlay');
     const bgElement = document.getElementById('background');
     const randomHash = document.getElementById('random-hash');
     const glitchOverlay = document.getElementById('glitch-overlay');
@@ -29,18 +30,19 @@
     const digitalTimer = document.getElementById('digital-timer');
     
     const endgameScreen = document.getElementById('endgame-screen');
-    const cardWrapper = document.getElementById('card-wrapper');
+    const cardScaleWrapper = document.getElementById('card-scale-wrapper');
     const resultCard = document.getElementById('result-card');
     const cardPfp = document.getElementById('card-pfp');
     const cardName = document.getElementById('card-name');
     const cardId = document.getElementById('card-id');
-    const cardHash = document.getElementById('card-hash');
+    const tcHash = document.getElementById('tc-hash');
     const finalScoreEl = document.getElementById('final-score');
     const scoreProgress = document.getElementById('score-progress');
     const cardStatus = document.getElementById('card-status');
     const endgameStamp = document.getElementById('endgame-stamp');
     const prisonBars = document.getElementById('prison-bars');
     
+    const actionButtons = document.getElementById('action-buttons');
     const downloadBtn = document.getElementById('download-btn');
     const shareXBtn = document.getElementById('share-x-btn');
 
@@ -57,13 +59,14 @@
     
     const TIME_PER_QUESTION_MS = 15000; 
 
-    // Story Logic
+    // Story
     const introLines = [
-        "ESTABLISHING SECURE CONNECTION...",
-        "SYSTEM BREACH DETECTED IN SECTOR 7.",
-        "INTERNAL AUDIT SUGGESTS A SPY INFILTRATION.",
-        "DETECTIVE ROCKY HAS SUMMONED YOU FOR EVALUATION.",
-        "WARNING: FAILURE RESULTS IN IMMEDIATE LOCKDOWN."
+        "> CONNECTING TO SEISMIC MAINFRAME...",
+        "> AUTHENTICATION: SUCCESS.",
+        "> WARNING: UNAUTHORIZED DATA BREACH DETECTED IN DEPT-7.",
+        "> PROBABILITY OF INTERNAL INSURGENT: 99.8%.",
+        "> DETECTIVE ROCKY HAS INITIATED CLEARANCE PROTOCOL.",
+        "> STAND BY FOR INTERROGATION."
     ];
 
     const rulesLines = [
@@ -110,6 +113,7 @@
     let isIntroTyping = false;
     let introTimeout;
 
+    // Core Helpers
     function shuffleArray(array) {
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -130,22 +134,36 @@
         randomHash.textContent = "AUTH: 0x" + Math.floor(Math.random()*16777215).toString(16).toUpperCase();
     }, 1500);
 
-    // FIX: Highly reliable Light Glitch Effect
     function startLightGlitches() {
         lightGlitchInterval = setInterval(() => {
-            if(Math.random() > 0.6) { 
-                triggerFlash();
-            }
+            if(Math.random() > 0.6) triggerFlash();
         }, 4000);
     }
 
     function triggerFlash() {
         glitchOverlay.classList.remove('flash-glitch');
-        void glitchOverlay.offsetWidth; // trigger reflow
+        void glitchOverlay.offsetWidth; 
         glitchOverlay.classList.add('flash-glitch');
     }
 
-    // Reliable Typewriter
+    // --- Cinematic Screen Transition Function ---
+    // This solves the "dead / sudden jump" feeling
+    async function transitionScreen(fromElement, toElement) {
+        // 1. Fade to black
+        transitionOverlay.classList.add('transition-active');
+        await new Promise(r => setTimeout(r, 800)); // wait for fade to finish
+        
+        // 2. Swap screens silently
+        fromElement.classList.remove('active');
+        fromElement.classList.add('hidden');
+        toElement.classList.remove('hidden');
+        toElement.classList.add('active');
+        
+        // 3. Fade from black
+        await new Promise(r => setTimeout(r, 200)); // small buffer
+        transitionOverlay.classList.remove('transition-active');
+    }
+
     function typeWriterEffect(element, text, speed, onComplete) {
         isTyping = true;
         element.textContent = ''; 
@@ -163,13 +181,7 @@
         }, speed);
     }
 
-    // FIX: Bulletproof text injection for Questions and Buttons
-    // Removed buggy scramble to ensure 100% visibility always.
-    function safeInjectText(element, text) {
-        element.textContent = text;
-    }
-
-    // Sequence 1: Intro
+    // Sequence 1: Boot Intro
     function startIntro() {
         skipBtn.classList.remove('hidden');
         storyTextContainer.innerHTML = '';
@@ -182,16 +194,16 @@
             lineDiv.className = 'intro-line';
             storyTextContainer.appendChild(lineDiv);
             
-            typeWriterEffect(lineDiv, introLines[lineIndex], 50, () => {
+            typeWriterEffect(lineDiv, introLines[lineIndex], 40, () => {
                 lineIndex++;
                 if (lineIndex < introLines.length) {
-                    introTimeout = setTimeout(showNextLine, 1200); 
+                    introTimeout = setTimeout(showNextLine, 800); 
                 } else {
                     introTimeout = setTimeout(() => {
                         isIntroTyping = false;
                         readyBtn.classList.remove('hidden');
                         skipBtn.classList.add('hidden');
-                    }, 800);
+                    }, 500);
                 }
             });
         }
@@ -213,14 +225,15 @@
         skipBtn.classList.add('hidden');
     });
 
-    readyBtn.addEventListener('click', () => {
-        introScreen.classList.remove('active');
-        introScreen.classList.add('hidden');
-        identityScreen.classList.remove('hidden');
-        identityScreen.classList.add('active');
+    readyBtn.addEventListener('click', async () => {
+        readyBtn.textContent = 'CONNECTING...';
+        readyBtn.classList.add('processing');
+        await new Promise(r => setTimeout(r, 1000));
+        await transitionScreen(introScreen, identityScreen);
     });
 
-    submitIdentityBtn.addEventListener('click', () => {
+    // Sequence 2: Identity
+    submitIdentityBtn.addEventListener('click', async () => {
         const nameVal = usernameInput.value.trim();
         const file = pfpInput.files[0];
         if (!nameVal || !file) {
@@ -230,27 +243,27 @@
         identityError.classList.add('hidden');
         playerName = nameVal;
         cardId.textContent = generateAgentID(); 
-        cardHash.textContent = Math.floor(Math.random()*999999).toString(16).toUpperCase();
+        tcHash.textContent = "ID: " + Math.floor(Math.random()*999999).toString(16).toUpperCase();
 
         const reader = new FileReader();
-        reader.onload = function(e) {
+        reader.onload = async function(e) {
             playerPfpSrc = e.target.result;
+            submitIdentityBtn.textContent = 'PROCESSING DATA...';
+            submitIdentityBtn.classList.add('processing');
+            await new Promise(r => setTimeout(r, 1200));
             proceedToDialogue();
         }
         reader.readAsDataURL(file);
     });
 
-    function proceedToDialogue() {
-        identityScreen.classList.remove('active');
-        identityScreen.classList.add('hidden');
+    async function proceedToDialogue() {
+        await transitionScreen(identityScreen, dialogueScreen);
         changeRockyImage('reading');
-        dialogueScreen.classList.remove('hidden');
-        dialogueScreen.classList.add('active');
         playNextDialogueLine();
         startLightGlitches(); 
     }
 
-    dialogueScreen.addEventListener('click', () => {
+    dialogueScreen.addEventListener('click', async () => {
         if (isTyping) {
             clearInterval(typingInterval);
             rockyDialogue.textContent = rulesLines[currentLineIndex];
@@ -260,28 +273,22 @@
             if (currentLineIndex < rulesLines.length) {
                 playNextDialogueLine();
             } else {
-                startInterrogation();
+                // Fade out before game starts
+                await transitionScreen(dialogueScreen, interrogationScreen);
+                changeRockyImage('normal');
+                activeQuestions = shuffleArray([...questionsDatabase]).slice(0, 8);
+                currentQuestionIndex = 0;
+                score = 0;
+                loadQuestion();
             }
         }
     });
 
     function playNextDialogueLine() {
-        typeWriterEffect(rockyDialogue, rulesLines[currentLineIndex], 30);
+        typeWriterEffect(rockyDialogue, rulesLines[currentLineIndex], 40);
     }
 
-    function startInterrogation() {
-        dialogueScreen.classList.remove('active');
-        dialogueScreen.classList.add('hidden');
-        interrogationScreen.classList.remove('hidden');
-        interrogationScreen.classList.add('active');
-        
-        changeRockyImage('normal');
-        activeQuestions = shuffleArray([...questionsDatabase]).slice(0, 8);
-        currentQuestionIndex = 0;
-        score = 0;
-        loadQuestion();
-    }
-
+    // Sequence 3: Gameplay
     function loadQuestion() {
         if (currentQuestionIndex >= activeQuestions.length) {
             triggerEndgame();
@@ -289,9 +296,7 @@
         }
         
         const currentQ = activeQuestions[currentQuestionIndex];
-        
-        // Immediate display to prevent bugs
-        safeInjectText(questionText, currentQ.q);
+        questionText.textContent = currentQ.q;
         
         if (currentQ.img !== "") {
             questionImage.src = currentQ.img;
@@ -303,15 +308,13 @@
 
         const shuffledOptions = shuffleArray([...currentQ.opts]);
         optionBtns.forEach((btn, index) => {
-            safeInjectText(btn, shuffledOptions[index]);
-            btn.onclick = () => handleAnswer(shuffledOptions[index], currentQ.ans);
+            btn.textContent = shuffledOptions[index];
+            btn.className = 'option-btn hud-panel cyber-hover'; // Reset classes
             btn.disabled = false;
+            btn.onclick = () => handleAnswer(btn, shuffledOptions[index], currentQ.ans);
         });
 
-        qContainer.classList.remove('fade-out');
-        optContainer.classList.remove('fade-out');
         digitalTimer.classList.remove('timer-danger');
-        
         changeRockyImage('normal');
         startDigitalTimer();
     }
@@ -337,7 +340,7 @@
             
             if(timeLeft <= 0) {
                 digitalTimer.textContent = "00:00:00";
-                handleAnswer(null, activeQuestions[currentQuestionIndex].ans);
+                handleAnswer(null, null, activeQuestions[currentQuestionIndex].ans);
                 return;
             }
             digitalTimer.textContent = formatTime(timeLeft);
@@ -346,49 +349,60 @@
         timerReq = requestAnimationFrame(update);
     }
 
-    function handleAnswer(selectedText, encodedCorrectAnswer) {
+    async function handleAnswer(clickedBtn, selectedText, encodedCorrectAnswer) {
         cancelAnimationFrame(timerReq);
         optionBtns.forEach(btn => btn.disabled = true);
 
         const decodedCorrect = atob(encodedCorrectAnswer);
         let isCorrect = (selectedText === decodedCorrect);
 
+        // Immediate visual feedback on the button
+        if(clickedBtn) {
+            if(isCorrect) clickedBtn.classList.add('selected-correct');
+            else clickedBtn.classList.add('selected-wrong');
+        }
+
+        await new Promise(r => setTimeout(r, 600)); // Pause to let user see their choice
+
         if (isCorrect) {
             score++;
             changeRockyImage('smiling');
-            safeInjectText(questionText, correctReactions[Math.floor(Math.random() * correctReactions.length)]);
+            questionText.textContent = correctReactions[Math.floor(Math.random() * correctReactions.length)];
         } else {
             changeRockyImage('angry');
-            safeInjectText(questionText, wrongReactions[Math.floor(Math.random() * wrongReactions.length)]);
+            questionText.textContent = wrongReactions[Math.floor(Math.random() * wrongReactions.length)];
             triggerFlash(); 
         }
 
-        setTimeout(() => {
-            qContainer.classList.add('fade-out');
-            optContainer.classList.add('fade-out');
-            setTimeout(() => {
-                currentQuestionIndex++;
-                loadQuestion();
-            }, 300);
-        }, 2000); 
+        await new Promise(r => setTimeout(r, 2500)); // Let them read Rocky's reaction
+        
+        // Fade to black to load next question smoothly
+        transitionOverlay.classList.add('transition-active');
+        await new Promise(r => setTimeout(r, 600));
+        
+        currentQuestionIndex++;
+        loadQuestion();
+        
+        await new Promise(r => setTimeout(r, 200));
+        transitionOverlay.classList.remove('transition-active');
     }
 
-    function triggerEndgame() {
+    // Sequence 4: Endgame
+    async function triggerEndgame() {
         clearInterval(lightGlitchInterval);
-        interrogationScreen.classList.remove('active');
-        interrogationScreen.classList.add('hidden');
-        endgameScreen.classList.remove('hidden');
-        endgameScreen.classList.add('active');
+        
+        // Final Fade to Black
+        await transitionScreen(interrogationScreen, endgameScreen);
         
         cardPfp.src = playerPfpSrc;
         cardName.textContent = playerName.toUpperCase();
         finalScoreEl.textContent = `${score}/8`;
         
-        // Progress bar calculation
         let percentage = (score / 8) * 100;
         scoreProgress.style.width = `${percentage}%`;
         
-        cardWrapper.classList.remove('hidden');
+        cardScaleWrapper.classList.remove('hidden');
+        cardScaleWrapper.classList.add('show-card-anim');
         
         setTimeout(() => {
             if (score >= 4) {
@@ -396,7 +410,7 @@
                 cardStatus.style.color = "var(--success-color)";
                 scoreProgress.style.background = "var(--success-color)";
                 endgameStamp.innerHTML = "CLEARED";
-                endgameStamp.className = "dossier-stamp stamp-success show";
+                endgameStamp.className = "tc-stamp stamp-success show";
                 bgElement.classList.add('bg-victory'); 
             } else {
                 cardStatus.textContent = "CRITICAL THREAT";
@@ -407,22 +421,29 @@
                 
                 setTimeout(() => {
                     endgameStamp.innerHTML = "SPY<br>DETECTED";
-                    endgameStamp.className = "dossier-stamp stamp-danger show";
+                    endgameStamp.className = "tc-stamp stamp-danger show";
                     triggerFlash();
                 }, 600);
             }
-        }, 800);
+        }, 1000);
     }
 
     downloadBtn.addEventListener('click', () => {
+        downloadBtn.textContent = 'GENERATING...';
+        downloadBtn.classList.add('processing');
+        
+        // Render exact 800x450 card regardless of screen scale
         html2canvas(resultCard, {
-            backgroundColor: "#050505",
-            scale: 2 
+            backgroundColor: "#080808",
+            scale: 2 // High Res
         }).then(canvas => {
             const link = document.createElement('a');
             link.download = `Seismic_Dossier_${playerName}.png`;
             link.href = canvas.toDataURL('image/png');
             link.click();
+            
+            downloadBtn.textContent = 'DOWNLOAD DOSSIER';
+            downloadBtn.classList.remove('processing');
         });
     });
 
