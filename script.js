@@ -30,7 +30,7 @@
     const digitalTimer = document.getElementById('digital-timer');
     
     const endgameScreen = document.getElementById('endgame-screen');
-    const cardScaleWrapper = document.getElementById('card-scale-wrapper');
+    const cardWrapper = document.getElementById('card-wrapper');
     const resultCard = document.getElementById('result-card');
     const cardPfp = document.getElementById('card-pfp');
     const cardName = document.getElementById('card-name');
@@ -44,6 +44,7 @@
     
     const downloadBtn = document.getElementById('download-btn');
     const shareXBtn = document.getElementById('share-x-btn');
+    const exportContainer = document.getElementById('export-container');
 
     let currentQuestionIndex = 0;
     let score = 0;
@@ -58,7 +59,7 @@
     
     const TIME_PER_QUESTION_MS = 15000; 
 
-    // Deep Tech Story
+    // Story Core
     const introLines = [
         "> INITIALIZING SEISMIC KERNEL V9.4...",
         "> MEMORY CHECK: OK.",
@@ -162,7 +163,7 @@
 
     function typeWriterEffect(element, text, speed, onComplete) {
         isTyping = true;
-        element.innerHTML = ''; // innerHTML to support HTML tags in intro
+        element.innerHTML = ''; 
         let i = 0;
         let isTag = false;
         let currentText = '';
@@ -177,7 +178,6 @@
                 if(char === '>') isTag = false;
                 
                 if(!isTag) {
-                    // Small random delay for realistic typing
                     i++;
                 } else {
                     i++;
@@ -232,7 +232,7 @@
         introLines.forEach(line => {
             const div = document.createElement('div');
             div.className = 'intro-line';
-            div.innerHTML = line; // innerHTML for tags
+            div.innerHTML = line; 
             storyTextContainer.appendChild(div);
         });
         readyBtn.classList.remove('hidden');
@@ -264,7 +264,7 @@
             playerPfpSrc = e.target.result;
             submitIdentityBtn.textContent = 'ENCRYPTING...';
             submitIdentityBtn.classList.add('processing');
-            await new Promise(r => setTimeout(r, 600)); // Small visual delay
+            await new Promise(r => setTimeout(r, 600)); 
             proceedToDialogue();
         }
         reader.readAsDataURL(file);
@@ -411,8 +411,8 @@
         let percentage = (score / 8) * 100;
         scoreProgress.style.width = `${percentage}%`;
         
-        cardScaleWrapper.classList.remove('hidden');
-        cardScaleWrapper.classList.add('show-card-anim');
+        cardWrapper.classList.remove('hidden');
+        cardWrapper.classList.add('show-card-anim');
         
         setTimeout(() => {
             if (score >= 4) {
@@ -443,30 +443,31 @@
         downloadBtn.textContent = 'GENERATING...';
         downloadBtn.classList.add('processing');
         
-        const cloneContainer = document.createElement('div');
-        cloneContainer.id = 'clone-container';
-        document.body.appendChild(cloneContainer);
+        // Clear previous clones
+        exportContainer.innerHTML = '';
         
         const clone = resultCard.cloneNode(true);
-        clone.style.width = '800px';
-        clone.style.height = '450px';
-        clone.style.transform = 'none'; // Overrides responsive scaling
-        cloneContainer.appendChild(clone);
+        // Force the clone to have the strict export-mode class
+        clone.classList.add('export-mode');
+        exportContainer.appendChild(clone);
         
-        html2canvas(clone, {
-            backgroundColor: "#080808",
-            scale: 2,
-            useCORS: true
-        }).then(canvas => {
-            const link = document.createElement('a');
-            link.download = `Seismic_Dossier_${playerName}.png`;
-            link.href = canvas.toDataURL('image/png');
-            link.click();
-            
-            document.body.removeChild(cloneContainer);
-            downloadBtn.textContent = 'DOWNLOAD DOSSIER';
-            downloadBtn.classList.remove('processing');
-        });
+        // Small delay to ensure CSS is applied
+        setTimeout(() => {
+            html2canvas(clone, {
+                backgroundColor: "#080808",
+                scale: 2,
+                useCORS: true
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `Seismic_Dossier_${playerName}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                
+                exportContainer.innerHTML = ''; // Cleanup
+                downloadBtn.textContent = 'EXTRACT_FILE';
+                downloadBtn.classList.remove('processing');
+            });
+        }, 100);
     });
 
     shareXBtn.addEventListener('click', () => {
