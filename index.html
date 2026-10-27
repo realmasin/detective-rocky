@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Seismic Interrogation</title>
-    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link rel="stylesheet" href="style.css">
@@ -25,7 +24,6 @@
             <span class="blinking-dot">ENCRYPTED_LINK</span>
         </div>
 
-        <!-- Intro Screen -->
         <div id="intro-screen" class="screen active">
             <div class="terminal-window">
                 <div class="terminal-header">
@@ -45,7 +43,6 @@
             </div>
         </div>
 
-        <!-- Identity Screen -->
         <div id="identity-screen" class="screen hidden">
             <div class="hud-panel identity-form fade-element">
                 <div class="form-header">
@@ -65,7 +62,6 @@
             </div>
         </div>
 
-        <!-- Dialogue Screen -->
         <div id="dialogue-screen" class="screen hidden">
             <div class="cinematic-subtitle">
                 <span class="bracket">[</span>
@@ -75,7 +71,6 @@
             </div>
         </div>
 
-        <!-- Interrogation Screen -->
         <div id="interrogation-screen" class="screen hidden">
             <div class="interrogation-wrapper">
                 <div class="top-section fade-element" id="q-container">
@@ -103,60 +98,60 @@
             </div>
         </div>
 
-        <!-- Endgame Screen -->
         <div id="endgame-screen" class="screen hidden">
             <div id="prison-bars" class="hidden">
                 <div class="bar"></div><div class="bar"></div><div class="bar"></div>
                 <div class="bar"></div><div class="bar"></div><div class="bar"></div>
             </div>
             
-            <div id="card-wrapper" class="hidden">
-                <!-- Native Responsive Card for UI -->
-                <div id="result-card" class="twitter-card">
-                    <div class="tc-bg-texture"></div>
-                    <div class="tc-radar-grid"></div>
-                    <div class="tc-watermark">SEISMIC DEPT.7</div>
-                    
-                    <div class="tc-header">
-                        <div class="tc-logo"></div>
-                        <span>OFFICIAL INTELLIGENCE DOSSIER</span>
-                        <div class="tc-date" id="tc-hash">UID: 00000000</div>
-                    </div>
-                    
-                    <div class="tc-body">
-                        <div class="tc-profile-col">
-                            <div class="tc-frame">
-                                <img id="card-pfp" src="" alt="Subject Asset">
-                                <div class="tc-crosshair"></div>
-                                <div class="tc-scan"></div>
-                            </div>
-                            <div class="tc-barcode"></div>
+            <div id="card-scale-wrapper" class="hidden">
+                <div class="twitter-card-container">
+                    <div id="result-card" class="twitter-card">
+                        <div class="tc-bg-texture"></div>
+                        <div class="tc-radar-grid"></div>
+                        <div class="tc-watermark">SEISMIC DEPT.7</div>
+                        
+                        <div class="tc-header">
+                            <div class="tc-logo"></div>
+                            <span>OFFICIAL INTELLIGENCE DOSSIER</span>
+                            <div class="tc-date" id="tc-hash">UID: 00000000</div>
                         </div>
                         
-                        <div class="tc-data-col">
-                            <div class="tc-data-row">
-                                <span class="tc-label">OPERATIVE ALIAS:</span>
-                                <span id="card-name" class="tc-value tc-highlight">UNKNOWN</span>
+                        <div class="tc-body">
+                            <div class="tc-profile-col">
+                                <div class="tc-frame">
+                                    <img id="card-pfp" src="" alt="Subject Asset">
+                                    <div class="tc-crosshair"></div>
+                                    <div class="tc-scan"></div>
+                                </div>
+                                <div class="tc-barcode"></div>
                             </div>
-                            <div class="tc-data-row">
-                                <span class="tc-label">SYSTEM ID NO:</span>
-                                <span id="card-id" class="tc-value">SMC-0000</span>
-                            </div>
-                            <div class="tc-data-row">
-                                <span class="tc-label">INTERROGATION YIELD:</span>
-                                <div class="tc-score-wrap">
-                                    <span id="final-score" class="tc-value">0/8</span>
-                                    <div class="tc-bar-bg"><div id="score-progress" class="tc-bar-fill"></div></div>
+                            
+                            <div class="tc-data-col">
+                                <div class="tc-data-row">
+                                    <span class="tc-label">OPERATIVE ALIAS:</span>
+                                    <span id="card-name" class="tc-value tc-highlight">UNKNOWN</span>
+                                </div>
+                                <div class="tc-data-row">
+                                    <span class="tc-label">SYSTEM ID NO:</span>
+                                    <span id="card-id" class="tc-value">SMC-0000</span>
+                                </div>
+                                <div class="tc-data-row">
+                                    <span class="tc-label">INTELLIGENCE ACCURACY:</span>
+                                    <div class="tc-score-wrap">
+                                        <span id="final-score" class="tc-value">0/8</span>
+                                        <div class="tc-bar-bg"><div id="score-progress" class="tc-bar-fill"></div></div>
+                                    </div>
+                                </div>
+                                <div class="tc-data-row">
+                                    <span class="tc-label">COMMAND DIRECTIVE:</span>
+                                    <span id="card-status" class="tc-value">EVALUATING...</span>
                                 </div>
                             </div>
-                            <div class="tc-data-row">
-                                <span class="tc-label">COMMAND DIRECTIVE:</span>
-                                <span id="card-status" class="tc-value">EVALUATING...</span>
-                            </div>
                         </div>
+                        
+                        <div id="endgame-stamp" class="tc-stamp"></div>
                     </div>
-                    
-                    <div id="endgame-stamp" class="tc-stamp"></div>
                 </div>
 
                 <div class="endgame-actions" id="action-buttons">
@@ -171,7 +166,6 @@
         </div>
 
     </div>
-    <!-- Hidden container used for generating perfect HD image -->
     <div id="export-container"></div>
     <script src="script.js"></script>
 </body>
