@@ -1,7 +1,8 @@
 (function() {
     
-    // DOM Initializations
     const transitionOverlay = document.getElementById('transition-overlay');
+    const transText = document.getElementById('trans-text');
+    
     const bgElement = document.getElementById('background');
     const randomHash = document.getElementById('random-hash');
     const glitchOverlay = document.getElementById('glitch-overlay');
@@ -56,11 +57,10 @@
     
     let playerName = "UNKNOWN";
     let playerPfpSrc = "images/rocky-normal.jpg"; 
-    let isSpyTweetStatus = ""; // Used for Twitter sharing text
+    let isSpyTweetStatus = ""; 
     
     const TIME_PER_QUESTION_MS = 15000; 
 
-    // Updated Lore Story
     const introLines = [
         "> ACCESSING SEISMIC COMMUNITY ARCHIVES...",
         "> WARNING: UNVERIFIED ENTITY DETECTED IN THE HQ.",
@@ -147,19 +147,20 @@
         glitchOverlay.classList.add('flash-glitch');
     }
 
-    // Slower Cinematic Transition
-    async function transitionScreen(fromElement, toElement) {
+    // --- NEW: DYNAMIC LOADING SCREEN TRANSITION ---
+    async function transitionScreen(fromElement, toElement, loadingText = "> SYSTEM_PROCESSING...", waitTime = 1200) {
+        transText.textContent = loadingText;
         transitionOverlay.classList.add('transition-active');
-        await new Promise(r => setTimeout(r, 1000)); // Slower fade to black
+        
+        await new Promise(r => setTimeout(r, waitTime)); 
         
         fromElement.classList.remove('active');
         fromElement.classList.add('hidden');
         toElement.classList.remove('hidden');
         toElement.classList.add('active');
         
-        await new Promise(r => setTimeout(r, 200)); 
         transitionOverlay.classList.remove('transition-active');
-        await new Promise(r => setTimeout(r, 700)); 
+        await new Promise(r => setTimeout(r, 600)); 
     }
 
     function typeWriterEffect(element, text, speed, onComplete) {
@@ -178,11 +179,7 @@
                 if(char === '<') isTag = true;
                 if(char === '>') isTag = false;
                 
-                if(!isTag) {
-                    i++;
-                } else {
-                    i++;
-                }
+                if(!isTag) i++; else i++;
             } else {
                 clearInterval(typingInterval);
                 isTyping = false;
@@ -195,7 +192,7 @@
         element.textContent = text;
     }
 
-    // Sequence 1: Boot Intro
+    // Sequence 1: Boot
     function startIntro() {
         skipBtn.classList.remove('hidden');
         storyTextContainer.innerHTML = '';
@@ -242,9 +239,8 @@
     });
 
     readyBtn.addEventListener('click', async () => {
-        readyBtn.querySelector('.btn-text').textContent = 'EXECUTING...';
         readyBtn.classList.add('processing');
-        await transitionScreen(introScreen, identityScreen);
+        await transitionScreen(introScreen, identityScreen, "> ESTABLISHING_SECURE_LINK...", 1500);
     });
 
     // Sequence 2: Form
@@ -263,20 +259,14 @@
         const reader = new FileReader();
         reader.onload = async function(e) {
             playerPfpSrc = e.target.result;
-            submitIdentityBtn.textContent = 'ENCRYPTING...';
             submitIdentityBtn.classList.add('processing');
-            await new Promise(r => setTimeout(r, 600)); 
-            proceedToDialogue();
+            await transitionScreen(identityScreen, dialogueScreen, "> ENCRYPTING_BIOMETRICS...", 1800);
+            changeRockyImage('reading');
+            playNextDialogueLine();
+            startLightGlitches(); 
         }
         reader.readAsDataURL(file);
     });
-
-    async function proceedToDialogue() {
-        await transitionScreen(identityScreen, dialogueScreen);
-        changeRockyImage('reading');
-        playNextDialogueLine();
-        startLightGlitches(); 
-    }
 
     dialogueScreen.addEventListener('click', async () => {
         if (isTyping) {
@@ -288,7 +278,7 @@
             if (currentLineIndex < rulesLines.length) {
                 playNextDialogueLine();
             } else {
-                await transitionScreen(dialogueScreen, interrogationScreen);
+                await transitionScreen(dialogueScreen, interrogationScreen, "> INITIALIZING_INTERROGATION...", 1500);
                 changeRockyImage('normal');
                 activeQuestions = shuffleArray([...questionsDatabase]).slice(0, 8);
                 currentQuestionIndex = 0;
@@ -387,25 +377,39 @@
             triggerFlash(); 
         }
 
-        // SLOWER WAIT BETWEEN QUESTIONS
-        await new Promise(r => setTimeout(r, 3000)); 
-        
-        transitionOverlay.classList.add('transition-active');
-        await new Promise(r => setTimeout(r, 800)); // wait for fade
+        await new Promise(r => setTimeout(r, 2200)); 
         
         currentQuestionIndex++;
-        loadQuestion();
         
-        await new Promise(r => setTimeout(r, 100));
-        transitionOverlay.classList.remove('transition-active');
+        if (currentQuestionIndex < activeQuestions.length) {
+            await transitionScreen(interrogationScreen, interrogationScreen, "> FETCHING_NEXT_FRAGMENT...", 1000);
+            loadQuestion();
+        } else {
+            loadQuestion(); // triggers endgame
+        }
     }
 
-    // Sequence 4: Endgame with 3 Tiers
+    // Sequence 4: Special Suspense Endgame Transition
     async function triggerEndgame() {
         clearInterval(lightGlitchInterval);
         
-        // SLOWER FADE INTO ENDGAME
-        await transitionScreen(interrogationScreen, endgameScreen);
+        // SUSPENSE TRANSITION
+        transText.textContent = "> ANALYZING_INTERROGATION_DATA...";
+        transitionOverlay.classList.add('transition-active');
+        await new Promise(r => setTimeout(r, 1500));
+        
+        transText.textContent = "> CALCULATING_THREAT_LEVEL...";
+        await new Promise(r => setTimeout(r, 1500));
+        
+        transText.textContent = "> GENERATING_OFFICIAL_DOSSIER...";
+        await new Promise(r => setTimeout(r, 1200));
+        
+        interrogationScreen.classList.remove('active');
+        interrogationScreen.classList.add('hidden');
+        endgameScreen.classList.remove('hidden');
+        endgameScreen.classList.add('active');
+        
+        transitionOverlay.classList.remove('transition-active');
         
         cardPfp.src = playerPfpSrc;
         cardName.textContent = playerName.toUpperCase();
@@ -414,15 +418,13 @@
         let percentage = (score / 8) * 100;
         scoreProgress.style.width = `${percentage}%`;
         
-        // DELAY BEFORE SHOWING CARD FOR SUSPENSE
-        await new Promise(r => setTimeout(r, 1500));
+        await new Promise(r => setTimeout(r, 600));
 
         cardScaleWrapper.classList.remove('hidden');
         cardScaleWrapper.classList.add('show-card-anim');
         
         setTimeout(() => {
             if (score >= 6) {
-                // Tier 1: True Member (6 to 8 points)
                 cardStatus.textContent = "VERIFIED ELITE";
                 cardStatus.style.color = "var(--success-color)";
                 scoreProgress.style.background = "var(--success-color)";
@@ -431,7 +433,6 @@
                 bgElement.classList.add('bg-victory'); 
                 isSpyTweetStatus = "Verified Elite Member! ✅";
             } else if (score >= 4) {
-                // Tier 2: Potential Spy (4 to 5 points)
                 cardStatus.textContent = "POTENTIAL SPY";
                 cardStatus.style.color = "var(--warning-color)";
                 scoreProgress.style.background = "var(--warning-color)";
@@ -440,7 +441,6 @@
                 triggerFlash();
                 isSpyTweetStatus = "Under Suspicion! ⚠️";
             } else {
-                // Tier 3: Spy (0 to 3 points)
                 cardStatus.textContent = "CRITICAL THREAT";
                 cardStatus.style.color = "var(--danger-color)";
                 scoreProgress.style.background = "var(--danger-color)";
@@ -457,7 +457,6 @@
         }, 1200);
     }
 
-    // PERFECT EXPORT
     downloadBtn.addEventListener('click', () => {
         downloadBtn.textContent = 'GENERATING...';
         downloadBtn.classList.add('processing');
