@@ -4,13 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Seismic Interrogation</title>
+    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     
-    <div id="transition-overlay"></div>
+    <!-- ADVANCED CINEMATIC TRANSITION OVERLAY -->
+    <div id="transition-overlay">
+        <div class="trans-matrix-bg"></div>
+        <div class="transition-ui">
+            <div class="trans-spinner"></div>
+            <div class="trans-text-box">
+                <span id="trans-text">> LOADING_PROTOCOL...</span><span class="blinking-cursor">_</span>
+            </div>
+            <div class="trans-progress">
+                <div class="trans-progress-fill"></div>
+            </div>
+        </div>
+    </div>
 
     <div id="game-container">
         
@@ -24,6 +37,7 @@
             <span class="blinking-dot">ENCRYPTED_LINK</span>
         </div>
 
+        <!-- Intro Screen -->
         <div id="intro-screen" class="screen active">
             <div class="terminal-window">
                 <div class="terminal-header">
@@ -43,6 +57,7 @@
             </div>
         </div>
 
+        <!-- Identity Screen -->
         <div id="identity-screen" class="screen hidden">
             <div class="hud-panel identity-form fade-element">
                 <div class="form-header">
@@ -62,6 +77,7 @@
             </div>
         </div>
 
+        <!-- Dialogue Screen -->
         <div id="dialogue-screen" class="screen hidden">
             <div class="cinematic-subtitle">
                 <span class="bracket">[</span>
@@ -71,6 +87,7 @@
             </div>
         </div>
 
+        <!-- Interrogation Screen -->
         <div id="interrogation-screen" class="screen hidden">
             <div class="interrogation-wrapper">
                 <div class="top-section fade-element" id="q-container">
@@ -98,6 +115,7 @@
             </div>
         </div>
 
+        <!-- Endgame Screen -->
         <div id="endgame-screen" class="screen hidden">
             <div id="prison-bars" class="hidden">
                 <div class="bar"></div><div class="bar"></div><div class="bar"></div>
@@ -137,7 +155,7 @@
                                     <span id="card-id" class="tc-value">SMC-0000</span>
                                 </div>
                                 <div class="tc-data-row">
-                                    <span class="tc-label">INTELLIGENCE ACCURACY:</span>
+                                    <span class="tc-label">INTERROGATION YIELD:</span>
                                     <div class="tc-score-wrap">
                                         <span id="final-score" class="tc-value">0/8</span>
                                         <div class="tc-bar-bg"><div id="score-progress" class="tc-bar-fill"></div></div>
@@ -166,6 +184,7 @@
         </div>
 
     </div>
+    
     <div id="export-container"></div>
     <script src="script.js"></script>
 </body>
