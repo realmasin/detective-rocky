@@ -1,6 +1,5 @@
 (function() {
     
-    // --- DOM Elements ---
     const bgElement = document.getElementById('background');
     const randomHash = document.getElementById('random-hash');
     
@@ -28,6 +27,7 @@
     const digitalTimer = document.getElementById('digital-timer');
     
     const endgameScreen = document.getElementById('endgame-screen');
+    const cardWrapper = document.getElementById('card-wrapper');
     const resultCard = document.getElementById('result-card');
     const cardPfp = document.getElementById('card-pfp');
     const cardName = document.getElementById('card-name');
@@ -37,11 +37,9 @@
     const endgameStamp = document.getElementById('endgame-stamp');
     const prisonBars = document.getElementById('prison-bars');
     
-    const actionButtons = document.getElementById('action-buttons');
     const downloadBtn = document.getElementById('download-btn');
     const shareXBtn = document.getElementById('share-x-btn');
 
-    // --- Variables ---
     let currentQuestionIndex = 0;
     let score = 0;
     let timerReq;
@@ -56,22 +54,23 @@
     
     const TIME_PER_QUESTION_MS = 15000; 
 
-    // --- Data ---
+    // Enhanced Prologue Story
     const introLines = [
-        "ESTABLISHING SECURE CONNECTION...",
-        "SYSTEM BREACH DETECTED...",
-        "SPIES INFILTRATION SUSPECTED...",
-        "DETECTIVE ROCKY AWAITING IN ROOM 7..."
+        "CONNECTION ESTABLISHED. ENCRYPTION PROTOCOL ALPHA INITIATED...",
+        "UNAUTHORIZED DATA EXFILTRATION DETECTED IN SECTOR 7.",
+        "INTERNAL AUDIT SUGGESTS A HIGH-LEVEL SPY IS AMONG US.",
+        "DETECTIVE ROCKY HAS SUMMONED YOU FOR A CLEARANCE EVALUATION.",
+        "WARNING: FAILURE TO VERIFY IDENTITY WILL RESULT IN IMMEDIATE LOCKDOWN."
     ];
 
     const rulesLines = [
-        "Welcome... Have a seat.",
-        "I am Rocky. I am on a special mission to catch spies in Seismic.",
-        "During my investigation, I suspected you might be a spy.",
-        "I brought you here today to ask you a few questions.",
-        "Your answers will tell me if my suspicions were right or wrong.",
-        "I will ask you 8 questions. Answer correctly before time runs out.",
-        "Let's begin. I have hundreds of spies waiting to be caught."
+        "Take a seat.",
+        "A critical breach has occurred at Seismic Headquarters.",
+        "My profiling algorithms suggest you might be the leak.",
+        "I have 8 encrypted questions. Answer them correctly.",
+        "If you are loyal, you walk free. If you are a spy...",
+        "Well, let's just say you won't need your badge anymore.",
+        "Timer starts now. Do not make a mistake."
     ];
 
     const correctReactions = [
@@ -108,7 +107,6 @@
     let isIntroTyping = false;
     let introTimeout;
 
-    // --- Utility & FX Functions ---
     function shuffleArray(array) {
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -122,24 +120,23 @@
     }
 
     function generateAgentID() {
-        return "SMC-" + Math.floor(1000 + Math.random() * 9000);
+        return "SMC-" + Math.floor(10000 + Math.random() * 90000);
     }
 
-    // Top bar hash generator
     setInterval(() => {
         randomHash.textContent = "HASH: 0x" + Math.floor(Math.random()*16777215).toString(16).toUpperCase();
     }, 2000);
 
-    // Random Micro Glitches for Rocky's background
-    function startMicroGlitches() {
+    function startErraticGlitches() {
         glitchInterval = setInterval(() => {
-            if(Math.random() > 0.7) { // 30% chance every 3s
-                bgElement.classList.add('random-glitch');
-                setTimeout(() => bgElement.classList.remove('random-glitch'), 200);
+            if(Math.random() > 0.6) { 
+                bgElement.classList.add('erratic-glitch');
+                setTimeout(() => bgElement.classList.remove('erratic-glitch'), 300);
             }
-        }, 3000);
+        }, 3500);
     }
 
+    // Slower typing for readability
     function typeWriterEffect(element, text, speed, onComplete) {
         isTyping = true;
         element.textContent = ''; 
@@ -198,7 +195,7 @@
         scrambleIntervals = [];
     }
 
-    // --- Sequences ---
+    // Sequence 1: Intro (Slower pacing)
     function startIntro() {
         skipBtn.classList.remove('hidden');
         storyTextContainer.innerHTML = '';
@@ -207,21 +204,20 @@
 
         function showNextLine() {
             if (!isIntroTyping) return;
-            storyTextContainer.innerHTML = '';
             const lineDiv = document.createElement('div');
             lineDiv.className = 'intro-line';
             storyTextContainer.appendChild(lineDiv);
             
-            typeWriterEffect(lineDiv, introLines[lineIndex], 40, () => {
+            typeWriterEffect(lineDiv, introLines[lineIndex], 60, () => {
                 lineIndex++;
                 if (lineIndex < introLines.length) {
-                    introTimeout = setTimeout(showNextLine, 1000); 
+                    introTimeout = setTimeout(showNextLine, 1400); 
                 } else {
                     introTimeout = setTimeout(() => {
                         isIntroTyping = false;
                         readyBtn.classList.remove('hidden');
                         skipBtn.classList.add('hidden');
-                    }, 800);
+                    }, 1000);
                 }
             });
         }
@@ -232,7 +228,13 @@
         isIntroTyping = false;
         clearInterval(typingInterval);
         clearTimeout(introTimeout);
-        storyTextContainer.innerHTML = `<div class="intro-line">${introLines[introLines.length - 1]}</div>`;
+        storyTextContainer.innerHTML = '';
+        introLines.forEach(line => {
+            const div = document.createElement('div');
+            div.className = 'intro-line';
+            div.textContent = line;
+            storyTextContainer.appendChild(div);
+        });
         readyBtn.classList.remove('hidden');
         skipBtn.classList.add('hidden');
     });
@@ -270,7 +272,7 @@
         dialogueScreen.classList.remove('hidden');
         dialogueScreen.classList.add('active');
         playNextDialogueLine();
-        startMicroGlitches(); // Start eerie glitches
+        startErraticGlitches(); 
     }
 
     dialogueScreen.addEventListener('click', () => {
@@ -387,8 +389,8 @@
         } else {
             changeRockyImage('angry');
             scrambleText(questionText, wrongReactions[Math.floor(Math.random() * wrongReactions.length)], 500);
-            bgElement.classList.add('random-glitch'); // Force glitch on wrong
-            setTimeout(() => bgElement.classList.remove('random-glitch'), 300);
+            bgElement.classList.add('erratic-glitch'); 
+            setTimeout(() => bgElement.classList.remove('erratic-glitch'), 300);
         }
 
         setTimeout(() => {
@@ -401,7 +403,6 @@
         }, 2000); 
     }
 
-    // --- Sequence 5: 3D Endgame ---
     function triggerEndgame() {
         clearInterval(glitchInterval);
         interrogationScreen.classList.remove('active');
@@ -413,13 +414,19 @@
         cardName.textContent = playerName;
         finalScoreEl.textContent = `${score}/8`;
         
+        // Unified reveal animation triggered by class
+        cardWrapper.classList.remove('hidden');
+        
         setTimeout(() => {
             if (score >= 4) {
-                cardStatus.textContent = "VERIFIED";
+                // Victory Vibes
+                cardStatus.textContent = "VERIFIED ELITE";
                 cardStatus.style.color = "var(--success-color)";
                 endgameStamp.innerHTML = "ACCESS<br>GRANTED";
                 endgameStamp.className = "stamp stamp-success show";
+                bgElement.classList.add('bg-victory'); // Changes background glow
             } else {
+                // Spy Detected Vibes
                 cardStatus.textContent = "SPY DETECTED";
                 cardStatus.style.color = "var(--danger-color)";
                 prisonBars.classList.remove('hidden');
@@ -428,53 +435,28 @@
                 setTimeout(() => {
                     endgameStamp.innerHTML = "SPY<br>DETECTED";
                     endgameStamp.className = "stamp stamp-danger show";
-                }, 800);
+                    bgElement.classList.add('erratic-glitch');
+                    setTimeout(() => bgElement.classList.remove('erratic-glitch'), 300);
+                }, 600);
             }
-            
-            setTimeout(() => {
-                actionButtons.classList.remove('hidden');
-                actionButtons.classList.remove('fade-out');
-            }, 1500);
-
-        }, 500);
+        }, 800);
     }
 
-    // 3D Card Mouse Parallax Effect
-    document.addEventListener('mousemove', (e) => {
-        if (endgameScreen.classList.contains('active')) {
-            // Calculate mouse position relative to center of screen
-            let xAxis = (window.innerWidth / 2 - e.pageX) / 25;
-            let yAxis = (window.innerHeight / 2 - e.pageY) / 25;
-            resultCard.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
-        }
-    });
-
-    // Reset 3D effect temporarily before saving image
     downloadBtn.addEventListener('click', () => {
-        // Save current transform to restore later
-        const currentTransform = resultCard.style.transform;
-        // Flatten card for clean screenshot
-        resultCard.style.transform = 'rotateY(0deg) rotateX(0deg)';
-        
-        setTimeout(() => {
-            html2canvas(resultCard, {
-                backgroundColor: "#0c0c0c",
-                scale: 2 
-            }).then(canvas => {
-                const link = document.createElement('a');
-                link.download = `Seismic_Report_${playerName}.png`;
-                link.href = canvas.toDataURL('image/png');
-                link.click();
-                
-                // Restore 3D
-                resultCard.style.transform = currentTransform;
-            });
-        }, 100); // Small delay to let CSS update
+        html2canvas(resultCard, {
+            backgroundColor: "#0c0c0c",
+            scale: 2 
+        }).then(canvas => {
+            const link = document.createElement('a');
+            link.download = `Seismic_Intel_${playerName}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        });
     });
 
     shareXBtn.addEventListener('click', () => {
         const isSpy = score < 4;
-        let tweetText = `Detective Rocky interrogated me at the Seismic Headquarters... 🕵️‍♂️\n\nAgent: ${playerName}\nScore: ${score}/8\nResult: ${isSpy ? 'Imprisoned as a SPY! 🚨' : 'Verified Elite Member! ✅'}\n\nCan you survive the interrogation? Play here: [YOUR_GAME_URL_HERE] @SeismicSystem`;
+        let tweetText = `Detective Rocky evaluated my clearance at Seismic HQ... 🕵️‍♂️\n\nAgent: ${playerName}\nIntel Score: ${score}/8\nStatus: ${isSpy ? 'Imprisoned as a SPY! 🚨' : 'Verified Elite Member! ✅'}\n\nDo you have what it takes? Play here: [YOUR_GAME_URL_HERE] @SeismicSystem`;
         const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
         window.open(twitterUrl, '_blank');
     });
