@@ -10,7 +10,14 @@
 </head>
 <body>
     
-    <div id="transition-overlay"></div>
+    <!-- Dynamic Cyber Panel Transition -->
+    <div id="transition-overlay">
+        <div class="trans-panel panel-1"></div>
+        <div class="trans-panel panel-2"></div>
+        <div class="trans-panel panel-3"></div>
+        <div class="trans-panel panel-4"></div>
+        <div class="trans-panel panel-5"></div>
+    </div>
 
     <div id="game-container">
         
@@ -58,7 +65,7 @@
             </div>
         </div>
 
-        <!-- Dialogue Screen (Redesigned) -->
+        <!-- Dialogue Screen -->
         <div id="dialogue-screen" class="screen hidden">
             <div class="cinematic-subtitle">
                 <span class="bracket">[</span>
@@ -103,8 +110,8 @@
             
             <div id="card-scale-wrapper" class="hidden">
                 <div class="twitter-card-container">
+                    <!-- The exact layout structure for cloning -->
                     <div id="result-card" class="twitter-card">
-                        
                         <div class="tc-bg-texture"></div>
                         <div class="tc-radar-grid"></div>
                         <div class="tc-watermark">SEISMIC DEPT.7</div>
@@ -130,12 +137,10 @@
                                     <span class="tc-label">SUBJECT ALIAS:</span>
                                     <span id="card-name" class="tc-value tc-highlight">UNKNOWN</span>
                                 </div>
-                                
                                 <div class="tc-data-row">
                                     <span class="tc-label">AGENT ID:</span>
                                     <span id="card-id" class="tc-value">SMC-0000</span>
                                 </div>
-                                
                                 <div class="tc-data-row">
                                     <span class="tc-label">INTELLIGENCE ACCURACY:</span>
                                     <div class="tc-score-wrap">
@@ -143,7 +148,6 @@
                                         <div class="tc-bar-bg"><div id="score-progress" class="tc-bar-fill"></div></div>
                                     </div>
                                 </div>
-                                
                                 <div class="tc-data-row">
                                     <span class="tc-label">FINAL DIRECTIVE:</span>
                                     <span id="card-status" class="tc-value">EVALUATING...</span>
