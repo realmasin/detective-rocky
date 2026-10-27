@@ -1,4 +1,3 @@
-/* --- Variables & Core System --- */
 :root {
     --primary-color: #ffffff; 
     --bg-color: #050505; 
@@ -16,7 +15,6 @@ body { background-color: var(--bg-color); color: var(--primary-color); font-fami
 
 #game-container { position: relative; width: 100vw; height: 100vh; display: flex; justify-content: center; align-items: center; background-color: #000; }
 
-/* Cinematic Transition Overlay */
 #transition-overlay {
     position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
     background: #000; z-index: 9999; pointer-events: none;
@@ -38,7 +36,6 @@ body { background-color: var(--bg-color); color: var(--primary-color); font-fami
     z-index: 100; pointer-events: none;
 }
 
-/* --- Environment --- */
 #background {
     position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
     background-image: url('images/rocky-normal.jpg');
@@ -46,7 +43,6 @@ body { background-color: var(--bg-color); color: var(--primary-color); font-fami
     transition: filter 1s ease, background-image 0.2s ease;
     animation: breatheEffect 20s infinite alternate ease-in-out; z-index: 1;
 }
-
 .bg-blur { filter: blur(8px) brightness(0.35); }
 .bg-victory { filter: blur(4px) brightness(0.7) sepia(0.2) hue-rotate(-10deg) !important; }
 
@@ -71,7 +67,7 @@ body { background-color: var(--bg-color); color: var(--primary-color); font-fami
 
 .hud-panel { background: var(--hud-bg); border: 1px solid var(--hud-border); box-shadow: 0 0 10px rgba(82,53,66,0.3), inset 0 0 15px rgba(0,0,0,0.8); border-radius: 2px; position: relative; }
 
-/* --- Buttons --- */
+/* Buttons & Animations */
 .cyber-btn {
     position: relative; background: rgba(0,0,0,0.8); color: var(--primary-color);
     border: 1px solid var(--brand-color); padding: 15px 25px;
@@ -85,8 +81,14 @@ body { background-color: var(--bg-color); color: var(--primary-color); font-fami
 .cyber-btn:hover::before { left: 100%; }
 .cyber-btn:hover { background: var(--brand-color); box-shadow: 0 0 15px var(--brand-light); color: #fff; }
 .cyber-btn.processing { background: #fff !important; color: #000 !important; cursor: wait; pointer-events: none; }
-
 .x-btn { border-color: #fff; } .x-btn:hover { background: #fff; color: #000; box-shadow: 0 0 15px #fff; }
+
+.decode-reveal { animation: decodeIn 1.5s cubic-bezier(0.1, 0.9, 0.2, 1) forwards; }
+@keyframes decodeIn {
+    0% { opacity: 0; filter: blur(10px) hue-rotate(90deg); transform: translateY(20px) scale(0.9); }
+    50% { opacity: 1; filter: blur(5px) hue-rotate(45deg); transform: translateY(-5px) scale(1.02); }
+    100% { opacity: 1; filter: blur(0); transform: translateY(0) scale(1); }
+}
 
 #skip-btn {
     position: absolute; bottom: 40px; right: 30px; background: transparent; border: none;
@@ -95,21 +97,14 @@ body { background-color: var(--bg-color); color: var(--primary-color); font-fami
 }
 #skip-btn:hover { color: #fff; }
 
-/* --- WOW Terminal Intro --- */
-/* Semi-transparent background so Rocky breathes behind it */
-#intro-screen { justify-content: center; align-items: center; background: radial-gradient(circle, rgba(82,53,66,0.3) 0%, rgba(0,0,0,0.6) 100%); padding: 2rem; }
+/* Intro Screen */
+#intro-screen { justify-content: center; align-items: center; background: radial-gradient(circle, rgba(82,53,66,0.1) 0%, rgba(0,0,0,0.8) 100%); padding: 2rem; }
+.terminal-window { width: 100%; max-width: 750px; }
+.terminal-body { min-height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.intro-line { font-size: 1.2rem; letter-spacing: 2px; color: #fff; text-shadow: 0 0 8px rgba(255,255,255,0.4); margin: 5px 0; text-align: center; line-height: 1.6; }
+.intro-buttons { display: flex; gap: 15px; margin-top: 30px; min-height: 60px; }
 
-.terminal-window { width: 90%; max-width: 750px; background: rgba(5,5,5,0.85); border: 1px solid var(--brand-color); box-shadow: 0 0 30px rgba(0,0,0,0.9); }
-.terminal-header { background: var(--brand-color); padding: 10px; display: flex; align-items: center; border-bottom: 2px solid #222; }
-.dot { width: 12px; height: 12px; border-radius: 50%; margin-right: 8px; }
-.dot.red { background: #ff5f56; } .dot.yellow { background: #ffbd2e; } .dot.green { background: #27c93f; }
-.terminal-title { margin-left: auto; color: #fff; font-size: 0.8rem; letter-spacing: 2px; opacity: 0.8; }
-.terminal-body { padding: 30px; min-height: 250px; display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; }
-.intro-line { font-size: 1.15rem; letter-spacing: 1px; color: #00ff66; text-shadow: 0 0 5px rgba(0,255,102,0.4); margin: 5px 0; text-align: left; line-height: 1.6; width: 100%; }
-
-.intro-buttons { display: flex; gap: 15px; margin-top: 20px; }
-
-/* --- Identity Screen --- */
+/* Identity Form */
 #identity-screen { justify-content: center; align-items: center; }
 .identity-form { width: 90%; max-width: 450px; padding: 40px; }
 .form-header { text-align: center; margin-bottom: 30px; }
@@ -124,13 +119,19 @@ body { background-color: var(--bg-color); color: var(--primary-color); font-fami
 .error-text { color: var(--danger-color); font-size: 0.8rem; margin-bottom: 15px; animation: blink 1s infinite; text-align: center; }
 .full-width-btn { width: 100%; }
 
-/* --- Dialogue Screen --- */
+/* Redesigned Cinematic Dialogue */
 #dialogue-screen { justify-content: center; align-items: center; }
-.dialogue-box { width: 90%; max-width: 650px; padding: 30px; text-align: left; border-left: 4px solid var(--brand-color); }
-#rocky-dialogue { font-size: 1.2rem; line-height: 1.6; display: inline; color: #fff; }
+.cinematic-subtitle {
+    width: 100%; max-width: 800px; padding: 25px; text-align: center;
+    background: linear-gradient(90deg, transparent, rgba(5,5,5,0.9), transparent);
+    border-top: 1px dashed var(--brand-color); border-bottom: 1px dashed var(--brand-color);
+    backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; gap: 10px;
+}
+.bracket { color: var(--brand-light); font-size: 1.8rem; font-weight: bold; opacity: 0.5; }
+#rocky-dialogue { font-size: 1.25rem; line-height: 1.6; display: inline; color: #fff; letter-spacing: 1px; text-shadow: 0 0 5px #000; }
 .type-cursor { font-size: 1.3rem; animation: blink 1s infinite; }
 
-/* --- Interrogation HUD --- */
+/* Interrogation HUD */
 #interrogation-screen { justify-content: center; align-items: center; gap: 30px; padding: 4vh 5vw; }
 .top-section, .bottom-section { width: 100%; max-width: 750px; }
 .timer-container { width: 100%; padding: 8px 15px; display: flex; justify-content: space-between; border-bottom: 2px solid var(--brand-color); margin-bottom: 15px; background: rgba(82,53,66,0.3); }
@@ -148,45 +149,36 @@ body { background-color: var(--bg-color); color: var(--primary-color); font-fami
 .option-btn.selected-correct { background: var(--success-color); color: #000; border-color: #fff; }
 .option-btn.selected-wrong { background: var(--danger-color); color: #fff; border-color: #fff; }
 
-/* --- VIRAL TWITTER 16:9 ID CARD --- */
+/* VIRAL DOSSIER CARD - MOBILE FIX */
 #endgame-screen { justify-content: center; align-items: center; background: rgba(0,0,0,0.85); flex-direction: column; transition: background 1s; }
 
-/* Scale wrapper handles mobile fitting, while the card stays strictly 800x450 */
 #card-scale-wrapper {
-    display: flex; flex-direction: column; gap: 25px; align-items: center;
+    display: flex; flex-direction: column; gap: 20px; align-items: center;
     width: 100%; max-width: 800px; z-index: 50;
 }
 .show-card-anim { animation: revealCard 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-@keyframes revealCard { 0% { opacity: 0; transform: scale(0.9) translateY(30px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
+@keyframes revealCard { 0% { opacity: 0; filter: blur(10px); transform: scale(0.9) translateY(30px); } 100% { opacity: 1; filter: blur(0); transform: scale(1) translateY(0); } }
 
-/* Strict 16:9 Dimension */
+/* Fix scaling clipping using Negative Margins for mobile sizes */
+.twitter-card-container {
+    position: relative; width: 800px; height: 450px;
+}
+
+@media (max-width: 850px) { .twitter-card-container { transform: scale(0.8); transform-origin: top center; margin-bottom: -90px; } }
+@media (max-width: 650px) { .twitter-card-container { transform: scale(0.6); transform-origin: top center; margin-bottom: -180px; } }
+@media (max-width: 450px) { .twitter-card-container { transform: scale(0.42); transform-origin: top center; margin-bottom: -261px; } }
+
 .twitter-card {
-    width: 800px; height: 450px; 
-    background: #080808; position: relative; overflow: hidden;
+    width: 800px; height: 450px; background: #080808; position: relative; overflow: hidden;
     border: 2px solid #222; box-shadow: 0 0 40px rgba(0,0,0,0.9), inset 0 0 30px rgba(82,53,66,0.5);
     display: flex; flex-direction: column;
 }
 
-/* Card Visual Layers */
 .tc-bg-texture { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, rgba(82,53,66,0.3) 0%, #000 100%); z-index: 1; }
-.tc-radar-grid {
-    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    background-image: 
-        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-    background-size: 30px 30px; z-index: 2;
-}
-.tc-watermark {
-    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-15deg);
-    font-size: 100px; color: rgba(255,255,255,0.02); font-weight: bold; white-space: nowrap; z-index: 3; letter-spacing: 5px;
-}
+.tc-radar-grid { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px); background-size: 30px 30px; z-index: 2; }
+.tc-watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-15deg); font-size: 100px; color: rgba(255,255,255,0.02); font-weight: bold; white-space: nowrap; z-index: 3; letter-spacing: 5px; }
 
-/* Card Structure */
-.tc-header {
-    position: relative; z-index: 10; background: var(--brand-color); padding: 15px 30px;
-    display: flex; align-items: center; border-bottom: 2px solid var(--brand-light); color: #fff;
-    font-weight: bold; letter-spacing: 3px; font-size: 1.1rem;
-}
+.tc-header { position: relative; z-index: 10; background: var(--brand-color); padding: 15px 30px; display: flex; align-items: center; border-bottom: 2px solid var(--brand-light); color: #fff; font-weight: bold; letter-spacing: 3px; font-size: 1.1rem; }
 .tc-logo { width: 20px; height: 20px; background: #fff; margin-right: 15px; border-radius: 2px; }
 .tc-date { margin-left: auto; color: #ddd; font-size: 0.9rem; }
 
@@ -216,24 +208,18 @@ body { background-color: var(--bg-color); color: var(--primary-color); font-fami
 }
 .tc-stamp.show { opacity: 1; transform: rotate(-15deg) scale(1); }
 
-.endgame-actions { display: flex; gap: 20px; width: 100%; max-width: 800px; justify-content: center; }
-.endgame-actions button { flex-grow: 1; padding: 18px; font-size: 1rem; }
-
-/* Scale down logic for mobile screens so it fits the viewport but exports correctly */
-@media (max-width: 850px) {
-    #card-scale-wrapper { transform-origin: top center; transform: scale(0.8); margin-top: 10vh; }
-}
-@media (max-width: 650px) {
-    #card-scale-wrapper { transform: scale(0.6); margin-top: 15vh; }
-}
-@media (max-width: 450px) {
-    #card-scale-wrapper { transform: scale(0.45); margin-top: 20vh; }
-}
+.endgame-actions { display: flex; gap: 15px; width: 100%; max-width: 800px; justify-content: center; z-index: 60; }
+.endgame-actions button { flex-grow: 1; padding: 15px; font-size: 0.95rem; }
 
 #prison-bars { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; display: flex; justify-content: space-evenly; z-index: 20; pointer-events: none; }
 .bar { width: 6vw; height: 100%; background: linear-gradient(90deg, #020202, #1a1a1a, #020202); transform: translateY(-100%); transition: transform 0.4s ease-in; box-shadow: 5px 0 20px rgba(0,0,0,0.9); pointer-events: none; }
 #prison-bars.drop .bar { transform: translateY(0); }
-.bar:nth-child(2) { transition-delay: 0.1s; } .bar:nth-child(3) { transition-delay: 0.2s; }
-.bar:nth-child(4) { transition-delay: 0.15s; } .bar:nth-child(5) { transition-delay: 0.05s; } .bar:nth-child(6) { transition-delay: 0.25s; }
 
+.fade-element { transition: opacity 0.3s ease; opacity: 1; }
+.fade-out { opacity: 0; pointer-events: none; }
 @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+@media (max-height: 700px) {
+    #interrogation-screen { gap: 15px; padding: 2vh 5vw; }
+    .option-btn { min-height: 55px; }
+}
