@@ -10,26 +10,37 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    
+    <!-- Cinematic Fade Overlay -->
+    <div id="transition-overlay"></div>
+
     <div id="game-container">
         
-        <!-- Effects Overlays -->
+        <!-- Environment -->
         <div class="crt-overlay"></div>
-        <div id="glitch-overlay"></div> <!-- NEW: Dedicated light glitch overlay -->
+        <div id="glitch-overlay"></div>
         <div id="background" class="bg-blur"></div>
 
-        <!-- System Status Bar -->
+        <!-- Top Status Bar -->
         <div id="top-status-bar">
-            <span>SEISMIC_SYS // TERMINAL_7</span>
+            <span>SEISMIC_SYS // DEPT-7</span>
             <span id="random-hash">AUTH: 0x0000</span>
             <span class="blinking-dot">LIVE</span>
         </div>
 
-        <!-- Intro Screen -->
+        <!-- WOW Intro Screen (Terminal Boot) -->
         <div id="intro-screen" class="screen active">
-            <div id="story-text-container"></div>
-            <button id="skip-btn" class="hidden">SKIP >></button>
+            <div class="terminal-window hud-panel">
+                <div class="terminal-header">
+                    <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+                    <span class="terminal-title">BOOT_SEQ_V3.0</span>
+                </div>
+                <div class="terminal-body" id="story-text-container"></div>
+            </div>
+            
+            <button id="skip-btn" class="hidden">SKIP_BOOT_SEQ >></button>
             <div class="intro-buttons">
-                <button id="ready-btn" class="cyber-btn hidden">CONNECT</button>
+                <button id="ready-btn" class="cyber-btn hidden">ESTABLISH_CONNECTION</button>
             </div>
         </div>
 
@@ -45,7 +56,7 @@
                     <input type="text" id="username-input" placeholder="Enter codename" autocomplete="off" maxlength="15">
                 </div>
                 <div class="input-group">
-                    <label>> BIOMETRIC_SCAN (UPLOAD):</label>
+                    <label>> UPLOAD_BIOMETRICS (PFP):</label>
                     <input type="file" id="pfp-input" accept="image/*">
                 </div>
                 <div id="identity-error" class="error-text hidden">ERR: ALL FIELDS REQUIRED</div>
@@ -94,67 +105,63 @@
                 <div class="bar"></div><div class="bar"></div><div class="bar"></div>
             </div>
             
-            <!-- HIGHLY DETAILED VIRAL ID CARD -->
-            <div id="card-wrapper" class="hidden">
-                <div id="result-card" class="dossier-card">
+            <!-- X-Optimized 16:9 Cinematic Result Card -->
+            <!-- The wrapper scales down for mobile, but the card remains 800x450 for HD exports -->
+            <div id="card-scale-wrapper" class="hidden">
+                <div id="result-card" class="twitter-card">
                     
-                    <!-- Decorative Tech Elements -->
-                    <div class="dossier-bg-pattern"></div>
-                    <div class="corner-accents">
-                        <div class="tl"></div><div class="tr"></div>
-                        <div class="bl"></div><div class="br"></div>
+                    <!-- Background Layers -->
+                    <div class="tc-bg-texture"></div>
+                    <div class="tc-radar-grid"></div>
+                    <div class="tc-watermark">SEISMIC DEPT.7</div>
+                    
+                    <!-- Top Bar -->
+                    <div class="tc-header">
+                        <div class="tc-logo"></div>
+                        <span>OFFICIAL INTELLIGENCE DOSSIER</span>
+                        <div class="tc-date" id="tc-hash">ID: 00000000</div>
                     </div>
                     
-                    <div class="dossier-header">
-                        <div class="header-left">
-                            <span class="dossier-title">SEISMIC THREAT DOSSIER</span>
-                            <span class="dossier-sub">CLASSIFIED // DEPT-7</span>
-                        </div>
-                        <div class="header-right">
-                            <div class="barcode-small"></div>
-                        </div>
-                    </div>
-                    
-                    <div class="dossier-body">
-                        <div class="dossier-photo-section">
-                            <div class="photo-frame">
+                    <!-- Main Content -->
+                    <div class="tc-body">
+                        <!-- Profile Area -->
+                        <div class="tc-profile-col">
+                            <div class="tc-frame">
                                 <img id="card-pfp" src="" alt="Subject">
-                                <div class="target-crosshair"></div>
-                                <div class="photo-scan-line"></div>
+                                <div class="tc-crosshair"></div>
+                                <div class="tc-scan"></div>
                             </div>
-                            <div id="card-id" class="id-tag">SMC-0000</div>
+                            <div class="tc-barcode"></div>
                         </div>
                         
-                        <div class="dossier-data-section">
-                            <div class="data-row">
-                                <span class="data-label">SUBJECT ALIAS:</span>
-                                <span id="card-name" class="data-value highlight-value">UNKNOWN</span>
+                        <!-- Data Area -->
+                        <div class="tc-data-col">
+                            <div class="tc-data-row">
+                                <span class="tc-label">SUBJECT ALIAS:</span>
+                                <span id="card-name" class="tc-value tc-highlight">UNKNOWN</span>
                             </div>
                             
-                            <div class="data-row">
-                                <span class="data-label">INTEL ACCURACY:</span>
-                                <div class="score-display">
-                                    <span id="final-score" class="data-value">0/8</span>
-                                    <div class="progress-bar-bg">
-                                        <div id="score-progress" class="progress-bar-fill"></div>
-                                    </div>
+                            <div class="tc-data-row">
+                                <span class="tc-label">AGENT ID:</span>
+                                <span id="card-id" class="tc-value">SMC-0000</span>
+                            </div>
+                            
+                            <div class="tc-data-row">
+                                <span class="tc-label">INTELLIGENCE ACCURACY:</span>
+                                <div class="tc-score-wrap">
+                                    <span id="final-score" class="tc-value">0/8</span>
+                                    <div class="tc-bar-bg"><div id="score-progress" class="tc-bar-fill"></div></div>
                                 </div>
                             </div>
                             
-                            <div class="data-row">
-                                <span class="data-label">THREAT LEVEL:</span>
-                                <span id="card-status" class="data-value">EVALUATING...</span>
-                            </div>
-                            
-                            <div class="micro-text-block">
-                                <p>SYS_VER: 9.4.2 // AUTH_HASH: <span id="card-hash">X789</span></p>
-                                <p>UNAUTHORIZED DISTRIBUTION IS STRICTLY PROHIBITED.</p>
+                            <div class="tc-data-row">
+                                <span class="tc-label">FINAL DIRECTIVE:</span>
+                                <span id="card-status" class="tc-value">EVALUATING...</span>
                             </div>
                         </div>
                     </div>
                     
-                    <!-- The big stamp -->
-                    <div id="endgame-stamp" class="dossier-stamp"></div>
+                    <div id="endgame-stamp" class="tc-stamp"></div>
                 </div>
 
                 <div class="endgame-actions" id="action-buttons">
@@ -164,7 +171,7 @@
             </div>
         </div>
         
-        <!-- Footer Exactly as requested -->
+        <!-- Footer -->
         <div id="copyright-footer">
             &copy; masinonline
         </div>
