@@ -141,14 +141,21 @@ body { background-color: var(--bg-color); color: var(--primary-color); font-fami
 .option-btn.selected-wrong { background: var(--danger-color); color: #fff; border-color: var(--danger-color); font-weight: bold; box-shadow: 0 0 20px rgba(255,42,42,0.3); }
 
 #endgame-screen { background: rgba(0,0,0,0.85); transition: background 1.5s ease; }
-#card-wrapper { display: flex; flex-direction: column; gap: 20px; align-items: center; width: 100%; max-width: 800px; z-index: 50; }
+
+/* FIX: Added position relative so the card stays above the prison bars */
+#card-scale-wrapper { 
+    position: relative; z-index: 50; 
+    display: flex; flex-direction: column; gap: 20px; align-items: center; width: 100%; max-width: 800px; 
+}
 .show-card-anim { animation: revealCard 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
 @keyframes revealCard { 0% { opacity: 0; filter: blur(10px); transform: translateY(20px); } 100% { opacity: 1; filter: blur(0); transform: translateY(0); } }
 
 .twitter-card-container { position: relative; width: 800px; height: 450px; }
+
+/* Responsive scaling for the 800x450 Card */
 @media (max-width: 850px) { .twitter-card-container { transform: scale(0.8); transform-origin: top center; margin-bottom: -90px; } }
-@media (max-width: 650px) { .twitter-card-container { transform: scale(0.6); transform-origin: top center; margin-bottom: -180px; } }
-@media (max-width: 450px) { .twitter-card-container { transform: scale(0.42); transform-origin: top center; margin-bottom: -261px; } }
+@media (max-width: 650px) { .twitter-card-container { transform: scale(0.55); transform-origin: top center; margin-bottom: -202px; } }
+@media (max-width: 450px) { .twitter-card-container { transform: scale(0.40); transform-origin: top center; margin-bottom: -270px; } }
 
 #export-container { position: absolute; left: -9999px; top: -9999px; }
 .export-mode.twitter-card { width: 800px !important; height: 450px !important; display: flex !important; flex-direction: column !important; }
@@ -198,7 +205,8 @@ body { background-color: var(--bg-color); color: var(--primary-color); font-fami
 .stamp-warning { color: var(--warning-color); border-color: var(--warning-color); text-shadow: 0 0 15px var(--warning-color); box-shadow: inset 0 0 15px rgba(255,189,46,0.2); }
 .stamp-danger { color: var(--danger-color); border-color: var(--danger-color); text-shadow: 0 0 15px var(--danger-color); box-shadow: inset 0 0 15px rgba(255,42,42,0.2); }
 
-.endgame-actions { display: flex; gap: 15px; width: 100%; flex-wrap: wrap; z-index: 60; }
+/* FIX: Added position relative so buttons stay above the prison bars */
+.endgame-actions { position: relative; z-index: 60; display: flex; gap: 15px; width: 100%; flex-wrap: wrap; }
 .endgame-actions button { flex-grow: 1; padding: 15px; font-size: 0.95rem; }
 
 #prison-bars { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; display: flex; justify-content: space-evenly; z-index: 20; pointer-events: none; }
@@ -211,6 +219,7 @@ body { background-color: var(--bg-color); color: var(--primary-color); font-fami
 .fade-out { opacity: 0; pointer-events: none; }
 @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
+/* Intelligent Mobile Media Queries - strictly for UI padding outside the card */
 @media (max-width: 600px) {
     .screen { padding: 30px 10px; }
     .identity-form { padding: 30px 20px; }
@@ -218,10 +227,4 @@ body { background-color: var(--bg-color); color: var(--primary-color); font-fami
     .options-grid { grid-template-columns: 1fr; gap: 10px; }
     .option-btn { min-height: 55px; padding: 12px; }
     #question-image { max-height: 100px; }
-    .tc-body { padding: 20px; gap: 20px; flex-direction: column; align-items: stretch; }
-    .tc-profile-col { flex-direction: row; width: 100%; gap: 15px; }
-    .tc-frame { width: 100px; height: 120px; }
-    .tc-barcode { flex-grow: 1; height: 100%; }
-    .tc-watermark { font-size: 3.5rem; }
-    .endgame-actions { flex-direction: column; gap: 10px; }
 }
