@@ -4,7 +4,7 @@
     --brand-color: #523542; 
     --brand-light: #7a4f63;
     --danger-color: #ff2a2a;
-    --warning-color: #ffbd2e; /* Added for Potential Spy tier */
+    --warning-color: #ffbd2e; 
     --success-color: #00ff66;
     --hud-bg: rgba(8, 8, 8, 0.85); 
     --hud-border: rgba(82, 53, 66, 0.6); 
@@ -14,9 +14,55 @@
 body { background-color: var(--bg-color); color: var(--primary-color); font-family: 'Share Tech Mono', monospace; overflow: hidden; user-select: none; }
 #game-container { position: relative; width: 100vw; height: 100vh; display: flex; justify-content: center; align-items: center; background-color: #000; }
 
-/* Slower Cinematic Transition Overlay */
-#transition-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #030303; z-index: 9999; pointer-events: none; opacity: 0; transition: opacity 1s cubic-bezier(0.4, 0, 0.2, 1); backdrop-filter: blur(10px); }
+/* --- DYNAMIC LOADING TRANSITION OVERLAY --- */
+#transition-overlay {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(3, 3, 3, 0.95); z-index: 9999; pointer-events: none;
+    opacity: 0; transition: opacity 0.5s ease-in-out;
+    display: flex; justify-content: center; align-items: center;
+    backdrop-filter: blur(15px);
+}
 .transition-active { opacity: 1 !important; pointer-events: all !important; }
+
+.trans-matrix-bg {
+    position: absolute; top:0; left:0; width: 100%; height: 100%;
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(82,53,66,0.05) 2px, rgba(82,53,66,0.05) 4px);
+    z-index: 1; pointer-events: none;
+}
+
+.transition-ui {
+    display: flex; flex-direction: column; align-items: center; gap: 25px;
+    width: 90%; max-width: 400px; position: relative; z-index: 2;
+}
+
+.trans-spinner {
+    width: 60px; height: 60px;
+    border: 3px solid rgba(82,53,66,0.3); border-top: 3px solid var(--brand-light);
+    border-radius: 50%; animation: spin 1s linear infinite;
+    box-shadow: 0 0 15px rgba(82,53,66,0.5);
+}
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+.trans-text-box {
+    font-size: 1.1rem; color: #fff; letter-spacing: 2px; text-align: center;
+    text-shadow: 0 0 10px rgba(255,255,255,0.5);
+}
+.blinking-cursor { animation: blink 1s infinite; color: var(--brand-light); }
+
+.trans-progress {
+    width: 100%; height: 3px; background: #222; border-radius: 2px; position: relative; overflow: hidden;
+}
+.trans-progress-fill {
+    position: absolute; top: 0; left: 0; height: 100%; width: 30%; background: var(--brand-light);
+    animation: cyberLoad 1.5s infinite ease-in-out alternate;
+    box-shadow: 0 0 10px var(--brand-light);
+}
+@keyframes cyberLoad {
+    0% { left: -30%; width: 30%; }
+    50% { width: 60%; }
+    100% { left: 100%; width: 30%; }
+}
+/* ------------------------------------------ */
 
 #top-status-bar { position: fixed; top: 0; left: 0; width: 100%; height: 25px; background: rgba(10, 10, 10, 0.9); border-bottom: 1px solid var(--brand-light); color: #888; z-index: 100; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; font-size: 0.75rem; letter-spacing: 2px; }
 .blinking-dot { animation: blink 1.5s infinite; color: var(--brand-light); font-weight: bold; }
@@ -141,7 +187,6 @@ body { background-color: var(--bg-color); color: var(--primary-color); font-fami
 .tc-bar-bg { flex-grow: 1; height: 6px; background: #222; border-radius: 3px; overflow: hidden; }
 .tc-bar-fill { height: 100%; background: var(--brand-light); width: 0%; transition: width 1s ease-out; }
 
-/* 3 Types of Stamps */
 .tc-stamp {
     position: absolute; bottom: 20px; right: 20px; transform: rotate(-12deg) scale(2);
     font-size: 1.8rem; font-weight: bold; border: 4px solid; padding: 10px 20px;
