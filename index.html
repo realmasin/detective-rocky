@@ -10,14 +10,8 @@
 </head>
 <body>
     
-    <!-- Dynamic Cyber Panel Transition -->
-    <div id="transition-overlay">
-        <div class="trans-panel panel-1"></div>
-        <div class="trans-panel panel-2"></div>
-        <div class="trans-panel panel-3"></div>
-        <div class="trans-panel panel-4"></div>
-        <div class="trans-panel panel-5"></div>
-    </div>
+    <!-- Smooth Cinematic Transition -->
+    <div id="transition-overlay"></div>
 
     <div id="game-container">
         
@@ -26,21 +20,29 @@
         <div id="background" class="bg-blur"></div>
 
         <div id="top-status-bar">
-            <span>SEISMIC_SYS // DEPT-7</span>
-            <span id="random-hash">AUTH: 0x0000</span>
-            <span class="blinking-dot">LIVE</span>
+            <span>SEISMIC_OS // KERNEL_V9.4</span>
+            <span id="random-hash">NODE: 0x0000</span>
+            <span class="blinking-dot">ENCRYPTED_LINK</span>
         </div>
 
-        <!-- Intro Screen -->
+        <!-- Redesigned WOW Intro -->
         <div id="intro-screen" class="screen active">
             <div class="terminal-window">
-                <div class="terminal-body" id="story-text-container"></div>
+                <div class="terminal-header">
+                    <div class="terminal-dots">
+                        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                    </div>
+                    <span class="terminal-title">SYS_BOOT_SEQUENCE</span>
+                </div>
+                <div class="terminal-body" id="story-text-container">
+                    <!-- Text injected via JS -->
+                </div>
             </div>
             
-            <button id="skip-btn" class="hidden">SKIP >></button>
+            <button id="skip-btn" class="hidden">FORCE_OVERRIDE >></button>
             <div class="intro-buttons">
                 <button id="ready-btn" class="cyber-btn hidden">
-                    <span class="btn-text">CONNECT_TO_TERMINAL</span>
+                    <span class="btn-text">BYPASS_SECURITY_PROTOCOLS</span>
                 </button>
             </div>
         </div>
@@ -49,19 +51,19 @@
         <div id="identity-screen" class="screen hidden">
             <div class="hud-panel identity-form fade-element">
                 <div class="form-header">
-                    <h2>SECURITY CLEARANCE</h2>
+                    <h2>IDENTITY VERIFICATION</h2>
                     <div class="glitch-line"></div>
                 </div>
                 <div class="input-group">
-                    <label>> AGENT_ALIAS:</label>
-                    <input type="text" id="username-input" placeholder="Enter codename" autocomplete="off" maxlength="15">
+                    <label>> CLASSIFIED_ALIAS:</label>
+                    <input type="text" id="username-input" placeholder="Enter designated codename" autocomplete="off" maxlength="15">
                 </div>
                 <div class="input-group">
-                    <label>> BIOMETRIC_SCAN (UPLOAD):</label>
+                    <label>> BIOMETRIC_UPLOAD (PFP):</label>
                     <input type="file" id="pfp-input" accept="image/*">
                 </div>
-                <div id="identity-error" class="error-text hidden">ERR: ALL FIELDS REQUIRED</div>
-                <button id="submit-identity-btn" class="cyber-btn full-width-btn">VERIFY IDENTITY</button>
+                <div id="identity-error" class="error-text hidden">SYS_ERR: INCOMPLETE DATA SET</div>
+                <button id="submit-identity-btn" class="cyber-btn full-width-btn">AUTHENTICATE_BIOMETRICS</button>
             </div>
         </div>
 
@@ -79,13 +81,13 @@
         <div id="interrogation-screen" class="screen hidden">
             <div class="top-section fade-element" id="q-container">
                 <div class="timer-container">
-                    <span class="timer-label">SYS_TIME: </span>
+                    <span class="timer-label">ENCRYPTION_DECAY: </span>
                     <span id="digital-timer">00:15:00</span>
                 </div>
                 <div class="question-box hud-panel">
                     <p id="question-text"></p>
                     <div id="image-wrapper" class="hidden">
-                        <img id="question-image" src="" alt="Target Data">
+                        <img id="question-image" src="" alt="Classified Intel">
                         <div class="scanner-line"></div>
                     </div>
                 </div>
@@ -119,13 +121,13 @@
                         <div class="tc-header">
                             <div class="tc-logo"></div>
                             <span>OFFICIAL INTELLIGENCE DOSSIER</span>
-                            <div class="tc-date" id="tc-hash">ID: 00000000</div>
+                            <div class="tc-date" id="tc-hash">UID: 00000000</div>
                         </div>
                         
                         <div class="tc-body">
                             <div class="tc-profile-col">
                                 <div class="tc-frame">
-                                    <img id="card-pfp" src="" alt="Subject">
+                                    <img id="card-pfp" src="" alt="Subject Asset">
                                     <div class="tc-crosshair"></div>
                                     <div class="tc-scan"></div>
                                 </div>
@@ -134,22 +136,22 @@
                             
                             <div class="tc-data-col">
                                 <div class="tc-data-row">
-                                    <span class="tc-label">SUBJECT ALIAS:</span>
+                                    <span class="tc-label">OPERATIVE ALIAS:</span>
                                     <span id="card-name" class="tc-value tc-highlight">UNKNOWN</span>
                                 </div>
                                 <div class="tc-data-row">
-                                    <span class="tc-label">AGENT ID:</span>
+                                    <span class="tc-label">SYSTEM ID NO:</span>
                                     <span id="card-id" class="tc-value">SMC-0000</span>
                                 </div>
                                 <div class="tc-data-row">
-                                    <span class="tc-label">INTELLIGENCE ACCURACY:</span>
+                                    <span class="tc-label">INTERROGATION YIELD:</span>
                                     <div class="tc-score-wrap">
                                         <span id="final-score" class="tc-value">0/8</span>
                                         <div class="tc-bar-bg"><div id="score-progress" class="tc-bar-fill"></div></div>
                                     </div>
                                 </div>
                                 <div class="tc-data-row">
-                                    <span class="tc-label">FINAL DIRECTIVE:</span>
+                                    <span class="tc-label">COMMAND DIRECTIVE:</span>
                                     <span id="card-status" class="tc-value">EVALUATING...</span>
                                 </div>
                             </div>
@@ -160,8 +162,8 @@
                 </div>
 
                 <div class="endgame-actions" id="action-buttons">
-                    <button id="download-btn" class="cyber-btn">DOWNLOAD DOSSIER</button>
-                    <button id="share-x-btn" class="cyber-btn x-btn">SHARE ON X</button>
+                    <button id="download-btn" class="cyber-btn">EXTRACT_ENCRYPTED_FILE</button>
+                    <button id="share-x-btn" class="cyber-btn x-btn">BROADCAST_TO_NETWORK</button>
                 </div>
             </div>
         </div>
