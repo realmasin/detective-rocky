@@ -1,7 +1,9 @@
 (function() {
     
+    // --- DOM Elements ---
     const bgElement = document.getElementById('background');
     const randomHash = document.getElementById('random-hash');
+    const glitchOverlay = document.getElementById('glitch-overlay');
     
     const introScreen = document.getElementById('intro-screen');
     const storyTextContainer = document.getElementById('story-text-container');
@@ -32,7 +34,9 @@
     const cardPfp = document.getElementById('card-pfp');
     const cardName = document.getElementById('card-name');
     const cardId = document.getElementById('card-id');
+    const cardHash = document.getElementById('card-hash');
     const finalScoreEl = document.getElementById('final-score');
+    const scoreProgress = document.getElementById('score-progress');
     const cardStatus = document.getElementById('card-status');
     const endgameStamp = document.getElementById('endgame-stamp');
     const prisonBars = document.getElementById('prison-bars');
@@ -44,33 +48,32 @@
     let score = 0;
     let timerReq;
     let typingInterval;
-    let scrambleIntervals = [];
     let isTyping = false;
     let currentLineIndex = 0;
-    let glitchInterval;
+    let lightGlitchInterval;
     
     let playerName = "UNKNOWN";
     let playerPfpSrc = "images/rocky-normal.jpg"; 
     
     const TIME_PER_QUESTION_MS = 15000; 
 
-    // Enhanced Prologue Story
+    // Story Logic
     const introLines = [
-        "CONNECTION ESTABLISHED. ENCRYPTION PROTOCOL ALPHA INITIATED...",
-        "UNAUTHORIZED DATA EXFILTRATION DETECTED IN SECTOR 7.",
-        "INTERNAL AUDIT SUGGESTS A HIGH-LEVEL SPY IS AMONG US.",
-        "DETECTIVE ROCKY HAS SUMMONED YOU FOR A CLEARANCE EVALUATION.",
-        "WARNING: FAILURE TO VERIFY IDENTITY WILL RESULT IN IMMEDIATE LOCKDOWN."
+        "ESTABLISHING SECURE CONNECTION...",
+        "SYSTEM BREACH DETECTED IN SECTOR 7.",
+        "INTERNAL AUDIT SUGGESTS A SPY INFILTRATION.",
+        "DETECTIVE ROCKY HAS SUMMONED YOU FOR EVALUATION.",
+        "WARNING: FAILURE RESULTS IN IMMEDIATE LOCKDOWN."
     ];
 
     const rulesLines = [
         "Take a seat.",
-        "A critical breach has occurred at Seismic Headquarters.",
-        "My profiling algorithms suggest you might be the leak.",
-        "I have 8 encrypted questions. Answer them correctly.",
-        "If you are loyal, you walk free. If you are a spy...",
-        "Well, let's just say you won't need your badge anymore.",
-        "Timer starts now. Do not make a mistake."
+        "A critical breach has occurred at Seismic.",
+        "My algorithm points to you.",
+        "I have 8 questions. Answer them correctly.",
+        "If you are loyal, you walk free.",
+        "If you are a spy... well, you won't leave this room.",
+        "Timer starts now. Do not lie to me."
     ];
 
     const correctReactions = [
@@ -124,19 +127,25 @@
     }
 
     setInterval(() => {
-        randomHash.textContent = "HASH: 0x" + Math.floor(Math.random()*16777215).toString(16).toUpperCase();
-    }, 2000);
+        randomHash.textContent = "AUTH: 0x" + Math.floor(Math.random()*16777215).toString(16).toUpperCase();
+    }, 1500);
 
-    function startErraticGlitches() {
-        glitchInterval = setInterval(() => {
+    // FIX: Highly reliable Light Glitch Effect
+    function startLightGlitches() {
+        lightGlitchInterval = setInterval(() => {
             if(Math.random() > 0.6) { 
-                bgElement.classList.add('erratic-glitch');
-                setTimeout(() => bgElement.classList.remove('erratic-glitch'), 300);
+                triggerFlash();
             }
-        }, 3500);
+        }, 4000);
     }
 
-    // Slower typing for readability
+    function triggerFlash() {
+        glitchOverlay.classList.remove('flash-glitch');
+        void glitchOverlay.offsetWidth; // trigger reflow
+        glitchOverlay.classList.add('flash-glitch');
+    }
+
+    // Reliable Typewriter
     function typeWriterEffect(element, text, speed, onComplete) {
         isTyping = true;
         element.textContent = ''; 
@@ -154,48 +163,13 @@
         }, speed);
     }
 
-    function scrambleText(element, finalString, duration) {
-        const chars = '!<>-_\\/[]{}—=+*^?#_';
-        let frame = 0;
-        const maxFrames = duration / 30;
-        let queue = [];
-        for(let i=0; i<finalString.length; i++) {
-            queue.push({
-                char: finalString[i],
-                start: Math.floor(Math.random() * (maxFrames/2)),
-                end: Math.floor(Math.random() * (maxFrames/2)) + (maxFrames/2)
-            });
-        }
-        const scrambleTimer = setInterval(() => {
-            let output = '';
-            let complete = 0;
-            for(let i=0; i<queue.length; i++) {
-                let {char, start, end} = queue[i];
-                if(frame >= end) {
-                    output += char;
-                    complete++;
-                } else if(frame >= start) {
-                    if(char === ' ') output += ' ';
-                    else output += chars[Math.floor(Math.random() * chars.length)];
-                } else {
-                    output += ' ';
-                }
-            }
-            element.textContent = output;
-            if(complete === queue.length) {
-                clearInterval(scrambleTimer);
-            }
-            frame++;
-        }, 30);
-        scrambleIntervals.push(scrambleTimer);
+    // FIX: Bulletproof text injection for Questions and Buttons
+    // Removed buggy scramble to ensure 100% visibility always.
+    function safeInjectText(element, text) {
+        element.textContent = text;
     }
 
-    function clearScrambles() {
-        scrambleIntervals.forEach(clearInterval);
-        scrambleIntervals = [];
-    }
-
-    // Sequence 1: Intro (Slower pacing)
+    // Sequence 1: Intro
     function startIntro() {
         skipBtn.classList.remove('hidden');
         storyTextContainer.innerHTML = '';
@@ -208,16 +182,16 @@
             lineDiv.className = 'intro-line';
             storyTextContainer.appendChild(lineDiv);
             
-            typeWriterEffect(lineDiv, introLines[lineIndex], 60, () => {
+            typeWriterEffect(lineDiv, introLines[lineIndex], 50, () => {
                 lineIndex++;
                 if (lineIndex < introLines.length) {
-                    introTimeout = setTimeout(showNextLine, 1400); 
+                    introTimeout = setTimeout(showNextLine, 1200); 
                 } else {
                     introTimeout = setTimeout(() => {
                         isIntroTyping = false;
                         readyBtn.classList.remove('hidden');
                         skipBtn.classList.add('hidden');
-                    }, 1000);
+                    }, 800);
                 }
             });
         }
@@ -256,6 +230,7 @@
         identityError.classList.add('hidden');
         playerName = nameVal;
         cardId.textContent = generateAgentID(); 
+        cardHash.textContent = Math.floor(Math.random()*999999).toString(16).toUpperCase();
 
         const reader = new FileReader();
         reader.onload = function(e) {
@@ -272,7 +247,7 @@
         dialogueScreen.classList.remove('hidden');
         dialogueScreen.classList.add('active');
         playNextDialogueLine();
-        startErraticGlitches(); 
+        startLightGlitches(); 
     }
 
     dialogueScreen.addEventListener('click', () => {
@@ -291,10 +266,7 @@
     });
 
     function playNextDialogueLine() {
-        rockyDialogue.textContent = '';
-        scrambleText(rockyDialogue, rulesLines[currentLineIndex], 500);
-        isTyping = true;
-        setTimeout(() => isTyping = false, 500); 
+        typeWriterEffect(rockyDialogue, rulesLines[currentLineIndex], 30);
     }
 
     function startInterrogation() {
@@ -315,10 +287,11 @@
             triggerEndgame();
             return;
         }
-        clearScrambles();
+        
         const currentQ = activeQuestions[currentQuestionIndex];
         
-        scrambleText(questionText, currentQ.q, 800);
+        // Immediate display to prevent bugs
+        safeInjectText(questionText, currentQ.q);
         
         if (currentQ.img !== "") {
             questionImage.src = currentQ.img;
@@ -330,8 +303,7 @@
 
         const shuffledOptions = shuffleArray([...currentQ.opts]);
         optionBtns.forEach((btn, index) => {
-            btn.textContent = ""; 
-            scrambleText(btn, shuffledOptions[index], 1000 + (index*100));
+            safeInjectText(btn, shuffledOptions[index]);
             btn.onclick = () => handleAnswer(shuffledOptions[index], currentQ.ans);
             btn.disabled = false;
         });
@@ -377,7 +349,6 @@
     function handleAnswer(selectedText, encodedCorrectAnswer) {
         cancelAnimationFrame(timerReq);
         optionBtns.forEach(btn => btn.disabled = true);
-        clearScrambles();
 
         const decodedCorrect = atob(encodedCorrectAnswer);
         let isCorrect = (selectedText === decodedCorrect);
@@ -385,12 +356,11 @@
         if (isCorrect) {
             score++;
             changeRockyImage('smiling');
-            scrambleText(questionText, correctReactions[Math.floor(Math.random() * correctReactions.length)], 500);
+            safeInjectText(questionText, correctReactions[Math.floor(Math.random() * correctReactions.length)]);
         } else {
             changeRockyImage('angry');
-            scrambleText(questionText, wrongReactions[Math.floor(Math.random() * wrongReactions.length)], 500);
-            bgElement.classList.add('erratic-glitch'); 
-            setTimeout(() => bgElement.classList.remove('erratic-glitch'), 300);
+            safeInjectText(questionText, wrongReactions[Math.floor(Math.random() * wrongReactions.length)]);
+            triggerFlash(); 
         }
 
         setTimeout(() => {
@@ -399,44 +369,46 @@
             setTimeout(() => {
                 currentQuestionIndex++;
                 loadQuestion();
-            }, 400);
+            }, 300);
         }, 2000); 
     }
 
     function triggerEndgame() {
-        clearInterval(glitchInterval);
+        clearInterval(lightGlitchInterval);
         interrogationScreen.classList.remove('active');
         interrogationScreen.classList.add('hidden');
         endgameScreen.classList.remove('hidden');
         endgameScreen.classList.add('active');
         
         cardPfp.src = playerPfpSrc;
-        cardName.textContent = playerName;
+        cardName.textContent = playerName.toUpperCase();
         finalScoreEl.textContent = `${score}/8`;
         
-        // Unified reveal animation triggered by class
+        // Progress bar calculation
+        let percentage = (score / 8) * 100;
+        scoreProgress.style.width = `${percentage}%`;
+        
         cardWrapper.classList.remove('hidden');
         
         setTimeout(() => {
             if (score >= 4) {
-                // Victory Vibes
-                cardStatus.textContent = "VERIFIED ELITE";
+                cardStatus.textContent = "THREAT MINIMAL";
                 cardStatus.style.color = "var(--success-color)";
-                endgameStamp.innerHTML = "ACCESS<br>GRANTED";
-                endgameStamp.className = "stamp stamp-success show";
-                bgElement.classList.add('bg-victory'); // Changes background glow
+                scoreProgress.style.background = "var(--success-color)";
+                endgameStamp.innerHTML = "CLEARED";
+                endgameStamp.className = "dossier-stamp stamp-success show";
+                bgElement.classList.add('bg-victory'); 
             } else {
-                // Spy Detected Vibes
-                cardStatus.textContent = "SPY DETECTED";
+                cardStatus.textContent = "CRITICAL THREAT";
                 cardStatus.style.color = "var(--danger-color)";
+                scoreProgress.style.background = "var(--danger-color)";
                 prisonBars.classList.remove('hidden');
                 setTimeout(() => prisonBars.classList.add('drop'), 50);
                 
                 setTimeout(() => {
                     endgameStamp.innerHTML = "SPY<br>DETECTED";
-                    endgameStamp.className = "stamp stamp-danger show";
-                    bgElement.classList.add('erratic-glitch');
-                    setTimeout(() => bgElement.classList.remove('erratic-glitch'), 300);
+                    endgameStamp.className = "dossier-stamp stamp-danger show";
+                    triggerFlash();
                 }, 600);
             }
         }, 800);
@@ -444,11 +416,11 @@
 
     downloadBtn.addEventListener('click', () => {
         html2canvas(resultCard, {
-            backgroundColor: "#0c0c0c",
+            backgroundColor: "#050505",
             scale: 2 
         }).then(canvas => {
             const link = document.createElement('a');
-            link.download = `Seismic_Intel_${playerName}.png`;
+            link.download = `Seismic_Dossier_${playerName}.png`;
             link.href = canvas.toDataURL('image/png');
             link.click();
         });
@@ -456,7 +428,7 @@
 
     shareXBtn.addEventListener('click', () => {
         const isSpy = score < 4;
-        let tweetText = `Detective Rocky evaluated my clearance at Seismic HQ... 🕵️‍♂️\n\nAgent: ${playerName}\nIntel Score: ${score}/8\nStatus: ${isSpy ? 'Imprisoned as a SPY! 🚨' : 'Verified Elite Member! ✅'}\n\nDo you have what it takes? Play here: [YOUR_GAME_URL_HERE] @SeismicSystem`;
+        let tweetText = `Subject Evaluated at Seismic HQ. 🕵️‍♂️\n\nAlias: ${playerName}\nAccuracy: ${score}/8\nVerdict: ${isSpy ? 'SPY DETECTED. Locked up! 🚨' : 'CLEARED. Loyal Member. ✅'}\n\nProve your loyalty: [YOUR_GAME_URL_HERE] @SeismicSystem`;
         const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
         window.open(twitterUrl, '_blank');
     });
