@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Seismic Interrogation</title>
+    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link rel="stylesheet" href="style.css">
@@ -11,13 +12,16 @@
 <body>
     <div id="game-container">
         
+        <!-- Effects Overlays -->
         <div class="crt-overlay"></div>
+        <div id="glitch-overlay"></div> <!-- NEW: Dedicated light glitch overlay -->
         <div id="background" class="bg-blur"></div>
 
+        <!-- System Status Bar -->
         <div id="top-status-bar">
-            <span>SYS.OP: SEISMIC_OS_v3.0</span>
-            <span id="random-hash">HASH: 0x00000000</span>
-            <span class="blinking-dot">SECURE_LINK</span>
+            <span>SEISMIC_SYS // TERMINAL_7</span>
+            <span id="random-hash">AUTH: 0x0000</span>
+            <span class="blinking-dot">LIVE</span>
         </div>
 
         <!-- Intro Screen -->
@@ -25,7 +29,7 @@
             <div id="story-text-container"></div>
             <button id="skip-btn" class="hidden">SKIP >></button>
             <div class="intro-buttons">
-                <button id="ready-btn" class="cyber-btn hidden">INITIATE_CONNECTION</button>
+                <button id="ready-btn" class="cyber-btn hidden">CONNECT</button>
             </div>
         </div>
 
@@ -33,19 +37,19 @@
         <div id="identity-screen" class="screen hidden">
             <div class="hud-panel identity-form fade-element">
                 <div class="form-header">
-                    <h2>SECURE LOGIN</h2>
+                    <h2>SECURITY CLEARANCE</h2>
                     <div class="glitch-line"></div>
                 </div>
                 <div class="input-group">
-                    <label>> INPUT_AGENT_ALIAS:</label>
-                    <input type="text" id="username-input" placeholder="e.g. GhostProtocol" autocomplete="off" maxlength="15">
+                    <label>> AGENT_ALIAS:</label>
+                    <input type="text" id="username-input" placeholder="Enter codename" autocomplete="off" maxlength="15">
                 </div>
                 <div class="input-group">
-                    <label>> BIOMETRIC_DATA (UPLOAD PFP):</label>
+                    <label>> BIOMETRIC_SCAN (UPLOAD):</label>
                     <input type="file" id="pfp-input" accept="image/*">
                 </div>
-                <div id="identity-error" class="error-text hidden">ERR: CREDENTIALS REQUIRED</div>
-                <button id="submit-identity-btn" class="cyber-btn full-width-btn">VERIFY & ENTER</button>
+                <div id="identity-error" class="error-text hidden">ERR: ALL FIELDS REQUIRED</div>
+                <button id="submit-identity-btn" class="cyber-btn full-width-btn">VERIFY IDENTITY</button>
             </div>
         </div>
 
@@ -61,7 +65,7 @@
         <div id="interrogation-screen" class="screen hidden">
             <div class="top-section fade-element" id="q-container">
                 <div class="timer-container">
-                    <span class="timer-label">TIME_REMAINING: </span>
+                    <span class="timer-label">SYS_TIME: </span>
                     <span id="digital-timer">00:15:00</span>
                 </div>
                 <div class="question-box hud-panel">
@@ -90,63 +94,79 @@
                 <div class="bar"></div><div class="bar"></div><div class="bar"></div>
             </div>
             
-            <!-- Horizontal Twitter-Optimized ID Card -->
+            <!-- HIGHLY DETAILED VIRAL ID CARD -->
             <div id="card-wrapper" class="hidden">
-                <div id="result-card" class="classified-card hud-panel">
-                    <div class="card-left-accent"></div>
-                    <div class="card-bg-texture"></div>
+                <div id="result-card" class="dossier-card">
                     
-                    <div class="card-content-horizontal">
-                        <!-- Left Side: Photo -->
-                        <div class="card-left-side">
-                            <div class="card-photo-wrapper">
-                                <img id="card-pfp" src="" alt="Subject Photo">
-                                <div class="photo-scanner"></div>
+                    <!-- Decorative Tech Elements -->
+                    <div class="dossier-bg-pattern"></div>
+                    <div class="corner-accents">
+                        <div class="tl"></div><div class="tr"></div>
+                        <div class="bl"></div><div class="br"></div>
+                    </div>
+                    
+                    <div class="dossier-header">
+                        <div class="header-left">
+                            <span class="dossier-title">SEISMIC THREAT DOSSIER</span>
+                            <span class="dossier-sub">CLASSIFIED // DEPT-7</span>
+                        </div>
+                        <div class="header-right">
+                            <div class="barcode-small"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="dossier-body">
+                        <div class="dossier-photo-section">
+                            <div class="photo-frame">
+                                <img id="card-pfp" src="" alt="Subject">
+                                <div class="target-crosshair"></div>
+                                <div class="photo-scan-line"></div>
                             </div>
-                            <div class="barcode"></div>
+                            <div id="card-id" class="id-tag">SMC-0000</div>
                         </div>
                         
-                        <!-- Right Side: Details -->
-                        <div class="card-right-side">
-                            <div class="card-header-hr">
-                                <h2>SEISMIC INTELLIGENCE</h2>
-                                <span>OFFICIAL DOSSIER</span>
+                        <div class="dossier-data-section">
+                            <div class="data-row">
+                                <span class="data-label">SUBJECT ALIAS:</span>
+                                <span id="card-name" class="data-value highlight-value">UNKNOWN</span>
                             </div>
                             
-                            <div class="card-info-grid">
-                                <div class="info-block">
-                                    <span class="label">ALIAS</span>
-                                    <span id="card-name" class="value">UNKNOWN</span>
-                                </div>
-                                <div class="info-block">
-                                    <span class="label">ID NO.</span>
-                                    <span id="card-id" class="value">SMC-0000</span>
-                                </div>
-                                <div class="info-block">
-                                    <span class="label">ACCURACY</span>
-                                    <span id="final-score" class="value highlight glow-text">0/8</span>
-                                </div>
-                                <div class="info-block">
-                                    <span class="label">STATUS</span>
-                                    <span id="card-status" class="value">EVALUATING</span>
+                            <div class="data-row">
+                                <span class="data-label">INTEL ACCURACY:</span>
+                                <div class="score-display">
+                                    <span id="final-score" class="data-value">0/8</span>
+                                    <div class="progress-bar-bg">
+                                        <div id="score-progress" class="progress-bar-fill"></div>
+                                    </div>
                                 </div>
                             </div>
+                            
+                            <div class="data-row">
+                                <span class="data-label">THREAT LEVEL:</span>
+                                <span id="card-status" class="data-value">EVALUATING...</span>
+                            </div>
+                            
+                            <div class="micro-text-block">
+                                <p>SYS_VER: 9.4.2 // AUTH_HASH: <span id="card-hash">X789</span></p>
+                                <p>UNAUTHORIZED DISTRIBUTION IS STRICTLY PROHIBITED.</p>
+                            </div>
                         </div>
-                        
-                        <div id="endgame-stamp" class="stamp"></div>
                     </div>
+                    
+                    <!-- The big stamp -->
+                    <div id="endgame-stamp" class="dossier-stamp"></div>
                 </div>
 
                 <div class="endgame-actions" id="action-buttons">
-                    <button id="download-btn" class="cyber-btn">DOWNLOAD INTEL</button>
+                    <button id="download-btn" class="cyber-btn">DOWNLOAD DOSSIER</button>
                     <button id="share-x-btn" class="cyber-btn x-btn">SHARE ON X</button>
                 </div>
             </div>
         </div>
         
-        <!-- Footer -->
+        <!-- Footer Exactly as requested -->
         <div id="copyright-footer">
-            &copy; 2026 masinonline. All rights reserved.
+            &copy; masinonline
         </div>
 
     </div>
