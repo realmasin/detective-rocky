@@ -30,7 +30,7 @@
     const digitalTimer = document.getElementById('digital-timer');
     
     const endgameScreen = document.getElementById('endgame-screen');
-    const cardWrapper = document.getElementById('card-wrapper');
+    const cardScaleWrapper = document.getElementById('card-scale-wrapper');
     const resultCard = document.getElementById('result-card');
     const cardPfp = document.getElementById('card-pfp');
     const cardName = document.getElementById('card-name');
@@ -56,40 +56,41 @@
     
     let playerName = "UNKNOWN";
     let playerPfpSrc = "images/rocky-normal.jpg"; 
+    let isSpyTweetStatus = ""; // Used for Twitter sharing text
     
     const TIME_PER_QUESTION_MS = 15000; 
 
-    // Story Core
+    // Updated Lore Story
     const introLines = [
-        "> INITIALIZING SEISMIC KERNEL V9.4...",
-        "> MEMORY CHECK: OK.",
-        "> DECRYPTING AUDIO LOGS...",
-        "<span class='system-alert'>[!] WARNING: CRITICAL BREACH DETECTED IN SECTOR 7.</span>",
-        "> ALGORITHM SUGGESTS INTERNAL INSURGENT ACTIVITY.",
-        "> DETECTIVE ROCKY DEMANDS IMMEDIATE CLEARANCE EVALUATION.",
-        "> PROCEED WITH CAUTION."
+        "> ACCESSING SEISMIC COMMUNITY ARCHIVES...",
+        "> WARNING: UNVERIFIED ENTITY DETECTED IN THE HQ.",
+        "> PROFILING IN PROGRESS... SUSPICIOUS ACTIVITY FOUND.",
+        "> LOCKING DOWN INTERROGATION ROOM 7.",
+        "> DETECTIVE ROCKY DEPLOYED FOR VETTING PROCESS.",
+        "> PREPARE FOR SEISMIC LORE EVALUATION."
     ];
 
     const rulesLines = [
-        "Take a seat.",
-        "Our networks have been compromised.",
-        "My profiling system flagged your signature.",
-        "I have 8 encrypted fragments. Decode them correctly.",
-        "If you are loyal, your clearance is reinstated.",
-        "If you are a spy... this room will be your last stop.",
-        "The timer is absolute. Do not lie to me."
+        "Sit down. Don't make any sudden moves.",
+        "Lately, we've had impostors claiming to be Seismic members.",
+        "Fake members... Spies trying to blend in.",
+        "My job is to weed them out.",
+        "You say you belong here? We will see about that.",
+        "I will ask you 8 questions about Seismic.",
+        "Only a true member knows the answers.",
+        "The timer is ticking. Let's see if you are a real Seismic."
     ];
 
     const correctReactions = [
-        "LOG: Answer acceptable... Proceeding.",
-        "LOG: Data verified. Next sequence.",
-        "LOG: Lucky guess. Continuing scan."
+        "Hmm... You know your history. But we are just getting started.",
+        "Correct. Any true Seismic member would know that.",
+        "Not bad. Let's see if you can handle the next one."
     ];
 
     const wrongReactions = [
-        "WARNING: Deception detected.",
-        "WARNING: Invalid response. Profile flagged.",
-        "WARNING: System anomaly. You are failing."
+        "Wrong. A real Seismic member would never miss that.",
+        "Are you even trying? You are starting to look like a spy.",
+        "Pathetic. You know absolutely nothing about this community."
     ];
 
     const questionsDatabase = [
@@ -146,19 +147,19 @@
         glitchOverlay.classList.add('flash-glitch');
     }
 
-    // Smooth Cinematic Fade Transition
+    // Slower Cinematic Transition
     async function transitionScreen(fromElement, toElement) {
         transitionOverlay.classList.add('transition-active');
-        await new Promise(r => setTimeout(r, 700)); 
+        await new Promise(r => setTimeout(r, 1000)); // Slower fade to black
         
         fromElement.classList.remove('active');
         fromElement.classList.add('hidden');
         toElement.classList.remove('hidden');
         toElement.classList.add('active');
         
-        await new Promise(r => setTimeout(r, 100)); 
+        await new Promise(r => setTimeout(r, 200)); 
         transitionOverlay.classList.remove('transition-active');
-        await new Promise(r => setTimeout(r, 700)); // Buffer to prevent double clicking
+        await new Promise(r => setTimeout(r, 700)); 
     }
 
     function typeWriterEffect(element, text, speed, onComplete) {
@@ -386,10 +387,11 @@
             triggerFlash(); 
         }
 
-        await new Promise(r => setTimeout(r, 2000)); 
+        // SLOWER WAIT BETWEEN QUESTIONS
+        await new Promise(r => setTimeout(r, 3000)); 
         
         transitionOverlay.classList.add('transition-active');
-        await new Promise(r => setTimeout(r, 600));
+        await new Promise(r => setTimeout(r, 800)); // wait for fade
         
         currentQuestionIndex++;
         loadQuestion();
@@ -398,10 +400,11 @@
         transitionOverlay.classList.remove('transition-active');
     }
 
-    // Sequence 4: Endgame
+    // Sequence 4: Endgame with 3 Tiers
     async function triggerEndgame() {
         clearInterval(lightGlitchInterval);
         
+        // SLOWER FADE INTO ENDGAME
         await transitionScreen(interrogationScreen, endgameScreen);
         
         cardPfp.src = playerPfpSrc;
@@ -411,18 +414,33 @@
         let percentage = (score / 8) * 100;
         scoreProgress.style.width = `${percentage}%`;
         
-        cardWrapper.classList.remove('hidden');
-        cardWrapper.classList.add('show-card-anim');
+        // DELAY BEFORE SHOWING CARD FOR SUSPENSE
+        await new Promise(r => setTimeout(r, 1500));
+
+        cardScaleWrapper.classList.remove('hidden');
+        cardScaleWrapper.classList.add('show-card-anim');
         
         setTimeout(() => {
-            if (score >= 4) {
-                cardStatus.textContent = "THREAT MINIMAL";
+            if (score >= 6) {
+                // Tier 1: True Member (6 to 8 points)
+                cardStatus.textContent = "VERIFIED ELITE";
                 cardStatus.style.color = "var(--success-color)";
                 scoreProgress.style.background = "var(--success-color)";
                 endgameStamp.innerHTML = "CLEARED";
                 endgameStamp.className = "tc-stamp stamp-success show";
                 bgElement.classList.add('bg-victory'); 
+                isSpyTweetStatus = "Verified Elite Member! ✅";
+            } else if (score >= 4) {
+                // Tier 2: Potential Spy (4 to 5 points)
+                cardStatus.textContent = "POTENTIAL SPY";
+                cardStatus.style.color = "var(--warning-color)";
+                scoreProgress.style.background = "var(--warning-color)";
+                endgameStamp.innerHTML = "SUSPECT";
+                endgameStamp.className = "tc-stamp stamp-warning show";
+                triggerFlash();
+                isSpyTweetStatus = "Under Suspicion! ⚠️";
             } else {
+                // Tier 3: Spy (0 to 3 points)
                 cardStatus.textContent = "CRITICAL THREAT";
                 cardStatus.style.color = "var(--danger-color)";
                 scoreProgress.style.background = "var(--danger-color)";
@@ -434,24 +452,21 @@
                     endgameStamp.className = "tc-stamp stamp-danger show";
                     triggerFlash();
                 }, 600);
+                isSpyTweetStatus = "Imprisoned as a SPY! 🚨";
             }
-        }, 1000);
+        }, 1200);
     }
 
-    // FIX FOR HTML2CANVAS: Hidden clone strategy for perfect 800x450 export
+    // PERFECT EXPORT
     downloadBtn.addEventListener('click', () => {
         downloadBtn.textContent = 'GENERATING...';
         downloadBtn.classList.add('processing');
         
-        // Clear previous clones
         exportContainer.innerHTML = '';
-        
         const clone = resultCard.cloneNode(true);
-        // Force the clone to have the strict export-mode class
         clone.classList.add('export-mode');
         exportContainer.appendChild(clone);
         
-        // Small delay to ensure CSS is applied
         setTimeout(() => {
             html2canvas(clone, {
                 backgroundColor: "#080808",
@@ -463,7 +478,7 @@
                 link.href = canvas.toDataURL('image/png');
                 link.click();
                 
-                exportContainer.innerHTML = ''; // Cleanup
+                exportContainer.innerHTML = ''; 
                 downloadBtn.textContent = 'EXTRACT_FILE';
                 downloadBtn.classList.remove('processing');
             });
@@ -471,8 +486,7 @@
     });
 
     shareXBtn.addEventListener('click', () => {
-        const isSpy = score < 4;
-        let tweetText = `Subject Evaluated at Seismic HQ. 🕵️‍♂️\n\nAlias: ${playerName}\nAccuracy: ${score}/8\nVerdict: ${isSpy ? 'SPY DETECTED. Locked up! 🚨' : 'CLEARED. Loyal Member. ✅'}\n\nProve your loyalty: [YOUR_GAME_URL_HERE] @SeismicSystem`;
+        let tweetText = `I just faced Detective Rocky to prove my loyalty to the Seismic family! 🕵️‍♂️🔥\n\nAgent: ${playerName}\nScore: ${score}/8\nVerdict: ${isSpyTweetStatus}\n\nAre you a true member or a SPY? Take the test: https://detective-rocky.vercel.app @SeismicSystem`;
         const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
         window.open(twitterUrl, '_blank');
     });
