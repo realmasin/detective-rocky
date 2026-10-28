@@ -228,3 +228,11 @@ body { background-color: var(--bg-color); color: var(--primary-color); font-fami
     .option-btn { min-height: 55px; padding: 12px; }
     #question-image { max-height: 100px; }
 }
+
+/* Pulse animation for the Start Button */
+.pulse-anim { animation: btnPulse 2s infinite; font-size: 1.2rem; padding: 20px 40px; }
+@keyframes btnPulse {
+    0% { box-shadow: 0 0 0 0 rgba(82, 53, 66, 0.7); }
+    70% { box-shadow: 0 0 0 20px rgba(82, 53, 66, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(82, 53, 66, 0); }
+}
