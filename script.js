@@ -1,7 +1,9 @@
 (function() {
     
-    // DOM Initializations
+    // --- DOM Initializations ---
     const transitionOverlay = document.getElementById('transition-overlay');
+    const transText = document.getElementById('trans-text');
+    
     const bgElement = document.getElementById('background');
     const randomHash = document.getElementById('random-hash');
     const glitchOverlay = document.getElementById('glitch-overlay');
@@ -46,6 +48,7 @@
     const shareXBtn = document.getElementById('share-x-btn');
     const exportContainer = document.getElementById('export-container');
 
+    // --- State Variables ---
     let currentQuestionIndex = 0;
     let score = 0;
     let timerReq;
@@ -60,7 +63,53 @@
     
     const TIME_PER_QUESTION_MS = 15000; 
 
-    // Story Core
+    // --- AUDIO ENGINE ---
+    const audioPath = 'audio/';
+    const sfx = {
+        bgm: new Audio(audioPath + 'bgm.mp3'),
+        typing: new Audio(audioPath + 'typing.mp3'),
+        hover: new Audio(audioPath + 'hover.mp3'),
+        click: new Audio(audioPath + 'click.mp3'),
+        correct: new Audio(audioPath + 'correct.mp3'),
+        wrong: new Audio(audioPath + 'wrong.mp3'),
+        glitch: new Audio(audioPath + 'glitch.mp3'),
+        stamp: new Audio(audioPath + 'stamp.mp3')
+    };
+
+    sfx.bgm.loop = true;
+    sfx.bgm.volume = 0.3;
+    sfx.typing.loop = true;
+    sfx.typing.volume = 0.6;
+
+    function playSfx(name) {
+        if(!sfx[name]) return;
+        const sound = sfx[name].cloneNode();
+        sound.volume = sfx[name].volume || 1;
+        sound.play().catch(e => console.log('Audio play blocked:', e));
+    }
+
+    function stopTypingSound() {
+        sfx.typing.pause();
+        sfx.typing.currentTime = 0;
+    }
+
+    // Attach hover and click sounds to all buttons automatically
+    document.querySelectorAll('button').forEach(btn => {
+        btn.addEventListener('mouseenter', () => playSfx('hover'));
+        btn.addEventListener('click', () => playSfx('click'));
+    });
+
+    // Autoplay BGM on first interaction (Bypasses Browser Restrictions)
+    let bgmStarted = false;
+    document.body.addEventListener('click', () => {
+        if (!bgmStarted) {
+            sfx.bgm.play().catch(e => console.log('BGM blocked:', e));
+            bgmStarted = true;
+        }
+    }, { once: true });
+
+
+    // --- Story Core ---
     const introLines = [
         "> INITIALIZING SEISMIC KERNEL V9.4...",
         "> MEMORY CHECK: OK.",
@@ -72,16 +121,16 @@
     ];
 
     const rulesLines = [
-        "Take a seat.",
-        "Our networks have been compromised.",
-        "My profiling system flagged your signature.",
-        "I have 8 encrypted fragments. Decode them correctly.",
-        "If you are loyal, your clearance is reinstated.",
-        "If you are a spy... this room will be your last stop.",
+        "Sit down. Don't make any sudden moves.",
+        "Lately, we've had impostors claiming to be Seismic members.",
+        "Fake members... Spies trying to blend in.",
+        "My job is to weed them out.",
+        "You say you belong here? We will see about that.",
+        "I will ask you 8 questions about Seismic.",
+        "Only a true member knows the answers.",
         "The timer is absolute. Do not lie to me."
     ];
 
-    // --- NEW: Dynamic Phase Reactions ---
     const correctReactions = {
         start: [
             "LOG: Data accepted. Do not get comfortable yet.",
@@ -138,6 +187,7 @@
     let isIntroTyping = false;
     let introTimeout;
 
+    // --- Core Helpers ---
     function shuffleArray(array) {
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -165,16 +215,14 @@
     }
 
     function triggerFlash() {
+        playSfx('glitch');
         glitchOverlay.classList.remove('flash-glitch');
         void glitchOverlay.offsetWidth; 
         glitchOverlay.classList.add('flash-glitch');
     }
 
-    // Advanced Cinematic Transition Overlay
     async function transitionScreen(fromElement, toElement, loadingText = "> SYSTEM_PROCESSING...", waitTime = 1200) {
-        const transText = document.getElementById('trans-text');
         if(transText) transText.textContent = loadingText;
-        
         transitionOverlay.classList.add('transition-active');
         
         await new Promise(r => setTimeout(r, waitTime)); 
@@ -195,6 +243,8 @@
         let isTag = false;
         let currentText = '';
         
+        sfx.typing.play().catch(()=>{}); // Start typing sound
+        
         clearInterval(typingInterval);
         typingInterval = setInterval(() => {
             if (i < text.length) {
@@ -208,6 +258,7 @@
             } else {
                 clearInterval(typingInterval);
                 isTyping = false;
+                stopTypingSound(); // Stop typing sound
                 if(onComplete) onComplete();
             }
         }, speed);
@@ -217,7 +268,7 @@
         element.textContent = text;
     }
 
-    // Sequence 1: Boot
+    // --- Sequence 1: Boot ---
     function startIntro() {
         skipBtn.classList.remove('hidden');
         storyTextContainer.innerHTML = '';
@@ -251,6 +302,8 @@
         isIntroTyping = false;
         clearInterval(typingInterval);
         clearTimeout(introTimeout);
+        stopTypingSound();
+        
         storyTextContainer.innerHTML = '';
         introLines.forEach(line => {
             const div = document.createElement('div');
@@ -268,7 +321,7 @@
         await transitionScreen(introScreen, identityScreen, "> ESTABLISHING_SECURE_LINK...", 1500);
     });
 
-    // Sequence 2: Form
+    // --- Sequence 2: Form ---
     submitIdentityBtn.addEventListener('click', async () => {
         const nameVal = usernameInput.value.trim();
         const file = pfpInput.files[0];
@@ -296,6 +349,7 @@
     dialogueScreen.addEventListener('click', async () => {
         if (isTyping) {
             clearInterval(typingInterval);
+            stopTypingSound();
             rockyDialogue.textContent = rulesLines[currentLineIndex];
             isTyping = false;
         } else {
@@ -317,7 +371,7 @@
         typeWriterEffect(rockyDialogue, rulesLines[currentLineIndex], 35);
     }
 
-    // Sequence 3: Quiz
+    // --- Sequence 3: Quiz ---
     function loadQuestion() {
         if (currentQuestionIndex >= activeQuestions.length) {
             triggerEndgame();
@@ -392,25 +446,23 @@
 
         await new Promise(r => setTimeout(r, 600)); 
 
-        // --- INTELLIGENT REACTION LOGIC ---
         let phase = "start";
-        if (currentQuestionIndex === activeQuestions.length - 1) {
-            phase = "end"; // The very last question
-        } else if (currentQuestionIndex >= 3) {
-            phase = "mid"; // Questions 4, 5, 6, 7
-        }
+        if (currentQuestionIndex === activeQuestions.length - 1) phase = "end"; 
+        else if (currentQuestionIndex >= 3) phase = "mid"; 
 
         let reactionPool = isCorrect ? correctReactions[phase] : wrongReactions[phase];
         let chosenReaction = reactionPool[Math.floor(Math.random() * reactionPool.length)];
 
         if (isCorrect) {
             score++;
+            playSfx('correct');
             changeRockyImage('smiling');
             safeInjectText(questionText, chosenReaction);
         } else {
+            playSfx('wrong');
             changeRockyImage('angry');
             safeInjectText(questionText, chosenReaction);
-            triggerFlash(); 
+            triggerFlash(); // Trigger flash also plays glitch sound automatically
         }
 
         await new Promise(r => setTimeout(r, 2200)); 
@@ -421,15 +473,14 @@
             await transitionScreen(interrogationScreen, interrogationScreen, "> FETCHING_NEXT_FRAGMENT...", 1000);
             loadQuestion();
         } else {
-            loadQuestion(); // triggers endgame loop
+            loadQuestion(); 
         }
     }
 
-    // Sequence 4: Endgame
+    // --- Sequence 4: Endgame ---
     async function triggerEndgame() {
         clearInterval(lightGlitchInterval);
         
-        const transText = document.getElementById('trans-text');
         if(transText) transText.textContent = "> ANALYZING_INTERROGATION_DATA...";
         transitionOverlay.classList.add('transition-active');
         await new Promise(r => setTimeout(r, 1500));
@@ -466,6 +517,7 @@
                 scoreProgress.style.background = "var(--success-color)";
                 endgameStamp.innerHTML = "CLEARED";
                 endgameStamp.className = "tc-stamp stamp-success show";
+                playSfx('stamp');
                 bgElement.classList.add('bg-victory'); 
                 isSpyTweetStatus = "Verified Elite Member! ✅";
             } else if (score >= 4) {
@@ -475,6 +527,7 @@
                 endgameStamp.innerHTML = "SUSPECT";
                 endgameStamp.className = "tc-stamp stamp-warning show";
                 triggerFlash();
+                playSfx('stamp');
                 isSpyTweetStatus = "Under Suspicion! ⚠️";
             } else {
                 cardStatus.textContent = "CRITICAL THREAT";
@@ -487,6 +540,7 @@
                     endgameStamp.innerHTML = "SPY<br>DETECTED";
                     endgameStamp.className = "tc-stamp stamp-danger show";
                     triggerFlash();
+                    playSfx('stamp');
                 }, 600);
                 isSpyTweetStatus = "Imprisoned as a SPY! 🚨";
             }
