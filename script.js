@@ -1,8 +1,7 @@
 (function() {
     
+    // DOM Initializations
     const transitionOverlay = document.getElementById('transition-overlay');
-    const transText = document.getElementById('trans-text');
-    
     const bgElement = document.getElementById('background');
     const randomHash = document.getElementById('random-hash');
     const glitchOverlay = document.getElementById('glitch-overlay');
@@ -61,37 +60,61 @@
     
     const TIME_PER_QUESTION_MS = 15000; 
 
+    // Story Core
     const introLines = [
-        "> ACCESSING SEISMIC COMMUNITY ARCHIVES...",
-        "> WARNING: UNVERIFIED ENTITY DETECTED IN THE HQ.",
-        "> PROFILING IN PROGRESS... SUSPICIOUS ACTIVITY FOUND.",
-        "> LOCKING DOWN INTERROGATION ROOM 7.",
-        "> DETECTIVE ROCKY DEPLOYED FOR VETTING PROCESS.",
-        "> PREPARE FOR SEISMIC LORE EVALUATION."
+        "> INITIALIZING SEISMIC KERNEL V9.4...",
+        "> MEMORY CHECK: OK.",
+        "> DECRYPTING AUDIO LOGS...",
+        "<span class='system-alert'>[!] WARNING: CRITICAL BREACH DETECTED IN SECTOR 7.</span>",
+        "> ALGORITHM SUGGESTS INTERNAL INSURGENT ACTIVITY.",
+        "> DETECTIVE ROCKY DEMANDS IMMEDIATE CLEARANCE EVALUATION.",
+        "> PROCEED WITH CAUTION."
     ];
 
     const rulesLines = [
-        "Sit down. Don't make any sudden moves.",
-        "Lately, we've had impostors claiming to be Seismic members.",
-        "Fake members... Spies trying to blend in.",
-        "My job is to weed them out.",
-        "You say you belong here? We will see about that.",
-        "I will ask you 8 questions about Seismic.",
-        "Only a true member knows the answers.",
-        "The timer is ticking. Let's see if you are a real Seismic."
+        "Take a seat.",
+        "Our networks have been compromised.",
+        "My profiling system flagged your signature.",
+        "I have 8 encrypted fragments. Decode them correctly.",
+        "If you are loyal, your clearance is reinstated.",
+        "If you are a spy... this room will be your last stop.",
+        "The timer is absolute. Do not lie to me."
     ];
 
-    const correctReactions = [
-        "Hmm... You know your history. But we are just getting started.",
-        "Correct. Any true Seismic member would know that.",
-        "Not bad. Let's see if you can handle the next one."
-    ];
+    // --- NEW: Dynamic Phase Reactions ---
+    const correctReactions = {
+        start: [
+            "LOG: Data accepted. Do not get comfortable yet.",
+            "LOG: Signature verified. But I am still watching you.",
+            "LOG: Acceptable. Let's see if it was just luck."
+        ],
+        mid: [
+            "LOG: Intel matches our database. You might actually belong here.",
+            "Hmm... You know your Seismic history. Next fragment.",
+            "LOG: Correct. You are surviving... for now."
+        ],
+        end: [
+            "LOG: Final fragment processed. Compiling your dossier...",
+            "LOG: Interrogation complete. Calculating your threat level..."
+        ]
+    };
 
-    const wrongReactions = [
-        "Wrong. A real Seismic member would never miss that.",
-        "Are you even trying? You are starting to look like a spy.",
-        "Pathetic. You know absolutely nothing about this community."
-    ];
+    const wrongReactions = {
+        start: [
+            "WARNING: Deception detected. You are digging your own grave.",
+            "WARNING: Contradiction found. A real member wouldn't miss this.",
+            "WARNING: A pathetic attempt at a lie. Strike marked."
+        ],
+        mid: [
+            "WARNING: Your cover is slipping. That was completely wrong.",
+            "Are you even trying? You are starting to look like a spy.",
+            "Wrong. A real Seismic member would never miss that."
+        ],
+        end: [
+            "WARNING: Critical failure on the final step. Preparing dossier...",
+            "WARNING: Interrogation complete. Locking down final verdict..."
+        ]
+    };
 
     const questionsDatabase = [
         {
@@ -147,9 +170,11 @@
         glitchOverlay.classList.add('flash-glitch');
     }
 
-    // --- NEW: DYNAMIC LOADING SCREEN TRANSITION ---
+    // Advanced Cinematic Transition Overlay
     async function transitionScreen(fromElement, toElement, loadingText = "> SYSTEM_PROCESSING...", waitTime = 1200) {
-        transText.textContent = loadingText;
+        const transText = document.getElementById('trans-text');
+        if(transText) transText.textContent = loadingText;
+        
         transitionOverlay.classList.add('transition-active');
         
         await new Promise(r => setTimeout(r, waitTime)); 
@@ -367,13 +392,24 @@
 
         await new Promise(r => setTimeout(r, 600)); 
 
+        // --- INTELLIGENT REACTION LOGIC ---
+        let phase = "start";
+        if (currentQuestionIndex === activeQuestions.length - 1) {
+            phase = "end"; // The very last question
+        } else if (currentQuestionIndex >= 3) {
+            phase = "mid"; // Questions 4, 5, 6, 7
+        }
+
+        let reactionPool = isCorrect ? correctReactions[phase] : wrongReactions[phase];
+        let chosenReaction = reactionPool[Math.floor(Math.random() * reactionPool.length)];
+
         if (isCorrect) {
             score++;
             changeRockyImage('smiling');
-            safeInjectText(questionText, correctReactions[Math.floor(Math.random() * correctReactions.length)]);
+            safeInjectText(questionText, chosenReaction);
         } else {
             changeRockyImage('angry');
-            safeInjectText(questionText, wrongReactions[Math.floor(Math.random() * wrongReactions.length)]);
+            safeInjectText(questionText, chosenReaction);
             triggerFlash(); 
         }
 
@@ -385,23 +421,23 @@
             await transitionScreen(interrogationScreen, interrogationScreen, "> FETCHING_NEXT_FRAGMENT...", 1000);
             loadQuestion();
         } else {
-            loadQuestion(); // triggers endgame
+            loadQuestion(); // triggers endgame loop
         }
     }
 
-    // Sequence 4: Special Suspense Endgame Transition
+    // Sequence 4: Endgame
     async function triggerEndgame() {
         clearInterval(lightGlitchInterval);
         
-        // SUSPENSE TRANSITION
-        transText.textContent = "> ANALYZING_INTERROGATION_DATA...";
+        const transText = document.getElementById('trans-text');
+        if(transText) transText.textContent = "> ANALYZING_INTERROGATION_DATA...";
         transitionOverlay.classList.add('transition-active');
         await new Promise(r => setTimeout(r, 1500));
         
-        transText.textContent = "> CALCULATING_THREAT_LEVEL...";
+        if(transText) transText.textContent = "> CALCULATING_THREAT_LEVEL...";
         await new Promise(r => setTimeout(r, 1500));
         
-        transText.textContent = "> GENERATING_OFFICIAL_DOSSIER...";
+        if(transText) transText.textContent = "> GENERATING_OFFICIAL_DOSSIER...";
         await new Promise(r => setTimeout(r, 1200));
         
         interrogationScreen.classList.remove('active');
