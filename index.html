@@ -37,8 +37,15 @@
             <span class="blinking-dot">ENCRYPTED_LINK</span>
         </div>
 
+        <!-- NEW: INITIALIZE SYSTEM SCREEN (To unlock Audio Context) -->
+        <div id="start-overlay" class="screen active" style="z-index: 500; background: #000; justify-content: center; align-items: center;">
+            <button id="start-game-btn" class="cyber-btn pulse-anim">
+                <span class="btn-text">[ INITIALIZE_SYSTEM ]</span>
+            </button>
+        </div>
+
         <!-- Intro Screen -->
-        <div id="intro-screen" class="screen active">
+        <div id="intro-screen" class="screen hidden">
             <div class="terminal-window">
                 <div class="terminal-header">
                     <div class="terminal-dots">
