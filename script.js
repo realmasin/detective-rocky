@@ -8,6 +8,9 @@
     const randomHash = document.getElementById('random-hash');
     const glitchOverlay = document.getElementById('glitch-overlay');
     
+    const startOverlay = document.getElementById('start-overlay');
+    const startGameBtn = document.getElementById('start-game-btn');
+
     const introScreen = document.getElementById('intro-screen');
     const storyTextContainer = document.getElementById('story-text-container');
     const readyBtn = document.getElementById('ready-btn');
@@ -48,7 +51,6 @@
     const shareXBtn = document.getElementById('share-x-btn');
     const exportContainer = document.getElementById('export-container');
 
-    // --- State Variables ---
     let currentQuestionIndex = 0;
     let score = 0;
     let timerReq;
@@ -80,6 +82,8 @@
     sfx.bgm.volume = 0.3;
     sfx.typing.loop = true;
     sfx.typing.volume = 0.6;
+    // تم خفض مستوى الصوت لملف الخطأ باش ما يبقاش مجهد
+    sfx.wrong.volume = 0.3; 
 
     function playSfx(name) {
         if(!sfx[name]) return;
@@ -93,20 +97,24 @@
         sfx.typing.currentTime = 0;
     }
 
-    // Attach hover and click sounds to all buttons automatically
     document.querySelectorAll('button').forEach(btn => {
         btn.addEventListener('mouseenter', () => playSfx('hover'));
         btn.addEventListener('click', () => playSfx('click'));
     });
 
-    // Autoplay BGM on first interaction (Bypasses Browser Restrictions)
-    let bgmStarted = false;
-    document.body.addEventListener('click', () => {
-        if (!bgmStarted) {
-            sfx.bgm.play().catch(e => console.log('BGM blocked:', e));
-            bgmStarted = true;
-        }
-    }, { once: true });
+    // --- INITIALIZE SYSTEM TRIGGER (Bypasses Autoplay Restrictions) ---
+    startGameBtn.addEventListener('click', () => {
+        // Now the browser allows audio!
+        sfx.bgm.play().catch(e => console.log('BGM blocked:', e));
+        
+        startOverlay.classList.remove('active');
+        startOverlay.classList.add('hidden');
+        
+        introScreen.classList.remove('hidden');
+        introScreen.classList.add('active');
+        
+        startIntro(); // Start the actual game sequence
+    });
 
 
     // --- Story Core ---
@@ -243,7 +251,7 @@
         let isTag = false;
         let currentText = '';
         
-        sfx.typing.play().catch(()=>{}); // Start typing sound
+        sfx.typing.play().catch(()=>{}); 
         
         clearInterval(typingInterval);
         typingInterval = setInterval(() => {
@@ -258,7 +266,7 @@
             } else {
                 clearInterval(typingInterval);
                 isTyping = false;
-                stopTypingSound(); // Stop typing sound
+                stopTypingSound(); 
                 if(onComplete) onComplete();
             }
         }, speed);
@@ -462,7 +470,7 @@
             playSfx('wrong');
             changeRockyImage('angry');
             safeInjectText(questionText, chosenReaction);
-            triggerFlash(); // Trigger flash also plays glitch sound automatically
+            triggerFlash(); 
         }
 
         await new Promise(r => setTimeout(r, 2200)); 
@@ -578,10 +586,6 @@
         let tweetText = `I just faced Detective Rocky to prove my loyalty to the Seismic family! 🕵️‍♂️🔥\n\nAgent: ${playerName}\nScore: ${score}/8\nVerdict: ${isSpyTweetStatus}\n\nAre you a true member or a SPY? Take the test: https://detective-rocky.vercel.app @SeismicSystem`;
         const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
         window.open(twitterUrl, '_blank');
-    });
-
-    document.addEventListener('DOMContentLoaded', () => {
-        startIntro();
     });
 
 })();
