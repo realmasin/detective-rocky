@@ -1,591 +1,279 @@
-(function() {
+:root {
+    --primary-color: #ffffff; 
+    --bg-color: #030303; 
+    --brand-color: #523542; 
+    --brand-light: #7a4f63;
+    --danger-color: #ff2a2a;
+    --warning-color: #ffbd2e; 
+    --success-color: #00ff66;
+    --hud-bg: rgba(8, 8, 8, 0.85); 
+    --hud-border: rgba(82, 53, 66, 0.6); 
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background-color: var(--bg-color); color: var(--primary-color); font-family: 'Share Tech Mono', monospace; overflow: hidden; user-select: none; }
+#game-container { position: relative; width: 100vw; height: 100vh; display: flex; justify-content: center; align-items: center; background-color: #000; }
+
+/* --- DYNAMIC LOADING TRANSITION OVERLAY --- */
+#transition-overlay {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(3, 3, 3, 0.95); z-index: 9999; pointer-events: none;
+    opacity: 0; transition: opacity 0.5s ease-in-out;
+    display: flex; justify-content: center; align-items: center;
+    backdrop-filter: blur(15px);
+}
+.transition-active { opacity: 1 !important; pointer-events: all !important; }
+
+.trans-matrix-bg {
+    position: absolute; top:0; left:0; width: 100%; height: 100%;
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(82,53,66,0.05) 2px, rgba(82,53,66,0.05) 4px);
+    z-index: 1; pointer-events: none;
+}
+
+.transition-ui {
+    display: flex; flex-direction: column; align-items: center; gap: 25px;
+    width: 90%; max-width: 400px; position: relative; z-index: 2;
+}
+
+.trans-spinner {
+    width: 60px; height: 60px;
+    border: 3px solid rgba(82,53,66,0.3); border-top: 3px solid var(--brand-light);
+    border-radius: 50%; animation: spin 1s linear infinite;
+    box-shadow: 0 0 15px rgba(82,53,66,0.5);
+}
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+.trans-text-box {
+    font-size: 1.1rem; color: #fff; letter-spacing: 2px; text-align: center;
+    text-shadow: 0 0 10px rgba(255,255,255,0.5);
+}
+.blinking-cursor { animation: blink 1s infinite; color: var(--brand-light); }
+
+.trans-progress {
+    width: 100%; height: 3px; background: #222; border-radius: 2px; position: relative; overflow: hidden;
+}
+.trans-progress-fill {
+    position: absolute; top: 0; left: 0; height: 100%; width: 30%; background: var(--brand-light);
+    animation: cyberLoad 1.5s infinite ease-in-out alternate;
+    box-shadow: 0 0 10px var(--brand-light);
+}
+@keyframes cyberLoad {
+    0% { left: -30%; width: 30%; }
+    50% { width: 60%; }
+    100% { left: 100%; width: 30%; }
+}
+/* ------------------------------------------ */
+
+#top-status-bar { position: fixed; top: 0; left: 0; width: 100%; height: 25px; background: rgba(10, 10, 10, 0.9); border-bottom: 1px solid var(--brand-light); color: #888; z-index: 100; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; font-size: 0.75rem; letter-spacing: 2px; }
+.blinking-dot { animation: blink 1.5s infinite; color: var(--brand-light); font-weight: bold; }
+#copyright-footer { position: fixed; bottom: 10px; width: 100%; text-align: center; color: rgba(255, 255, 255, 0.2); font-size: 0.75rem; letter-spacing: 3px; z-index: 100; pointer-events: none; }
+
+#background { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-image: url('images/rocky-normal.jpg'); background-size: cover; background-position: center; transform-origin: center; transition: filter 1s ease; animation: breatheEffect 20s infinite alternate ease-in-out; z-index: 1; }
+.bg-blur { filter: blur(10px) brightness(0.3); }
+.bg-victory { filter: blur(6px) brightness(0.6) sepia(0.3) hue-rotate(-15deg) !important; }
+@keyframes breatheEffect { 0% { transform: scale(1); } 100% { transform: scale(1.05); } }
+.crt-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.15) 50%), linear-gradient(90deg, rgba(255,0,0,0.03), rgba(0,255,0,0.01), rgba(0,0,255,0.03)); background-size: 100% 4px, 6px 100%; pointer-events: none; z-index: 99; animation: crtFlicker 0.15s infinite; }
+@keyframes crtFlicker { 0% { opacity: 0.95; } 100% { opacity: 1; } }
+#glitch-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: var(--brand-color); opacity: 0; mix-blend-mode: overlay; pointer-events: none; z-index: 98; }
+.flash-glitch { animation: powerFlash 0.3s ease-out; }
+@keyframes powerFlash { 0% { opacity: 0; } 20% { opacity: 0.6; background: #fff; } 40% { opacity: 0; } 60% { opacity: 0.4; background: var(--brand-color); } 100% { opacity: 0; } }
+
+.screen { position: absolute; width: 100%; height: 100%; z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow-y: auto; padding: 40px 15px; }
+.hidden { display: none !important; }
+.active { display: flex; }
+.hud-panel { background: var(--hud-bg); border: 1px solid var(--hud-border); box-shadow: 0 0 20px rgba(0,0,0,0.8), inset 0 0 15px rgba(82,53,66,0.1); border-radius: 4px; position: relative; }
+
+/* Pulse animation for the Start Button */
+.pulse-anim { animation: btnPulse 2s infinite; font-size: 1.2rem; padding: 20px 40px; }
+@keyframes btnPulse {
+    0% { box-shadow: 0 0 0 0 rgba(82, 53, 66, 0.7); }
+    70% { box-shadow: 0 0 0 20px rgba(82, 53, 66, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(82, 53, 66, 0); }
+}
+
+.cyber-btn { position: relative; background: rgba(5,5,5,0.9); color: var(--primary-color); border: 1px solid var(--brand-color); padding: 16px 25px; font-family: 'Share Tech Mono', monospace; font-size: 1rem; letter-spacing: 2px; cursor: pointer; overflow: hidden; transition: all 0.3s ease; text-transform: uppercase; box-shadow: 0 0 10px rgba(82,53,66,0.2); }
+.cyber-btn::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent); transition: left 0.4s ease; }
+.cyber-btn:hover::before { left: 100%; }
+.cyber-btn:hover { background: var(--brand-color); box-shadow: 0 0 20px var(--brand-light); color: #fff; transform: translateY(-1px); }
+.cyber-btn.processing { background: #fff !important; color: #000 !important; cursor: wait; pointer-events: none; box-shadow: 0 0 20px #fff; }
+
+#skip-btn { position: fixed; bottom: 35px; right: 25px; background: transparent; border: none; color: #555; font-family: 'Share Tech Mono', monospace; font-size: 0.9rem; cursor: pointer; transition: color 0.3s; letter-spacing: 3px; z-index: 50; }
+#skip-btn:hover { color: #fff; text-shadow: 0 0 8px #fff; }
+
+.decode-reveal { animation: decodeIn 1s cubic-bezier(0.1, 0.9, 0.2, 1) forwards; }
+@keyframes decodeIn { 0% { opacity: 0; filter: blur(10px); transform: translateY(15px); } 100% { opacity: 1; filter: blur(0); transform: translateY(0); } }
+
+.identity-form { width: 100%; max-width: 480px; padding: 40px; }
+.form-header { text-align: center; margin-bottom: 30px; }
+.form-header h2 { font-size: 1.5rem; letter-spacing: 4px; color: var(--primary-color); }
+.glitch-line { height: 2px; width: 100%; background: var(--brand-color); margin-top: 10px; animation: widthPulse 2s infinite; }
+@keyframes widthPulse { 0% { width: 10%; } 50% { width: 100%; } 100% { width: 10%; } }
+.input-group { margin-bottom: 25px; }
+.input-group label { display: block; font-size: 0.85rem; margin-bottom: 8px; color: #aaa; letter-spacing: 1px; }
+.input-group input[type="text"] { width: 100%; padding: 12px; background: rgba(0,0,0,0.8); border: 1px solid #333; color: #fff; font-family: 'Share Tech Mono', monospace; font-size: 1rem; border-left: 4px solid var(--brand-color); transition: border 0.3s; }
+.input-group input[type="text"]:focus { border-color: var(--brand-light); outline: none; background: rgba(0,0,0,0.9); }
+.input-group input[type="file"] { width: 100%; color: #888; font-size: 0.85rem; }
+.error-text { color: var(--danger-color); font-size: 0.85rem; margin-bottom: 20px; animation: blink 1s infinite; text-align: center; letter-spacing: 1px; }
+.full-width-btn { width: 100%; font-weight: bold; }
+
+#intro-screen { background: radial-gradient(circle, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.95) 100%); }
+.terminal-window { width: 100%; max-width: 800px; background: rgba(5, 5, 5, 0.85); border: 1px solid #333; box-shadow: 0 20px 50px rgba(0,0,0,0.9), 0 0 15px rgba(82,53,66,0.3); border-radius: 4px; overflow: hidden; }
+.terminal-header { background: #111; padding: 12px 20px; display: flex; align-items: center; border-bottom: 1px solid #333; }
+.terminal-dots { display: flex; gap: 6px; }
+.dot { width: 12px; height: 12px; border-radius: 50%; background: #444; }
+.terminal-title { margin-left: auto; color: #666; font-size: 0.85rem; letter-spacing: 3px; }
+.terminal-body { padding: 30px; min-height: 250px; display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; }
+.intro-line { font-size: 1.1rem; letter-spacing: 1px; color: #ddd; margin: 6px 0; text-align: left; line-height: 1.6; width: 100%; }
+.system-alert { color: var(--danger-color); font-weight: bold; text-shadow: 0 0 8px var(--danger-color); animation: blink 1s infinite; }
+.intro-buttons { display: flex; gap: 15px; margin-top: 30px; min-height: 60px; justify-content: center; width: 100%; }
+
+.cinematic-subtitle { width: 100%; max-width: 800px; padding: 30px 20px; text-align: center; background: linear-gradient(90deg, transparent, rgba(5,5,5,0.98), transparent); border-top: 1px solid rgba(82,53,66,0.3); border-bottom: 1px solid rgba(82,53,66,0.3); display: flex; justify-content: center; align-items: center; gap: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+.bracket { color: var(--brand-light); font-size: 2rem; font-weight: bold; opacity: 0.3; }
+#rocky-dialogue { font-size: 1.25rem; line-height: 1.6; display: inline; color: #fff; letter-spacing: 1px; text-shadow: 0 0 10px rgba(0,0,0,0.8); }
+.type-cursor { font-size: 1.5rem; animation: blink 1s infinite; color: var(--brand-light); }
+
+.interrogation-wrapper { display: flex; flex-direction: column; gap: 20px; width: 100%; max-width: 800px; }
+.timer-container { width: 100%; padding: 10px 20px; display: flex; justify-content: space-between; border-bottom: 2px solid var(--brand-color); margin-bottom: 15px; background: rgba(82,53,66,0.15); border-radius: 2px; }
+#digital-timer { font-size: 1.4rem; font-weight: bold; letter-spacing: 3px; }
+.timer-danger { color: var(--danger-color); text-shadow: 0 0 12px var(--danger-color); animation: blink 0.5s infinite; }
+.question-box { padding: 20px; text-align: center; border-left: 4px solid var(--brand-color); }
+#question-text { font-size: 1.15rem; letter-spacing: 1px; margin-bottom: 15px; line-height: 1.5; color: #fff; }
+#image-wrapper { position: relative; display: inline-block; border: 1px solid var(--brand-color); padding: 2px; background: #000; }
+#question-image { max-height: 120px; display: block; }
+.scanner-line { position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px #fff; animation: scan 2s linear infinite; }
+@keyframes scan { 0% { top: -10%; } 100% { top: 110%; } }
+.options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+.option-btn { padding: 15px; font-size: 0.95rem; border-bottom: 2px solid var(--brand-color); min-height: 65px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #ddd; transition: all 0.2s ease; letter-spacing: 1px; }
+.cyber-hover:hover { background: rgba(82,53,66,0.5); border-color: #fff; color: #fff; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+.option-btn.selected-correct { background: var(--success-color); color: #000; border-color: var(--success-color); font-weight: bold; box-shadow: 0 0 20px rgba(0,255,102,0.3); }
+.option-btn.selected-wrong { background: var(--danger-color); color: #fff; border-color: var(--danger-color); font-weight: bold; box-shadow: 0 0 20px rgba(255,42,42,0.3); }
+
+#endgame-screen { background: rgba(0,0,0,0.85); transition: background 1.5s ease; }
+
+#card-scale-wrapper { 
+    position: relative; z-index: 50; 
+    display: flex; flex-direction: column; gap: 20px; align-items: center; width: 100%; max-width: 800px; 
+}
+.show-card-anim { animation: revealCard 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+@keyframes revealCard { 0% { opacity: 0; filter: blur(10px); transform: translateY(20px); } 100% { opacity: 1; filter: blur(0); transform: translateY(0); } }
+
+/* --- Seismic Endgame Logo --- */
+.seismic-ui-logo {
+    width: 80px; 
+    height: auto;
+    margin-bottom: 5px;
+    z-index: 60;
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.3));
+    animation: pulseGlow 2.5s infinite alternate;
+}
+
+@keyframes pulseGlow {
+    0% { filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.3)); }
+    100% { filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.8)); }
+}
+
+.twitter-card-container { position: relative; width: 800px; height: 450px; }
+@media (max-width: 850px) { .twitter-card-container { transform: scale(0.8); transform-origin: top center; margin-bottom: -90px; } }
+@media (max-width: 650px) { .twitter-card-container { transform: scale(0.55); transform-origin: top center; margin-bottom: -202px; } }
+@media (max-width: 450px) { 
+    .twitter-card-container { 
+        transform: scale(0.50) !important; 
+        transform-origin: top center; 
+        margin-bottom: -220px !important; 
+    } 
+}
+
+#export-container { position: absolute; left: -9999px; top: -9999px; }
+.export-mode.twitter-card { width: 800px !important; height: 450px !important; display: flex !important; flex-direction: column !important; }
+.export-mode .tc-body { padding: 40px !important; gap: 50px !important; align-items: center !important; flex-direction: row !important; }
+.export-mode .tc-profile-col { width: 220px !important; flex-direction: column !important; }
+.export-mode .tc-frame { width: 180px !important; height: 220px !important; }
+.export-mode .tc-data-col { gap: 25px !important; }
+.export-mode .tc-value { font-size: 1.5rem !important; }
+.export-mode .tc-highlight { font-size: 1.8rem !important; }
+.export-mode .tc-stamp { font-size: 2.2rem !important; bottom: 30px !important; right: 40px !important; }
+.export-mode .tc-watermark { font-size: 100px !important; }
+
+.twitter-card { width: 100%; background: #0a0a0a; position: relative; overflow: hidden; border: 1px solid #333; box-shadow: 0 20px 50px rgba(0,0,0,0.9), inset 0 0 40px rgba(82,53,66,0.4); display: flex; flex-direction: column; }
+.tc-bg-texture { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 70% 30%, rgba(82,53,66,0.35) 0%, #000 100%); z-index: 1; pointer-events: none; }
+.tc-radar-grid { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px); background-size: 40px 40px; z-index: 2; pointer-events: none; }
+.tc-watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-10deg); font-size: 5rem; color: rgba(255,255,255,0.02); font-weight: bold; white-space: nowrap; z-index: 3; letter-spacing: 8px; pointer-events: none; text-shadow: 0 0 20px rgba(255,255,255,0.02); }
+
+.tc-header { position: relative; z-index: 10; background: rgba(82,53,66,0.8); padding: 15px 25px; display: flex; align-items: center; border-bottom: 2px solid var(--brand-light); color: #fff; font-weight: bold; letter-spacing: 2px; font-size: 1rem; flex-wrap: wrap; gap: 10px; }
+.tc-logo { width: 20px; height: 20px; background: #fff; margin-right: 10px; border-radius: 1px; box-shadow: 0 0 10px rgba(255,255,255,0.5); flex-shrink: 0; }
+.tc-date { margin-left: auto; color: #eee; font-size: 0.85rem; }
+
+.tc-body { display: flex; padding: 30px; position: relative; z-index: 10; gap: 30px; align-items: center; flex-wrap: wrap; }
+.tc-profile-col { display: flex; flex-direction: column; align-items: center; gap: 15px; width: 180px; flex-shrink: 0; }
+.tc-frame { width: 100%; height: 200px; background: #000; border: 2px solid #555; position: relative; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.8); padding: 4px; }
+.tc-frame img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(15%) contrast(110%); }
+.tc-crosshair { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 70px; height: 70px; border: 1px solid rgba(255,255,255,0.25); border-radius: 50%; pointer-events: none;}
+.tc-scan { position: absolute; top: 0; left: 0; width: 100%; height: 6px; background: rgba(82,53,66,0.8); filter: blur(2px); animation: scan 3s linear infinite; pointer-events: none;}
+.tc-barcode { height: 35px; width: 100%; background: repeating-linear-gradient(90deg, #ccc, #ccc 3px, transparent 3px, transparent 6px, #ccc 6px, #ccc 9px, transparent 9px, transparent 15px); opacity: 0.7; }
+
+.tc-data-col { flex-grow: 1; display: flex; flex-direction: column; gap: 20px; min-width: 200px; }
+.tc-data-row { display: flex; flex-direction: column; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px; }
+.tc-label { font-size: 0.8rem; color: #888; letter-spacing: 2px; margin-bottom: 4px; }
+.tc-value { font-size: 1.3rem; color: #fff; font-weight: bold; letter-spacing: 1px; }
+.tc-highlight { color: var(--brand-light); text-shadow: 0 0 10px rgba(122,79,99,0.8); font-size: 1.5rem; }
+.tc-score-wrap { display: flex; align-items: center; gap: 15px; width: 100%; }
+.tc-bar-bg { flex-grow: 1; height: 6px; background: #222; border-radius: 3px; overflow: hidden; }
+.tc-bar-fill { height: 100%; background: var(--brand-light); width: 0%; transition: width 1s ease-out; }
+
+.tc-stamp {
+    position: absolute; bottom: 20px; right: 20px; transform: rotate(-12deg) scale(2);
+    font-size: 1.8rem; font-weight: bold; border: 4px solid; padding: 10px 20px;
+    opacity: 0; transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: none;
+    background: rgba(0,0,0,0.9); text-align: center; letter-spacing: 3px; z-index: 20;
+}
+.tc-stamp.show { opacity: 1; transform: rotate(-12deg) scale(1); }
+.stamp-success { color: var(--success-color); border-color: var(--success-color); text-shadow: 0 0 15px var(--success-color); box-shadow: inset 0 0 15px rgba(0,255,102,0.2); }
+.stamp-warning { color: var(--warning-color); border-color: var(--warning-color); text-shadow: 0 0 15px var(--warning-color); box-shadow: inset 0 0 15px rgba(255,189,46,0.2); }
+.stamp-danger { color: var(--danger-color); border-color: var(--danger-color); text-shadow: 0 0 15px var(--danger-color); box-shadow: inset 0 0 15px rgba(255,42,42,0.2); }
+
+.endgame-actions { position: relative; z-index: 60; display: flex; gap: 15px; width: 100%; flex-wrap: wrap; }
+.endgame-actions button { flex-grow: 1; padding: 15px; font-size: 0.95rem; }
+
+/* --- Fixed Twitter Button --- */
+.x-btn { 
+    border-color: #fff !important; 
+    background: rgba(0, 0, 0, 0.8) !important; 
+    color: #fff !important; 
+} 
+.x-btn:hover { 
+    background: #fff !important; 
+    color: #000 !important; 
+    box-shadow: 0 0 20px #fff !important; 
+}
+
+#prison-bars { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; display: flex; justify-content: space-evenly; z-index: 20; pointer-events: none; }
+.bar { width: 6vw; height: 100%; background: linear-gradient(90deg, #020202, #1a1a1a, #020202); transform: translateY(-100%); transition: transform 0.4s ease-in; box-shadow: 5px 0 20px rgba(0,0,0,0.9); pointer-events: none; }
+#prison-bars.drop .bar { transform: translateY(0); }
+.bar:nth-child(2) { transition-delay: 0.1s; } .bar:nth-child(3) { transition-delay: 0.2s; }
+.bar:nth-child(4) { transition-delay: 0.15s; } .bar:nth-child(5) { transition-delay: 0.05s; } .bar:nth-child(6) { transition-delay: 0.25s; }
+
+.fade-element { transition: opacity 0.4s ease; opacity: 1; }
+.fade-out { opacity: 0; pointer-events: none; }
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+/* Intelligent Mobile Media Queries */
+@media (max-width: 650px) {
+    .screen { padding: 30px 10px; }
+    .identity-form { padding: 30px 20px; }
+    .interrogation-wrapper { gap: 15px; }
+    .options-grid { grid-template-columns: 1fr; gap: 10px; }
+    .option-btn { min-height: 55px; padding: 12px; }
+    #question-image { max-height: 100px; }
     
-    // --- DOM Initializations ---
-    const transitionOverlay = document.getElementById('transition-overlay');
-    const transText = document.getElementById('trans-text');
-    
-    const bgElement = document.getElementById('background');
-    const randomHash = document.getElementById('random-hash');
-    const glitchOverlay = document.getElementById('glitch-overlay');
-    
-    const startOverlay = document.getElementById('start-overlay');
-    const startGameBtn = document.getElementById('start-game-btn');
-
-    const introScreen = document.getElementById('intro-screen');
-    const storyTextContainer = document.getElementById('story-text-container');
-    const readyBtn = document.getElementById('ready-btn');
-    const skipBtn = document.getElementById('skip-btn');
-    
-    const identityScreen = document.getElementById('identity-screen');
-    const usernameInput = document.getElementById('username-input');
-    const pfpInput = document.getElementById('pfp-input');
-    const submitIdentityBtn = document.getElementById('submit-identity-btn');
-    const identityError = document.getElementById('identity-error');
-    
-    const dialogueScreen = document.getElementById('dialogue-screen');
-    const rockyDialogue = document.getElementById('rocky-dialogue');
-    
-    const interrogationScreen = document.getElementById('interrogation-screen');
-    const qContainer = document.getElementById('q-container');
-    const optContainer = document.getElementById('opt-container');
-    const imageWrapper = document.getElementById('image-wrapper');
-    const questionImage = document.getElementById('question-image');
-    const questionText = document.getElementById('question-text');
-    const optionBtns = document.querySelectorAll('.option-btn');
-    const digitalTimer = document.getElementById('digital-timer');
-    
-    const endgameScreen = document.getElementById('endgame-screen');
-    const cardScaleWrapper = document.getElementById('card-scale-wrapper');
-    const resultCard = document.getElementById('result-card');
-    const cardPfp = document.getElementById('card-pfp');
-    const cardName = document.getElementById('card-name');
-    const cardId = document.getElementById('card-id');
-    const tcHash = document.getElementById('tc-hash');
-    const finalScoreEl = document.getElementById('final-score');
-    const scoreProgress = document.getElementById('score-progress');
-    const cardStatus = document.getElementById('card-status');
-    const endgameStamp = document.getElementById('endgame-stamp');
-    const prisonBars = document.getElementById('prison-bars');
-    
-    const downloadBtn = document.getElementById('download-btn');
-    const shareXBtn = document.getElementById('share-x-btn');
-    const exportContainer = document.getElementById('export-container');
-
-    let currentQuestionIndex = 0;
-    let score = 0;
-    let timerReq;
-    let typingInterval;
-    let isTyping = false;
-    let currentLineIndex = 0;
-    let lightGlitchInterval;
-    
-    let playerName = "UNKNOWN";
-    let playerPfpSrc = "images/rocky-normal.jpg"; 
-    let isSpyTweetStatus = ""; 
-    
-    const TIME_PER_QUESTION_MS = 15000; 
-
-    // --- AUDIO ENGINE ---
-    const audioPath = 'audio/';
-    const sfx = {
-        bgm: new Audio(audioPath + 'bgm.mp3'),
-        typing: new Audio(audioPath + 'typing.mp3'),
-        hover: new Audio(audioPath + 'hover.mp3'),
-        click: new Audio(audioPath + 'click.mp3'),
-        correct: new Audio(audioPath + 'correct.mp3'),
-        wrong: new Audio(audioPath + 'wrong.mp3'),
-        glitch: new Audio(audioPath + 'glitch.mp3'),
-        stamp: new Audio(audioPath + 'stamp.mp3')
-    };
-
-    sfx.bgm.loop = true;
-    sfx.bgm.volume = 0.3;
-    sfx.typing.loop = true;
-    sfx.typing.volume = 0.6;
-    // تم خفض مستوى الصوت لملف الخطأ باش ما يبقاش مجهد
-    sfx.wrong.volume = 0.3; 
-
-    function playSfx(name) {
-        if(!sfx[name]) return;
-        const sound = sfx[name].cloneNode();
-        sound.volume = sfx[name].volume || 1;
-        sound.play().catch(e => console.log('Audio play blocked:', e));
+    .seismic-ui-logo { width: 60px; }
+    .endgame-actions { 
+        flex-direction: column; 
+        gap: 15px; 
+        width: 90%; 
+        max-width: 350px;
     }
-
-    function stopTypingSound() {
-        sfx.typing.pause();
-        sfx.typing.currentTime = 0;
+    .endgame-actions button { 
+        width: 100%; 
+        padding: 16px; 
     }
-
-    document.querySelectorAll('button').forEach(btn => {
-        btn.addEventListener('mouseenter', () => playSfx('hover'));
-        btn.addEventListener('click', () => playSfx('click'));
-    });
-
-    // --- INITIALIZE SYSTEM TRIGGER (Bypasses Autoplay Restrictions) ---
-    startGameBtn.addEventListener('click', () => {
-        // Now the browser allows audio!
-        sfx.bgm.play().catch(e => console.log('BGM blocked:', e));
-        
-        startOverlay.classList.remove('active');
-        startOverlay.classList.add('hidden');
-        
-        introScreen.classList.remove('hidden');
-        introScreen.classList.add('active');
-        
-        startIntro(); // Start the actual game sequence
-    });
-
-
-    // --- Story Core ---
-    const introLines = [
-        "> INITIALIZING SEISMIC KERNEL V9.4...",
-        "> MEMORY CHECK: OK.",
-        "> DECRYPTING AUDIO LOGS...",
-        "<span class='system-alert'>[!] WARNING: CRITICAL BREACH DETECTED IN SECTOR 7.</span>",
-        "> ALGORITHM SUGGESTS INTERNAL INSURGENT ACTIVITY.",
-        "> DETECTIVE ROCKY DEMANDS IMMEDIATE CLEARANCE EVALUATION.",
-        "> PROCEED WITH CAUTION."
-    ];
-
-    const rulesLines = [
-        "Sit down. Don't make any sudden moves.",
-        "Lately, we've had impostors claiming to be Seismic members.",
-        "Fake members... Spies trying to blend in.",
-        "My job is to weed them out.",
-        "You say you belong here? We will see about that.",
-        "I will ask you 8 questions about Seismic.",
-        "Only a true member knows the answers.",
-        "The timer is absolute. Do not lie to me."
-    ];
-
-    const correctReactions = {
-        start: [
-            "LOG: Data accepted. Do not get comfortable yet.",
-            "LOG: Signature verified. But I am still watching you.",
-            "LOG: Acceptable. Let's see if it was just luck."
-        ],
-        mid: [
-            "LOG: Intel matches our database. You might actually belong here.",
-            "Hmm... You know your Seismic history. Next fragment.",
-            "LOG: Correct. You are surviving... for now."
-        ],
-        end: [
-            "LOG: Final fragment processed. Compiling your dossier...",
-            "LOG: Interrogation complete. Calculating your threat level..."
-        ]
-    };
-
-    const wrongReactions = {
-        start: [
-            "WARNING: Deception detected. You are digging your own grave.",
-            "WARNING: Contradiction found. A real member wouldn't miss this.",
-            "WARNING: A pathetic attempt at a lie. Strike marked."
-        ],
-        mid: [
-            "WARNING: Your cover is slipping. That was completely wrong.",
-            "Are you even trying? You are starting to look like a spy.",
-            "Wrong. A real Seismic member would never miss that."
-        ],
-        end: [
-            "WARNING: Critical failure on the final step. Preparing dossier...",
-            "WARNING: Interrogation complete. Locking down final verdict..."
-        ]
-    };
-
-    const questionsDatabase = [
-        {
-            q: "Identify this target:",
-            img: "images/founder.jpg",
-            opts: ["Founder of Seismic", "Leader", "Unknown Entity", "System Admin"],
-            ans: "Rm91bmRlciBvZiBTZWlzbWlj"
-        }
-    ];
-
-    for(let i = 2; i <= 8; i++) {
-        questionsDatabase.push({
-            q: `DATA FRAGMENT #${i} REQUIRED. SELECT OPTION 1.`,
-            img: "", 
-            opts: ["Option 1", "Option 2", "Option 3", "Option 4"],
-            ans: "T3B0aW9uIDE="
-        });
-    }
-
-    let activeQuestions = [];
-    let isIntroTyping = false;
-    let introTimeout;
-
-    // --- Core Helpers ---
-    function shuffleArray(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]];
-        }
-        return array;
-    }
-
-    function changeRockyImage(state) {
-        bgElement.style.backgroundImage = `url('images/rocky-${state}.jpg')`;
-    }
-
-    function generateAgentID() {
-        return "SMC-" + Math.floor(10000 + Math.random() * 90000);
-    }
-
-    setInterval(() => {
-        randomHash.textContent = "NODE: 0x" + Math.floor(Math.random()*16777215).toString(16).toUpperCase();
-    }, 1500);
-
-    function startLightGlitches() {
-        lightGlitchInterval = setInterval(() => {
-            if(Math.random() > 0.65) triggerFlash();
-        }, 4000);
-    }
-
-    function triggerFlash() {
-        playSfx('glitch');
-        glitchOverlay.classList.remove('flash-glitch');
-        void glitchOverlay.offsetWidth; 
-        glitchOverlay.classList.add('flash-glitch');
-    }
-
-    async function transitionScreen(fromElement, toElement, loadingText = "> SYSTEM_PROCESSING...", waitTime = 1200) {
-        if(transText) transText.textContent = loadingText;
-        transitionOverlay.classList.add('transition-active');
-        
-        await new Promise(r => setTimeout(r, waitTime)); 
-        
-        fromElement.classList.remove('active');
-        fromElement.classList.add('hidden');
-        toElement.classList.remove('hidden');
-        toElement.classList.add('active');
-        
-        transitionOverlay.classList.remove('transition-active');
-        await new Promise(r => setTimeout(r, 600)); 
-    }
-
-    function typeWriterEffect(element, text, speed, onComplete) {
-        isTyping = true;
-        element.innerHTML = ''; 
-        let i = 0;
-        let isTag = false;
-        let currentText = '';
-        
-        sfx.typing.play().catch(()=>{}); 
-        
-        clearInterval(typingInterval);
-        typingInterval = setInterval(() => {
-            if (i < text.length) {
-                let char = text.charAt(i);
-                currentText += char;
-                element.innerHTML = currentText;
-                if(char === '<') isTag = true;
-                if(char === '>') isTag = false;
-                
-                if(!isTag) i++; else i++;
-            } else {
-                clearInterval(typingInterval);
-                isTyping = false;
-                stopTypingSound(); 
-                if(onComplete) onComplete();
-            }
-        }, speed);
-    }
-
-    function safeInjectText(element, text) {
-        element.textContent = text;
-    }
-
-    // --- Sequence 1: Boot ---
-    function startIntro() {
-        skipBtn.classList.remove('hidden');
-        storyTextContainer.innerHTML = '';
-        let lineIndex = 0;
-        isIntroTyping = true;
-
-        function showNextLine() {
-            if (!isIntroTyping) return;
-            const lineDiv = document.createElement('div');
-            lineDiv.className = 'intro-line';
-            storyTextContainer.appendChild(lineDiv);
-            
-            typeWriterEffect(lineDiv, introLines[lineIndex], 30, () => {
-                lineIndex++;
-                if (lineIndex < introLines.length) {
-                    introTimeout = setTimeout(showNextLine, 600); 
-                } else {
-                    introTimeout = setTimeout(() => {
-                        isIntroTyping = false;
-                        readyBtn.classList.remove('hidden');
-                        readyBtn.classList.add('decode-reveal'); 
-                        skipBtn.classList.add('hidden');
-                    }, 500);
-                }
-            });
-        }
-        showNextLine();
-    }
-
-    skipBtn.addEventListener('click', () => {
-        isIntroTyping = false;
-        clearInterval(typingInterval);
-        clearTimeout(introTimeout);
-        stopTypingSound();
-        
-        storyTextContainer.innerHTML = '';
-        introLines.forEach(line => {
-            const div = document.createElement('div');
-            div.className = 'intro-line';
-            div.innerHTML = line; 
-            storyTextContainer.appendChild(div);
-        });
-        readyBtn.classList.remove('hidden');
-        readyBtn.classList.add('decode-reveal');
-        skipBtn.classList.add('hidden');
-    });
-
-    readyBtn.addEventListener('click', async () => {
-        readyBtn.classList.add('processing');
-        await transitionScreen(introScreen, identityScreen, "> ESTABLISHING_SECURE_LINK...", 1500);
-    });
-
-    // --- Sequence 2: Form ---
-    submitIdentityBtn.addEventListener('click', async () => {
-        const nameVal = usernameInput.value.trim();
-        const file = pfpInput.files[0];
-        if (!nameVal || !file) {
-            identityError.classList.remove('hidden');
-            return;
-        }
-        identityError.classList.add('hidden');
-        playerName = nameVal;
-        cardId.textContent = generateAgentID(); 
-        tcHash.textContent = "UID: " + Math.floor(Math.random()*999999).toString(16).toUpperCase();
-
-        const reader = new FileReader();
-        reader.onload = async function(e) {
-            playerPfpSrc = e.target.result;
-            submitIdentityBtn.classList.add('processing');
-            await transitionScreen(identityScreen, dialogueScreen, "> ENCRYPTING_BIOMETRICS...", 1800);
-            changeRockyImage('reading');
-            playNextDialogueLine();
-            startLightGlitches(); 
-        }
-        reader.readAsDataURL(file);
-    });
-
-    dialogueScreen.addEventListener('click', async () => {
-        if (isTyping) {
-            clearInterval(typingInterval);
-            stopTypingSound();
-            rockyDialogue.textContent = rulesLines[currentLineIndex];
-            isTyping = false;
-        } else {
-            currentLineIndex++;
-            if (currentLineIndex < rulesLines.length) {
-                playNextDialogueLine();
-            } else {
-                await transitionScreen(dialogueScreen, interrogationScreen, "> INITIALIZING_INTERROGATION...", 1500);
-                changeRockyImage('normal');
-                activeQuestions = shuffleArray([...questionsDatabase]).slice(0, 8);
-                currentQuestionIndex = 0;
-                score = 0;
-                loadQuestion();
-            }
-        }
-    });
-
-    function playNextDialogueLine() {
-        typeWriterEffect(rockyDialogue, rulesLines[currentLineIndex], 35);
-    }
-
-    // --- Sequence 3: Quiz ---
-    function loadQuestion() {
-        if (currentQuestionIndex >= activeQuestions.length) {
-            triggerEndgame();
-            return;
-        }
-        
-        const currentQ = activeQuestions[currentQuestionIndex];
-        safeInjectText(questionText, currentQ.q);
-        
-        if (currentQ.img !== "") {
-            questionImage.src = currentQ.img;
-            imageWrapper.classList.remove('hidden');
-        } else {
-            imageWrapper.classList.add('hidden');
-            questionImage.src = "";
-        }
-
-        const shuffledOptions = shuffleArray([...currentQ.opts]);
-        optionBtns.forEach((btn, index) => {
-            safeInjectText(btn, shuffledOptions[index]);
-            btn.className = 'option-btn hud-panel cyber-hover'; 
-            btn.disabled = false;
-            btn.onclick = () => handleAnswer(btn, shuffledOptions[index], currentQ.ans);
-        });
-
-        digitalTimer.classList.remove('timer-danger');
-        changeRockyImage('normal');
-        startDigitalTimer();
-    }
-
-    function formatTime(ms) {
-        if(ms <= 0) return "00:00:00";
-        let totalSeconds = ms / 1000;
-        let seconds = Math.floor(totalSeconds);
-        let hundreths = Math.floor((totalSeconds - seconds) * 100);
-        let strSec = seconds < 10 ? "0"+seconds : seconds;
-        let strHun = hundreths < 10 ? "0"+hundreths : hundreths;
-        return `00:${strSec}:${strHun}`;
-    }
-
-    function startDigitalTimer() {
-        let startTime = Date.now();
-        cancelAnimationFrame(timerReq);
-        function update() {
-            let elapsed = Date.now() - startTime;
-            let timeLeft = TIME_PER_QUESTION_MS - elapsed;
-            
-            if (timeLeft <= 4000) digitalTimer.classList.add('timer-danger');
-            
-            if(timeLeft <= 0) {
-                digitalTimer.textContent = "00:00:00";
-                handleAnswer(null, null, activeQuestions[currentQuestionIndex].ans);
-                return;
-            }
-            digitalTimer.textContent = formatTime(timeLeft);
-            timerReq = requestAnimationFrame(update);
-        }
-        timerReq = requestAnimationFrame(update);
-    }
-
-    async function handleAnswer(clickedBtn, selectedText, encodedCorrectAnswer) {
-        cancelAnimationFrame(timerReq);
-        optionBtns.forEach(btn => btn.disabled = true);
-
-        const decodedCorrect = atob(encodedCorrectAnswer);
-        let isCorrect = (selectedText === decodedCorrect);
-
-        if(clickedBtn) {
-            if(isCorrect) clickedBtn.classList.add('selected-correct');
-            else clickedBtn.classList.add('selected-wrong');
-        }
-
-        await new Promise(r => setTimeout(r, 600)); 
-
-        let phase = "start";
-        if (currentQuestionIndex === activeQuestions.length - 1) phase = "end"; 
-        else if (currentQuestionIndex >= 3) phase = "mid"; 
-
-        let reactionPool = isCorrect ? correctReactions[phase] : wrongReactions[phase];
-        let chosenReaction = reactionPool[Math.floor(Math.random() * reactionPool.length)];
-
-        if (isCorrect) {
-            score++;
-            playSfx('correct');
-            changeRockyImage('smiling');
-            safeInjectText(questionText, chosenReaction);
-        } else {
-            playSfx('wrong');
-            changeRockyImage('angry');
-            safeInjectText(questionText, chosenReaction);
-            triggerFlash(); 
-        }
-
-        await new Promise(r => setTimeout(r, 2200)); 
-        
-        currentQuestionIndex++;
-        
-        if (currentQuestionIndex < activeQuestions.length) {
-            await transitionScreen(interrogationScreen, interrogationScreen, "> FETCHING_NEXT_FRAGMENT...", 1000);
-            loadQuestion();
-        } else {
-            loadQuestion(); 
-        }
-    }
-
-    // --- Sequence 4: Endgame ---
-    async function triggerEndgame() {
-        clearInterval(lightGlitchInterval);
-        
-        if(transText) transText.textContent = "> ANALYZING_INTERROGATION_DATA...";
-        transitionOverlay.classList.add('transition-active');
-        await new Promise(r => setTimeout(r, 1500));
-        
-        if(transText) transText.textContent = "> CALCULATING_THREAT_LEVEL...";
-        await new Promise(r => setTimeout(r, 1500));
-        
-        if(transText) transText.textContent = "> GENERATING_OFFICIAL_DOSSIER...";
-        await new Promise(r => setTimeout(r, 1200));
-        
-        interrogationScreen.classList.remove('active');
-        interrogationScreen.classList.add('hidden');
-        endgameScreen.classList.remove('hidden');
-        endgameScreen.classList.add('active');
-        
-        transitionOverlay.classList.remove('transition-active');
-        
-        cardPfp.src = playerPfpSrc;
-        cardName.textContent = playerName.toUpperCase();
-        finalScoreEl.textContent = `${score}/8`;
-        
-        let percentage = (score / 8) * 100;
-        scoreProgress.style.width = `${percentage}%`;
-        
-        await new Promise(r => setTimeout(r, 600));
-
-        cardScaleWrapper.classList.remove('hidden');
-        cardScaleWrapper.classList.add('show-card-anim');
-        
-        setTimeout(() => {
-            if (score >= 6) {
-                cardStatus.textContent = "VERIFIED ELITE";
-                cardStatus.style.color = "var(--success-color)";
-                scoreProgress.style.background = "var(--success-color)";
-                endgameStamp.innerHTML = "CLEARED";
-                endgameStamp.className = "tc-stamp stamp-success show";
-                playSfx('stamp');
-                bgElement.classList.add('bg-victory'); 
-                isSpyTweetStatus = "Verified Elite Member! ✅";
-            } else if (score >= 4) {
-                cardStatus.textContent = "POTENTIAL SPY";
-                cardStatus.style.color = "var(--warning-color)";
-                scoreProgress.style.background = "var(--warning-color)";
-                endgameStamp.innerHTML = "SUSPECT";
-                endgameStamp.className = "tc-stamp stamp-warning show";
-                triggerFlash();
-                playSfx('stamp');
-                isSpyTweetStatus = "Under Suspicion! ⚠️";
-            } else {
-                cardStatus.textContent = "CRITICAL THREAT";
-                cardStatus.style.color = "var(--danger-color)";
-                scoreProgress.style.background = "var(--danger-color)";
-                prisonBars.classList.remove('hidden');
-                setTimeout(() => prisonBars.classList.add('drop'), 50);
-                
-                setTimeout(() => {
-                    endgameStamp.innerHTML = "SPY<br>DETECTED";
-                    endgameStamp.className = "tc-stamp stamp-danger show";
-                    triggerFlash();
-                    playSfx('stamp');
-                }, 600);
-                isSpyTweetStatus = "Imprisoned as a SPY! 🚨";
-            }
-        }, 1200);
-    }
-
-    downloadBtn.addEventListener('click', () => {
-        downloadBtn.textContent = 'GENERATING...';
-        downloadBtn.classList.add('processing');
-        
-        exportContainer.innerHTML = '';
-        const clone = resultCard.cloneNode(true);
-        clone.classList.add('export-mode');
-        exportContainer.appendChild(clone);
-        
-        setTimeout(() => {
-            html2canvas(clone, {
-                backgroundColor: "#080808",
-                scale: 2,
-                useCORS: true
-            }).then(canvas => {
-                const link = document.createElement('a');
-                link.download = `Seismic_Dossier_${playerName}.png`;
-                link.href = canvas.toDataURL('image/png');
-                link.click();
-                
-                exportContainer.innerHTML = ''; 
-                downloadBtn.textContent = 'EXTRACT_FILE';
-                downloadBtn.classList.remove('processing');
-            });
-        }, 100);
-    });
-
-    shareXBtn.addEventListener('click', () => {
-        let tweetText = `I just faced Detective Rocky to prove my loyalty to the Seismic family! 🕵️‍♂️🔥\n\nAgent: ${playerName}\nScore: ${score}/8\nVerdict: ${isSpyTweetStatus}\n\nAre you a true member or a SPY? Take the test: https://detective-rocky.vercel.app @SeismicSystem`;
-        const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
-        window.open(twitterUrl, '_blank');
-    });
-
-})();
+}
