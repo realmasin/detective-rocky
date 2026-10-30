@@ -83,12 +83,20 @@ body { background-color: var(--bg-color); color: var(--primary-color); font-fami
 .active { display: flex; }
 .hud-panel { background: var(--hud-bg); border: 1px solid var(--hud-border); box-shadow: 0 0 20px rgba(0,0,0,0.8), inset 0 0 15px rgba(82,53,66,0.1); border-radius: 4px; position: relative; }
 
+/* Pulse animation for the Start Button */
+.pulse-anim { animation: btnPulse 2s infinite; font-size: 1.2rem; padding: 20px 40px; }
+@keyframes btnPulse {
+    0% { box-shadow: 0 0 0 0 rgba(82, 53, 66, 0.7); }
+    70% { box-shadow: 0 0 0 20px rgba(82, 53, 66, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(82, 53, 66, 0); }
+}
+
 .cyber-btn { position: relative; background: rgba(5,5,5,0.9); color: var(--primary-color); border: 1px solid var(--brand-color); padding: 16px 25px; font-family: 'Share Tech Mono', monospace; font-size: 1rem; letter-spacing: 2px; cursor: pointer; overflow: hidden; transition: all 0.3s ease; text-transform: uppercase; box-shadow: 0 0 10px rgba(82,53,66,0.2); }
 .cyber-btn::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent); transition: left 0.4s ease; }
 .cyber-btn:hover::before { left: 100%; }
 .cyber-btn:hover { background: var(--brand-color); box-shadow: 0 0 20px var(--brand-light); color: #fff; transform: translateY(-1px); }
 .cyber-btn.processing { background: #fff !important; color: #000 !important; cursor: wait; pointer-events: none; box-shadow: 0 0 20px #fff; }
-.x-btn { border-color: #fff; background: #fff; color: #000; font-weight: bold; } .x-btn:hover { background: #ccc; color: #000; box-shadow: 0 0 20px #fff; }
+
 #skip-btn { position: fixed; bottom: 35px; right: 25px; background: transparent; border: none; color: #555; font-family: 'Share Tech Mono', monospace; font-size: 0.9rem; cursor: pointer; transition: color 0.3s; letter-spacing: 3px; z-index: 50; }
 #skip-btn:hover { color: #fff; text-shadow: 0 0 8px #fff; }
 
@@ -142,7 +150,6 @@ body { background-color: var(--bg-color); color: var(--primary-color); font-fami
 
 #endgame-screen { background: rgba(0,0,0,0.85); transition: background 1.5s ease; }
 
-/* FIX: Added position relative so the card stays above the prison bars */
 #card-scale-wrapper { 
     position: relative; z-index: 50; 
     display: flex; flex-direction: column; gap: 20px; align-items: center; width: 100%; max-width: 800px; 
@@ -150,12 +157,31 @@ body { background-color: var(--bg-color); color: var(--primary-color); font-fami
 .show-card-anim { animation: revealCard 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
 @keyframes revealCard { 0% { opacity: 0; filter: blur(10px); transform: translateY(20px); } 100% { opacity: 1; filter: blur(0); transform: translateY(0); } }
 
-.twitter-card-container { position: relative; width: 800px; height: 450px; }
+/* --- Seismic Endgame Logo --- */
+.seismic-ui-logo {
+    width: 80px; 
+    height: auto;
+    margin-bottom: 5px;
+    z-index: 60;
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.3));
+    animation: pulseGlow 2.5s infinite alternate;
+}
 
-/* Responsive scaling for the 800x450 Card */
+@keyframes pulseGlow {
+    0% { filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.3)); }
+    100% { filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.8)); }
+}
+
+.twitter-card-container { position: relative; width: 800px; height: 450px; }
 @media (max-width: 850px) { .twitter-card-container { transform: scale(0.8); transform-origin: top center; margin-bottom: -90px; } }
 @media (max-width: 650px) { .twitter-card-container { transform: scale(0.55); transform-origin: top center; margin-bottom: -202px; } }
-@media (max-width: 450px) { .twitter-card-container { transform: scale(0.40); transform-origin: top center; margin-bottom: -270px; } }
+@media (max-width: 450px) { 
+    .twitter-card-container { 
+        transform: scale(0.50) !important; 
+        transform-origin: top center; 
+        margin-bottom: -220px !important; 
+    } 
+}
 
 #export-container { position: absolute; left: -9999px; top: -9999px; }
 .export-mode.twitter-card { width: 800px !important; height: 450px !important; display: flex !important; flex-direction: column !important; }
@@ -205,9 +231,20 @@ body { background-color: var(--bg-color); color: var(--primary-color); font-fami
 .stamp-warning { color: var(--warning-color); border-color: var(--warning-color); text-shadow: 0 0 15px var(--warning-color); box-shadow: inset 0 0 15px rgba(255,189,46,0.2); }
 .stamp-danger { color: var(--danger-color); border-color: var(--danger-color); text-shadow: 0 0 15px var(--danger-color); box-shadow: inset 0 0 15px rgba(255,42,42,0.2); }
 
-/* FIX: Added position relative so buttons stay above the prison bars */
 .endgame-actions { position: relative; z-index: 60; display: flex; gap: 15px; width: 100%; flex-wrap: wrap; }
 .endgame-actions button { flex-grow: 1; padding: 15px; font-size: 0.95rem; }
+
+/* --- Fixed Twitter Button --- */
+.x-btn { 
+    border-color: #fff !important; 
+    background: rgba(0, 0, 0, 0.8) !important; 
+    color: #fff !important; 
+} 
+.x-btn:hover { 
+    background: #fff !important; 
+    color: #000 !important; 
+    box-shadow: 0 0 20px #fff !important; 
+}
 
 #prison-bars { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; display: flex; justify-content: space-evenly; z-index: 20; pointer-events: none; }
 .bar { width: 6vw; height: 100%; background: linear-gradient(90deg, #020202, #1a1a1a, #020202); transform: translateY(-100%); transition: transform 0.4s ease-in; box-shadow: 5px 0 20px rgba(0,0,0,0.9); pointer-events: none; }
@@ -219,20 +256,24 @@ body { background-color: var(--bg-color); color: var(--primary-color); font-fami
 .fade-out { opacity: 0; pointer-events: none; }
 @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
-/* Intelligent Mobile Media Queries - strictly for UI padding outside the card */
-@media (max-width: 600px) {
+/* Intelligent Mobile Media Queries */
+@media (max-width: 650px) {
     .screen { padding: 30px 10px; }
     .identity-form { padding: 30px 20px; }
     .interrogation-wrapper { gap: 15px; }
     .options-grid { grid-template-columns: 1fr; gap: 10px; }
     .option-btn { min-height: 55px; padding: 12px; }
     #question-image { max-height: 100px; }
-}
-
-/* Pulse animation for the Start Button */
-.pulse-anim { animation: btnPulse 2s infinite; font-size: 1.2rem; padding: 20px 40px; }
-@keyframes btnPulse {
-    0% { box-shadow: 0 0 0 0 rgba(82, 53, 66, 0.7); }
-    70% { box-shadow: 0 0 0 20px rgba(82, 53, 66, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(82, 53, 66, 0); }
+    
+    .seismic-ui-logo { width: 60px; }
+    .endgame-actions { 
+        flex-direction: column; 
+        gap: 15px; 
+        width: 90%; 
+        max-width: 350px;
+    }
+    .endgame-actions button { 
+        width: 100%; 
+        padding: 16px; 
+    }
 }
