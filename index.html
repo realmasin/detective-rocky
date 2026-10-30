@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Seismic Interrogation</title>
-    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link rel="stylesheet" href="style.css">
@@ -37,7 +36,7 @@
             <span class="blinking-dot">ENCRYPTED_LINK</span>
         </div>
 
-        <!-- NEW: INITIALIZE SYSTEM SCREEN (To unlock Audio Context) -->
+        <!-- INITIALIZE SYSTEM SCREEN (To unlock Audio Context) -->
         <div id="start-overlay" class="screen active" style="z-index: 500; background: #000; justify-content: center; align-items: center;">
             <button id="start-game-btn" class="cyber-btn pulse-anim">
                 <span class="btn-text">[ INITIALIZE_SYSTEM ]</span>
@@ -130,6 +129,10 @@
             </div>
             
             <div id="card-scale-wrapper" class="hidden">
+                
+                <!-- SEISMIC LOGO -->
+                <img src="images/seismic-logo.png" alt="Seismic Logo" class="seismic-ui-logo">
+
                 <div class="twitter-card-container">
                     <div id="result-card" class="twitter-card">
                         <div class="tc-bg-texture"></div>
