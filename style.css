@@ -157,21 +157,6 @@ body { background-color: var(--bg-color); color: var(--primary-color); font-fami
 .show-card-anim { animation: revealCard 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
 @keyframes revealCard { 0% { opacity: 0; filter: blur(10px); transform: translateY(20px); } 100% { opacity: 1; filter: blur(0); transform: translateY(0); } }
 
-/* --- Seismic Endgame Logo --- */
-.seismic-ui-logo {
-    width: 80px; 
-    height: auto;
-    margin-bottom: 5px;
-    z-index: 60;
-    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.3));
-    animation: pulseGlow 2.5s infinite alternate;
-}
-
-@keyframes pulseGlow {
-    0% { filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.3)); }
-    100% { filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.8)); }
-}
-
 .twitter-card-container { position: relative; width: 800px; height: 450px; }
 @media (max-width: 850px) { .twitter-card-container { transform: scale(0.8); transform-origin: top center; margin-bottom: -90px; } }
 @media (max-width: 650px) { .twitter-card-container { transform: scale(0.55); transform-origin: top center; margin-bottom: -202px; } }
@@ -193,6 +178,7 @@ body { background-color: var(--bg-color); color: var(--primary-color); font-fami
 .export-mode .tc-highlight { font-size: 1.8rem !important; }
 .export-mode .tc-stamp { font-size: 2.2rem !important; bottom: 30px !important; right: 40px !important; }
 .export-mode .tc-watermark { font-size: 100px !important; }
+.export-mode .tc-logo { width: 30px !important; margin-right: 15px !important; }
 
 .twitter-card { width: 100%; background: #0a0a0a; position: relative; overflow: hidden; border: 1px solid #333; box-shadow: 0 20px 50px rgba(0,0,0,0.9), inset 0 0 40px rgba(82,53,66,0.4); display: flex; flex-direction: column; }
 .tc-bg-texture { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 70% 30%, rgba(82,53,66,0.35) 0%, #000 100%); z-index: 1; pointer-events: none; }
@@ -200,7 +186,16 @@ body { background-color: var(--bg-color); color: var(--primary-color); font-fami
 .tc-watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-10deg); font-size: 5rem; color: rgba(255,255,255,0.02); font-weight: bold; white-space: nowrap; z-index: 3; letter-spacing: 8px; pointer-events: none; text-shadow: 0 0 20px rgba(255,255,255,0.02); }
 
 .tc-header { position: relative; z-index: 10; background: rgba(82,53,66,0.8); padding: 15px 25px; display: flex; align-items: center; border-bottom: 2px solid var(--brand-light); color: #fff; font-weight: bold; letter-spacing: 2px; font-size: 1rem; flex-wrap: wrap; gap: 10px; }
-.tc-logo { width: 20px; height: 20px; background: #fff; margin-right: 10px; border-radius: 1px; box-shadow: 0 0 10px rgba(255,255,255,0.5); flex-shrink: 0; }
+
+/* --- UPDATED LOGO STYLE --- */
+.tc-logo { 
+    width: 24px; 
+    height: auto; 
+    margin-right: 12px; 
+    flex-shrink: 0;
+    filter: drop-shadow(0 0 6px rgba(255,255,255,0.5));
+}
+
 .tc-date { margin-left: auto; color: #eee; font-size: 0.85rem; }
 
 .tc-body { display: flex; padding: 30px; position: relative; z-index: 10; gap: 30px; align-items: center; flex-wrap: wrap; }
@@ -265,7 +260,6 @@ body { background-color: var(--bg-color); color: var(--primary-color); font-fami
     .option-btn { min-height: 55px; padding: 12px; }
     #question-image { max-height: 100px; }
     
-    .seismic-ui-logo { width: 60px; }
     .endgame-actions { 
         flex-direction: column; 
         gap: 15px; 
