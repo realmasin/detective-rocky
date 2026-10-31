@@ -64,7 +64,7 @@
     
     const TIME_PER_QUESTION_MS = 15000; 
 
-    const audioPath = 'audio/';
+        const audioPath = 'audio/';
     const sfx = {
         bgm: new Audio(audioPath + 'bgm.mp3'),
         typing: new Audio(audioPath + 'typing.mp3'),
@@ -81,6 +81,9 @@
     sfx.typing.loop = true;
     sfx.typing.volume = 0.6;
     sfx.wrong.volume = 0.3; 
+    
+    
+    sfx.stamp.volume = 0.4; 
 
     function playSfx(name) {
         if(!sfx[name]) return;
@@ -88,6 +91,7 @@
         sound.volume = sfx[name].volume || 1;
         sound.play().catch(e => console.log('Audio play blocked:', e));
     }
+
 
     function stopTypingSound() {
         sfx.typing.pause();
