@@ -10,7 +10,6 @@
 </head>
 <body>
     
-    <!-- ADVANCED CINEMATIC TRANSITION OVERLAY -->
     <div id="transition-overlay">
         <div class="trans-matrix-bg"></div>
         <div class="transition-ui">
@@ -28,7 +27,7 @@
         
         <div class="crt-overlay"></div>
         <div id="glitch-overlay"></div>
-        <div id="background" class="bg-blur"></div>
+        <div id="background"></div>
 
         <div id="top-status-bar">
             <span>SEISMIC_OS // KERNEL_V9.4</span>
@@ -36,14 +35,12 @@
             <span class="blinking-dot">ENCRYPTED_LINK</span>
         </div>
 
-        <!-- INITIALIZE SYSTEM SCREEN -->
         <div id="start-overlay" class="screen active" style="z-index: 500; background: #000; justify-content: center; align-items: center;">
             <button id="start-game-btn" class="cyber-btn pulse-anim">
                 <span class="btn-text">[ INITIALIZE_SYSTEM ]</span>
             </button>
         </div>
 
-        <!-- Intro Screen -->
         <div id="intro-screen" class="screen hidden">
             <div class="terminal-window">
                 <div class="terminal-header">
@@ -63,7 +60,6 @@
             </div>
         </div>
 
-        <!-- Identity Screen -->
         <div id="identity-screen" class="screen hidden">
             <div class="hud-panel identity-form fade-element">
                 <div class="form-header">
@@ -83,7 +79,6 @@
             </div>
         </div>
 
-        <!-- Dialogue Screen -->
         <div id="dialogue-screen" class="screen hidden">
             <div class="cinematic-subtitle">
                 <span class="bracket">[</span>
@@ -93,14 +88,29 @@
             </div>
         </div>
 
-        <!-- Interrogation Screen -->
+        <!-- NEW: INTERROGATION SPLIT LAYOUT -->
         <div id="interrogation-screen" class="screen hidden">
-            <div class="interrogation-wrapper">
-                <div class="top-section fade-element" id="q-container">
-                    <div class="timer-container">
-                        <span class="timer-label">ENCRYPTION_DECAY: </span>
-                        <span id="digital-timer">00:15:00</span>
+            <div class="interrogation-layout">
+                
+                <!-- Side Panel: Rocky's Security Camera Feed -->
+                <div class="side-panel fade-element">
+                    <div class="timer-container hud-panel">
+                        <span class="timer-label">DECAY_TIMER:</span>
+                        <span id="digital-timer" class="timer-value">00:15:00</span>
                     </div>
+                    <div class="rocky-cam-wrapper hud-panel">
+                        <div class="cam-header">
+                            <span class="blinking-dot" style="color: #ff2a2a;"></span> REC // ROOM_7_CAM
+                        </div>
+                        <div class="cam-frame">
+                            <div class="tc-scan"></div>
+                            <img id="rocky-avatar" src="images/rocky-normal.jpg" alt="Detective Rocky">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Panel: Question and Options -->
+                <div class="main-panel fade-element" id="q-container">
                     <div class="question-box hud-panel">
                         <p id="question-text"></p>
                         <div id="image-wrapper" class="hidden">
@@ -108,20 +118,20 @@
                             <div class="scanner-line"></div>
                         </div>
                     </div>
-                </div>
-                
-                <div class="bottom-section fade-element" id="opt-container">
-                    <div class="options-grid">
-                        <button class="option-btn hud-panel cyber-hover" data-index="0"></button>
-                        <button class="option-btn hud-panel cyber-hover" data-index="1"></button>
-                        <button class="option-btn hud-panel cyber-hover" data-index="2"></button>
-                        <button class="option-btn hud-panel cyber-hover" data-index="3"></button>
+                    
+                    <div class="bottom-section" id="opt-container">
+                        <div class="options-grid">
+                            <button class="option-btn hud-panel cyber-hover" data-index="0"></button>
+                            <button class="option-btn hud-panel cyber-hover" data-index="1"></button>
+                            <button class="option-btn hud-panel cyber-hover" data-index="2"></button>
+                            <button class="option-btn hud-panel cyber-hover" data-index="3"></button>
+                        </div>
                     </div>
                 </div>
+
             </div>
         </div>
 
-        <!-- Endgame Screen -->
         <div id="endgame-screen" class="screen hidden">
             <div id="prison-bars" class="hidden">
                 <div class="bar"></div><div class="bar"></div><div class="bar"></div>
@@ -137,9 +147,7 @@
                         <div class="tc-watermark">SEISMIC DEPT.7</div>
                         
                         <div class="tc-header">
-                            <!-- INTEGRATED SEISMIC LOGO -->
                             <img src="images/seismic-logo.png" alt="Seismic Logo" class="tc-logo">
-                            
                             <span>OFFICIAL INTELLIGENCE DOSSIER</span>
                             <div class="tc-date" id="tc-hash">UID: 00000000</div>
                         </div>
