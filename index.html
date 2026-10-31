@@ -31,8 +31,10 @@
 
         <div id="top-status-bar">
             <span>SEISMIC_OS // KERNEL_V9.4</span>
-            <span id="random-hash">NODE: 0x0000</span>
-            <span class="blinking-dot">ENCRYPTED_LINK</span>
+            <!-- Hidden on mobile to make space for Audio Button -->
+            <span id="random-hash" class="hide-on-mobile">NODE: 0x0000</span>
+            <!-- Audio Toggle Button -->
+            <span id="audio-toggle-btn">[ AUDIO: <span class="success-text">ON</span> ]</span>
         </div>
 
         <div id="start-overlay" class="screen active" style="z-index: 500; background: #000; justify-content: center; align-items: center;">
@@ -83,7 +85,6 @@
             <div class="cinematic-subtitle">
                 <span class="bracket">[</span>
                 <p id="rocky-dialogue"></p>
-                <span class="type-cursor">_</span>
                 <span class="bracket">]</span>
             </div>
         </div>
@@ -95,12 +96,15 @@
                         <span class="timer-label">ENCRYPTION_DECAY: </span>
                         <span id="digital-timer">00:15:00</span>
                     </div>
+                    
                     <div class="question-box hud-panel">
                         <p id="question-text"></p>
                         <div id="image-wrapper" class="hidden">
                             <img id="question-image" src="" alt="Classified Intel">
                             <div class="scanner-line"></div>
                         </div>
+                        <!-- NEW: Rocky's Separate Reaction Log -->
+                        <p id="reaction-log" class="hidden"></p>
                     </div>
                 </div>
                 
@@ -125,13 +129,11 @@
                 <div class="twitter-card-container">
                     <div id="result-card" class="twitter-card">
                         
-                        <!-- NEW DECORATIVE ELEMENTS FOR THE CARD -->
                         <div class="tech-corner top-left"></div>
                         <div class="tech-corner top-right"></div>
                         <div class="tech-corner bottom-left"></div>
                         <div class="tech-corner bottom-right"></div>
                         <div class="tc-full-scan"></div>
-                        <!-- =================================== -->
 
                         <div class="tc-bg-texture"></div>
                         <div class="tc-radar-grid"></div>
