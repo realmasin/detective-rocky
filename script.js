@@ -9,8 +9,6 @@
     
     const startOverlay = document.getElementById('start-overlay');
     const startGameBtn = document.getElementById('start-game-btn');
-    
-    // NEW: Audio Toggle Button
     const audioToggleBtn = document.getElementById('audio-toggle-btn');
 
     const introScreen = document.getElementById('intro-screen');
@@ -33,8 +31,6 @@
     const imageWrapper = document.getElementById('image-wrapper');
     const questionImage = document.getElementById('question-image');
     const questionText = document.getElementById('question-text');
-    // NEW: Reaction Log
-    const reactionLog = document.getElementById('reaction-log');
     
     const optionBtns = document.querySelectorAll('.option-btn');
     const digitalTimer = document.getElementById('digital-timer');
@@ -67,7 +63,7 @@
     let playerName = "UNKNOWN";
     let playerPfpSrc = "images/rocky-normal.jpg"; 
     let isSpyTweetStatus = ""; 
-    let isBgmPlaying = true; // Track audio state
+    let isBgmPlaying = true; 
     
     const TIME_PER_QUESTION_MS = 15000; 
 
@@ -107,7 +103,6 @@
         btn.addEventListener('click', () => playSfx('click'));
     });
     
-    // NEW: Audio Toggle Logic
     audioToggleBtn.addEventListener('click', () => {
         isBgmPlaying = !isBgmPlaying;
         if(isBgmPlaying) {
@@ -149,20 +144,6 @@
         "The timer is absolute. Do not lie to me."
     ];
 
-    const correctReactions = {
-        start: ["LOG: Lucky guess. Do not get comfortable yet.", "LOG: First layer breached. But I am still watching you."],
-        earlyMid: ["LOG: Acceptable. Let's see if it was just luck.", "Hmm... You know basic history. Next fragment."],
-        lateMid: ["LOG: Intel matches our database. You might actually belong here.", "LOG: Correct. You are surviving the interrogation... for now."],
-        end: ["LOG: Final fragment processed. Compiling your official dossier..."]
-    };
-
-    const wrongReactions = {
-        start: ["WARNING: Deception detected. You are digging your own grave.", "WARNING: A pathetic attempt at a lie. Strike marked."],
-        earlyMid: ["WARNING: Contradiction found. A real member wouldn't miss this.", "Are you even trying? You are starting to look like a spy."],
-        lateMid: ["WARNING: Your cover is slipping. That was completely wrong.", "Wrong. A real Seismic member would never miss that."],
-        end: ["WARNING: Critical failure on the final step. Preparing dossier..."]
-    };
-
     const questionsDatabase = [
         { q: "On which day is the poker tournament usually held?", img: "images/poker.jpg", opts: ["Thursday", "Friday", "Wednesday", "Monday"], ans: "RnJpZGF5" },
         { q: "What is this person's role in the Seismic community?", img: "images/xealist.jpg", opts: ["Leader", "Admin", "Not part of Seismic", "Seismic Founder"], ans: "QWRtaW4=" },
@@ -184,7 +165,7 @@
         { q: "Members whose work is shared in the spotlight channel receive which role?", img: "", opts: ["Seismic Artist", "Art Creator", "They don't receive any role", "Neurocreative"], ans: "VGhleSBkb24ndCByZWNlaXZlIGFueSByb2xl" },
         { q: "How many questions are in the Seismic quiz?", img: "images/quiz.jpg", opts: ["10", "15", "8", "12"], ans: "MTA=" },
         { q: "What is Seismic's handle on X?", img: "images/handle.jpg", opts: ["SeismicSys", "SeismicSmc", "SeismicHQ", "Seismic_Xyz"], ans: "U2Vpc21pY1N5cw==" },
-        { q: "What was the name/title of the SEISCREAT #2 event?", img: "images/seiscreat.jpg", opts: ["IMAGINE SEISMIC", "DRAW SEISMIC", "SEISMIC, YOUR WAY", "DRAW ROCKY"], ans: "SU1BR0lORSBTRUlTTUlD" },
+        { q: "What was the theme/title of the SEISCREAT #2 event?", img: "images/seiscreat.jpg", opts: ["IMAGINE SEISMIC", "DRAW SEISMIC", "SEISMIC, YOUR WAY", "DRAW ROCKY"], ans: "SU1BR0lORSBTRUlTTUlD" },
         { q: "What type of content is required to start the Magnitude journey?", img: "", opts: ["Reposting official Seismic announcements", "Sharing original content about Seismic", "Inviting new members to Discord", "Completing daily community tasks"], ans: "U2hhcmluZyBvcmlnaW5hbCBjb250ZW50IGFib3V0IFNlaXNtaWM=" },
         { q: "Where should members submit their X posts to apply for Mag1?", img: "images/join.jpg", opts: ["#general", "#community-events", "#join-magnitude", "#announcements"], ans: "I2pvaW4tbWFnbml0dWRl" },
         { q: "Who evaluates Mag1-3 roles?", img: "", opts: ["Moderators", "Community members", "Leaders", "Project developers"], ans: "TGVhZGVycw==" },
@@ -223,7 +204,8 @@
         glitchOverlay.classList.add('flash-glitch');
     }
 
-    async function transitionScreen(fromElement, toElement, loadingText = "> SYSTEM_PROCESSING...", waitTime = 1200) {
+    // UPDATED: Slower transition time to make it feel natural and deliberate
+    async function transitionScreen(fromElement, toElement, loadingText = "> SYSTEM_PROCESSING...", waitTime = 1600) {
         if(transText) transText.textContent = loadingText;
         transitionOverlay.classList.add('transition-active');
         await new Promise(r => setTimeout(r, waitTime)); 
@@ -235,7 +217,7 @@
         await new Promise(r => setTimeout(r, 600)); 
     }
 
-    // NEW: Updated TypeWriter Effect that keeps the cursor inside the text dynamically
+    // ORIGINAL CLEAN TYPING FUNCTION (Cursor is now handled by CSS ::after or inline flex, no spamming DOM)
     function typeWriterEffect(element, text, speed, onComplete) {
         isTyping = true;
         element.innerHTML = ''; 
@@ -249,14 +231,13 @@
             if (i < text.length) {
                 let char = text.charAt(i);
                 currentText += char;
-                element.innerHTML = currentText + '<span class="type-cursor">_</span>';
+                element.innerHTML = currentText;
                 if(char === '<') isTag = true;
                 if(char === '>') isTag = false;
                 if(!isTag) i++; else i++;
             } else {
                 clearInterval(typingInterval);
                 isTyping = false;
-                element.innerHTML = currentText + '<span class="type-cursor">_</span>';
                 stopTypingSound(); 
                 if(onComplete) onComplete();
             }
@@ -313,7 +294,7 @@
 
     readyBtn.addEventListener('click', async () => {
         readyBtn.classList.add('processing');
-        await transitionScreen(introScreen, identityScreen, "> ESTABLISHING_SECURE_LINK...", 1500);
+        await transitionScreen(introScreen, identityScreen, "> ESTABLISHING_SECURE_LINK...", 1600);
     });
 
     submitIdentityBtn.addEventListener('click', async () => {
@@ -343,14 +324,14 @@
         if (isTyping) {
             clearInterval(typingInterval);
             stopTypingSound();
-            rockyDialogue.innerHTML = rulesLines[currentLineIndex] + '<span class="type-cursor">_</span>';
+            rockyDialogue.innerHTML = rulesLines[currentLineIndex];
             isTyping = false;
         } else {
             currentLineIndex++;
             if (currentLineIndex < rulesLines.length) {
                 playNextDialogueLine();
             } else {
-                await transitionScreen(dialogueScreen, interrogationScreen, "> INITIALIZING_INTERROGATION...", 1500);
+                await transitionScreen(dialogueScreen, interrogationScreen, "> INITIALIZING_INTERROGATION...", 1600);
                 activeQuestions = shuffleArray([...questionsDatabase]).slice(0, 8);
                 currentQuestionIndex = 0;
                 score = 0;
@@ -368,12 +349,6 @@
         }
         
         bgElement.classList.add('bg-heavy-blur');
-        
-        // Reset reaction log & question opacity for the new question
-        questionText.classList.remove('question-fade');
-        reactionLog.classList.remove('active-log');
-        reactionLog.classList.add('hidden');
-        reactionLog.innerHTML = "";
         
         const currentQ = activeQuestions[currentQuestionIndex];
         safeInjectText(questionText, currentQ.q);
@@ -440,67 +415,32 @@
             else clickedBtn.classList.add('selected-wrong');
         }
 
-        await new Promise(r => setTimeout(r, 600)); 
-
-        let phase = "";
-        if (currentQuestionIndex === 0) phase = "start";
-        else if (currentQuestionIndex > 0 && currentQuestionIndex < 4) phase = "earlyMid";
-        else if (currentQuestionIndex >= 4 && currentQuestionIndex < 7) phase = "lateMid";
-        else phase = "end";
-
-        let reactionPool = isCorrect ? correctReactions[phase] : wrongReactions[phase];
-        let chosenReaction = reactionPool[Math.floor(Math.random() * reactionPool.length)];
-
-        // NEW: Fade question and show reaction log
-        questionText.classList.add('question-fade');
-        reactionLog.classList.remove('hidden');
-        reactionLog.classList.add('active-log');
-
+        // NEW: Removed Rocky's text reactions entirely. Just Sounds and Button Highlight.
         if (isCorrect) {
             score++;
             playSfx('correct');
-            reactionLog.style.color = "var(--success-color)";
-            reactionLog.style.textShadow = "0 0 8px var(--success-color)";
         } else {
             playSfx('wrong');
             triggerFlash(); 
-            reactionLog.style.color = "var(--danger-color)";
-            reactionLog.style.textShadow = "0 0 8px var(--danger-color)";
         }
 
-        // Type out the reaction log
-        typeWriterEffect(reactionLog, chosenReaction, 30);
-
-        await new Promise(r => setTimeout(r, 2200)); 
+        await new Promise(r => setTimeout(r, 1200)); 
         
         currentQuestionIndex++;
         
         if (currentQuestionIndex < activeQuestions.length) {
-            await transitionScreen(interrogationScreen, interrogationScreen, "> FETCHING_NEXT_FRAGMENT...", 1000);
+            await transitionScreen(interrogationScreen, interrogationScreen, "> DECRYPTING_NEXT_NODE...", 1200);
             loadQuestion();
         } else {
-            loadQuestion(); 
+            triggerEndgame(); 
         }
     }
 
     async function triggerEndgame() {
         clearInterval(lightGlitchInterval);
         
-        if(transText) transText.textContent = "> ANALYZING_INTERROGATION_DATA...";
-        transitionOverlay.classList.add('transition-active');
-        await new Promise(r => setTimeout(r, 1500));
-        if(transText) transText.textContent = "> CALCULATING_THREAT_LEVEL...";
-        await new Promise(r => setTimeout(r, 1500));
-        if(transText) transText.textContent = "> GENERATING_OFFICIAL_DOSSIER...";
-        await new Promise(r => setTimeout(r, 1200));
-        
+        await transitionScreen(interrogationScreen, endgameScreen, "> ANALYZING_THREAT_LEVEL...", 2000);
         bgElement.classList.remove('bg-heavy-blur');
-
-        interrogationScreen.classList.remove('active');
-        interrogationScreen.classList.add('hidden');
-        endgameScreen.classList.remove('hidden');
-        endgameScreen.classList.add('active');
-        transitionOverlay.classList.remove('transition-active');
         
         cardPfp.src = playerPfpSrc;
         cardName.textContent = playerName.toUpperCase();
