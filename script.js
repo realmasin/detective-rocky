@@ -577,7 +577,7 @@
     });
 
     shareXBtn.addEventListener('click', () => {
-        let tweetText = `I just faced Detective Rocky to prove my loyalty to the Seismic family! 🕵️‍♂️🔥\n\nAgent: ${playerName}\nScore: ${score}/8\nVerdict: ${isSpyTweetStatus}\n\nAre you a true member or a SPY? Take the test: https://detective-rocky.vercel.app @SeismicSystem`;
+        let tweetText = `I just faced Detective Rocky to prove my loyalty to the Seismic family! 🕵️‍♂️🔥\n\nAgent: ${playerName}\nScore: ${score}/8\nVerdict: ${isSpyTweetStatus}\n\nAre you a true member or a SPY? Take the test: https://detective-rocky.vercel.app @SeismicSys`;
         const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
         window.open(twitterUrl, '_blank');
     });
