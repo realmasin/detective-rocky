@@ -1,6 +1,5 @@
 (function() {
     
-    // --- DOM Initializations ---
     const transitionOverlay = document.getElementById('transition-overlay');
     const transText = document.getElementById('trans-text');
     
@@ -34,6 +33,9 @@
     const optionBtns = document.querySelectorAll('.option-btn');
     const digitalTimer = document.getElementById('digital-timer');
     
+    // NEW: Target the Rocky Camera Feed Image
+    const rockyAvatar = document.getElementById('rocky-avatar');
+    
     const endgameScreen = document.getElementById('endgame-screen');
     const cardScaleWrapper = document.getElementById('card-scale-wrapper');
     const resultCard = document.getElementById('result-card');
@@ -65,7 +67,6 @@
     
     const TIME_PER_QUESTION_MS = 15000; 
 
-    // --- AUDIO ENGINE ---
     const audioPath = 'audio/';
     const sfx = {
         bgm: new Audio(audioPath + 'bgm.mp3'),
@@ -101,7 +102,6 @@
         btn.addEventListener('click', () => playSfx('click'));
     });
 
-    // --- INITIALIZE SYSTEM TRIGGER ---
     startGameBtn.addEventListener('click', () => {
         sfx.bgm.play().catch(e => console.log('BGM blocked:', e));
         startOverlay.classList.remove('active');
@@ -112,7 +112,6 @@
     });
 
 
-    // --- Story Core ---
     const introLines = [
         "> INITIALIZING SEISMIC KERNEL V9.4...",
         "> MEMORY CHECK: OK.",
@@ -134,44 +133,20 @@
         "The timer is absolute. Do not lie to me."
     ];
 
-    // --- DYNAMIC REACTIONS (4 PHASES) ---
     const correctReactions = {
-        start: [
-            "LOG: Lucky guess. Do not get comfortable yet.",
-            "LOG: First layer breached. But I am still watching you."
-        ],
-        earlyMid: [
-            "LOG: Acceptable. Let's see if it was just luck.",
-            "Hmm... You know basic history. Next fragment."
-        ],
-        lateMid: [
-            "LOG: Intel matches our database. You might actually belong here.",
-            "LOG: Correct. You are surviving the interrogation... for now."
-        ],
-        end: [
-            "LOG: Final fragment processed. Compiling your official dossier..."
-        ]
+        start: ["LOG: Lucky guess. Do not get comfortable yet.", "LOG: First layer breached. But I am still watching you."],
+        earlyMid: ["LOG: Acceptable. Let's see if it was just luck.", "Hmm... You know basic history. Next fragment."],
+        lateMid: ["LOG: Intel matches our database. You might actually belong here.", "LOG: Correct. You are surviving the interrogation... for now."],
+        end: ["LOG: Final fragment processed. Compiling your official dossier..."]
     };
 
     const wrongReactions = {
-        start: [
-            "WARNING: Deception detected. You are digging your own grave.",
-            "WARNING: A pathetic attempt at a lie. Strike marked."
-        ],
-        earlyMid: [
-            "WARNING: Contradiction found. A real member wouldn't miss this.",
-            "Are you even trying? You are starting to look like a spy."
-        ],
-        lateMid: [
-            "WARNING: Your cover is slipping. That was completely wrong.",
-            "Wrong. A real Seismic member would never miss that."
-        ],
-        end: [
-            "WARNING: Critical failure on the final step. Preparing dossier..."
-        ]
+        start: ["WARNING: Deception detected. You are digging your own grave.", "WARNING: A pathetic attempt at a lie. Strike marked."],
+        earlyMid: ["WARNING: Contradiction found. A real member wouldn't miss this.", "Are you even trying? You are starting to look like a spy."],
+        lateMid: ["WARNING: Your cover is slipping. That was completely wrong.", "Wrong. A real Seismic member would never miss that."],
+        end: ["WARNING: Critical failure on the final step. Preparing dossier..."]
     };
 
-    // --- 32 QUESTIONS DATABASE (ENCRYPTED ANSWERS) ---
     const questionsDatabase = [
         { q: "On which day is the poker tournament usually held?", img: "images/poker.jpg", opts: ["Thursday", "Friday", "Wednesday", "Monday"], ans: "RnJpZGF5" },
         { q: "What is this person's role in the Seismic community?", img: "images/xealist.jpg", opts: ["Leader", "Admin", "Not part of Seismic", "Seismic Founder"], ans: "QWRtaW4=" },
@@ -211,7 +186,6 @@
     let isIntroTyping = false;
     let introTimeout;
 
-    // --- Core Helpers ---
     function shuffleArray(array) {
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -220,23 +194,18 @@
         return array;
     }
 
+    // UPDATED: Now changes the source of the camera frame image instead of background
     function changeRockyImage(state) {
-        bgElement.style.backgroundImage = `url('images/rocky-${state}.jpg')`;
+        if(rockyAvatar) {
+            rockyAvatar.src = `images/rocky-${state}.jpg`;
+        }
     }
 
-    function generateAgentID() {
-        return "SMC-" + Math.floor(10000 + Math.random() * 90000);
-    }
+    function generateAgentID() { return "SMC-" + Math.floor(10000 + Math.random() * 90000); }
 
-    setInterval(() => {
-        randomHash.textContent = "NODE: 0x" + Math.floor(Math.random()*16777215).toString(16).toUpperCase();
-    }, 1500);
+    setInterval(() => { randomHash.textContent = "NODE: 0x" + Math.floor(Math.random()*16777215).toString(16).toUpperCase(); }, 1500);
 
-    function startLightGlitches() {
-        lightGlitchInterval = setInterval(() => {
-            if(Math.random() > 0.65) triggerFlash();
-        }, 4000);
-    }
+    function startLightGlitches() { lightGlitchInterval = setInterval(() => { if(Math.random() > 0.65) triggerFlash(); }, 4000); }
 
     function triggerFlash() {
         playSfx('glitch');
@@ -248,14 +217,11 @@
     async function transitionScreen(fromElement, toElement, loadingText = "> SYSTEM_PROCESSING...", waitTime = 1200) {
         if(transText) transText.textContent = loadingText;
         transitionOverlay.classList.add('transition-active');
-        
         await new Promise(r => setTimeout(r, waitTime)); 
-        
         fromElement.classList.remove('active');
         fromElement.classList.add('hidden');
         toElement.classList.remove('hidden');
         toElement.classList.add('active');
-        
         transitionOverlay.classList.remove('transition-active');
         await new Promise(r => setTimeout(r, 600)); 
     }
@@ -266,7 +232,6 @@
         let i = 0;
         let isTag = false;
         let currentText = '';
-        
         sfx.typing.play().catch(()=>{}); 
         
         clearInterval(typingInterval);
@@ -277,7 +242,6 @@
                 element.innerHTML = currentText;
                 if(char === '<') isTag = true;
                 if(char === '>') isTag = false;
-                
                 if(!isTag) i++; else i++;
             } else {
                 clearInterval(typingInterval);
@@ -288,11 +252,8 @@
         }, speed);
     }
 
-    function safeInjectText(element, text) {
-        element.textContent = text;
-    }
+    function safeInjectText(element, text) { element.textContent = text; }
 
-    // --- Sequence 1: Boot ---
     function startIntro() {
         skipBtn.classList.remove('hidden');
         storyTextContainer.innerHTML = '';
@@ -327,7 +288,6 @@
         clearInterval(typingInterval);
         clearTimeout(introTimeout);
         stopTypingSound();
-        
         storyTextContainer.innerHTML = '';
         introLines.forEach(line => {
             const div = document.createElement('div');
@@ -345,7 +305,6 @@
         await transitionScreen(introScreen, identityScreen, "> ESTABLISHING_SECURE_LINK...", 1500);
     });
 
-    // --- Sequence 2: Form ---
     submitIdentityBtn.addEventListener('click', async () => {
         const nameVal = usernameInput.value.trim();
         const file = pfpInput.files[0];
@@ -383,7 +342,6 @@
             } else {
                 await transitionScreen(dialogueScreen, interrogationScreen, "> INITIALIZING_INTERROGATION...", 1500);
                 changeRockyImage('normal');
-                // Select 8 random questions from the database
                 activeQuestions = shuffleArray([...questionsDatabase]).slice(0, 8);
                 currentQuestionIndex = 0;
                 score = 0;
@@ -392,11 +350,8 @@
         }
     });
 
-    function playNextDialogueLine() {
-        typeWriterEffect(rockyDialogue, rulesLines[currentLineIndex], 35);
-    }
+    function playNextDialogueLine() { typeWriterEffect(rockyDialogue, rulesLines[currentLineIndex], 35); }
 
-    // --- Sequence 3: Quiz ---
     function loadQuestion() {
         if (currentQuestionIndex >= activeQuestions.length) {
             triggerEndgame();
@@ -471,17 +426,11 @@
 
         await new Promise(r => setTimeout(r, 600)); 
 
-        // SMART REACTION LOGIC (4 PHASES)
         let phase = "";
-        if (currentQuestionIndex === 0) {
-            phase = "start";
-        } else if (currentQuestionIndex > 0 && currentQuestionIndex < 4) {
-            phase = "earlyMid";
-        } else if (currentQuestionIndex >= 4 && currentQuestionIndex < 7) {
-            phase = "lateMid";
-        } else {
-            phase = "end"; // The 8th question
-        }
+        if (currentQuestionIndex === 0) phase = "start";
+        else if (currentQuestionIndex > 0 && currentQuestionIndex < 4) phase = "earlyMid";
+        else if (currentQuestionIndex >= 4 && currentQuestionIndex < 7) phase = "lateMid";
+        else phase = "end";
 
         let reactionPool = isCorrect ? correctReactions[phase] : wrongReactions[phase];
         let chosenReaction = reactionPool[Math.floor(Math.random() * reactionPool.length)];
@@ -510,17 +459,14 @@
         }
     }
 
-    // --- Sequence 4: Endgame ---
     async function triggerEndgame() {
         clearInterval(lightGlitchInterval);
         
         if(transText) transText.textContent = "> ANALYZING_INTERROGATION_DATA...";
         transitionOverlay.classList.add('transition-active');
         await new Promise(r => setTimeout(r, 1500));
-        
         if(transText) transText.textContent = "> CALCULATING_THREAT_LEVEL...";
         await new Promise(r => setTimeout(r, 1500));
-        
         if(transText) transText.textContent = "> GENERATING_OFFICIAL_DOSSIER...";
         await new Promise(r => setTimeout(r, 1200));
         
@@ -528,7 +474,6 @@
         interrogationScreen.classList.add('hidden');
         endgameScreen.classList.remove('hidden');
         endgameScreen.classList.add('active');
-        
         transitionOverlay.classList.remove('transition-active');
         
         cardPfp.src = playerPfpSrc;
@@ -539,7 +484,6 @@
         scoreProgress.style.width = `${percentage}%`;
         
         await new Promise(r => setTimeout(r, 600));
-
         cardScaleWrapper.classList.remove('hidden');
         cardScaleWrapper.classList.add('show-card-anim');
         
@@ -568,7 +512,6 @@
                 scoreProgress.style.background = "var(--danger-color)";
                 prisonBars.classList.remove('hidden');
                 setTimeout(() => prisonBars.classList.add('drop'), 50);
-                
                 setTimeout(() => {
                     endgameStamp.innerHTML = "SPY<br>DETECTED";
                     endgameStamp.className = "tc-stamp stamp-danger show";
@@ -583,23 +526,17 @@
     downloadBtn.addEventListener('click', () => {
         downloadBtn.textContent = 'GENERATING...';
         downloadBtn.classList.add('processing');
-        
         exportContainer.innerHTML = '';
         const clone = resultCard.cloneNode(true);
         clone.classList.add('export-mode');
         exportContainer.appendChild(clone);
         
         setTimeout(() => {
-            html2canvas(clone, {
-                backgroundColor: "#080808",
-                scale: 2,
-                useCORS: true
-            }).then(canvas => {
+            html2canvas(clone, { backgroundColor: "#080808", scale: 2, useCORS: true }).then(canvas => {
                 const link = document.createElement('a');
                 link.download = `Seismic_Dossier_${playerName}.png`;
                 link.href = canvas.toDataURL('image/png');
                 link.click();
-                
                 exportContainer.innerHTML = ''; 
                 downloadBtn.textContent = 'EXTRACT_FILE';
                 downloadBtn.classList.remove('processing');
