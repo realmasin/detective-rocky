@@ -29,6 +29,13 @@ body { background-color: var(--bg-color); color: var(--primary-color); font-fami
 .blinking-dot { animation: blink 1.5s infinite; color: var(--brand-light); font-weight: bold; }
 #copyright-footer { position: fixed; bottom: 10px; width: 100%; text-align: center; color: rgba(255, 255, 255, 0.2); font-size: 0.75rem; letter-spacing: 3px; z-index: 100; pointer-events: none; }
 
+/* AUDIO TOGGLE STYLES */
+#audio-toggle-btn { cursor: pointer; pointer-events: auto; transition: color 0.3s; }
+#audio-toggle-btn:hover { color: #fff; }
+.success-text { color: var(--success-color); text-shadow: 0 0 5px var(--success-color); }
+.danger-text { color: var(--danger-color); text-shadow: 0 0 5px var(--danger-color); }
+
+/* Dynamic Background Blurring */
 #background { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-image: url('images/rocky-normal.jpg'); background-size: cover; background-position: center; transform-origin: center; transition: filter 0.6s ease; animation: breatheEffect 20s infinite alternate ease-in-out; z-index: 1; }
 .bg-blur { filter: blur(8px) brightness(0.4); } 
 .bg-heavy-blur { filter: blur(25px) brightness(0.25); } 
@@ -86,7 +93,9 @@ body { background-color: var(--bg-color); color: var(--primary-color); font-fami
 .cinematic-subtitle { width: 100%; max-width: 800px; padding: 30px 20px; text-align: center; background: linear-gradient(90deg, transparent, rgba(5,5,5,0.98), transparent); border-top: 1px solid rgba(82,53,66,0.3); border-bottom: 1px solid rgba(82,53,66,0.3); display: flex; justify-content: center; align-items: center; gap: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
 .bracket { color: var(--brand-light); font-size: 2rem; font-weight: bold; opacity: 0.3; }
 #rocky-dialogue { font-size: 1.25rem; line-height: 1.6; display: inline; color: #fff; letter-spacing: 1px; text-shadow: 0 0 10px rgba(0,0,0,0.8); }
-.type-cursor { font-size: 1.5rem; animation: terminalBlink 0.8s step-end infinite; color: var(--brand-light); }
+
+/* DYNAMIC INLINE CURSOR */
+.type-cursor { animation: terminalBlink 0.8s step-end infinite; color: var(--brand-light); font-weight: bold; margin-left: 2px; }
 .blinking-cursor { animation: terminalBlink 0.8s step-end infinite; color: var(--brand-light); }
 @keyframes terminalBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
@@ -94,9 +103,16 @@ body { background-color: var(--bg-color); color: var(--primary-color); font-fami
 .timer-container { width: 100%; padding: 10px 20px; display: flex; justify-content: space-between; border-bottom: 2px solid var(--brand-color); margin-bottom: 15px; background: rgba(82,53,66,0.15); border-radius: 2px; }
 #digital-timer { font-size: 1.4rem; font-weight: bold; letter-spacing: 3px; }
 .timer-danger { color: var(--danger-color); text-shadow: 0 0 12px var(--danger-color); animation: blink 0.5s infinite; }
-.question-box { padding: 20px; text-align: center; border-left: 4px solid var(--brand-color); }
-#question-text { font-size: 1.15rem; letter-spacing: 1px; margin-bottom: 15px; line-height: 1.5; color: #fff; }
-#image-wrapper { position: relative; display: inline-block; border: 1px solid var(--brand-color); padding: 2px; background: #000; }
+.question-box { padding: 20px; text-align: center; border-left: 4px solid var(--brand-color); display: flex; flex-direction: column; align-items: center; }
+
+/* REACTION LOG & QUESTION FADE */
+#question-text { font-size: 1.15rem; letter-spacing: 1px; margin-bottom: 15px; line-height: 1.5; color: #fff; transition: opacity 0.5s ease; width: 100%; }
+.question-fade { opacity: 0.3; }
+#reaction-log { font-size: 1.1rem; margin-top: 20px; padding-top: 15px; border-top: 1px dashed rgba(82,53,66,0.6); width: 100%; line-height: 1.5; font-weight: bold; }
+.active-log { animation: fadeIn 0.4s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+#image-wrapper { position: relative; display: inline-block; border: 1px solid var(--brand-color); padding: 2px; background: #000; margin-bottom: 10px; }
 #question-image { max-height: 120px; display: block; }
 .scanner-line { position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px #fff; animation: scan 2s linear infinite; }
 @keyframes scan { 0% { top: -10%; } 100% { top: 110%; } }
@@ -126,34 +142,20 @@ body { background-color: var(--bg-color); color: var(--primary-color); font-fami
 .export-mode .tc-frame { width: 180px !important; height: 220px !important; }
 .export-mode .tc-data-col { gap: 25px !important; }
 .export-mode .tc-value { font-size: 1.5rem !important; }
-.export-mode .tc-highlight { font-size: 1.8rem !important; text-shadow: none !important; color: var(--brand-light) !important; } /* Simplify for export */
+.export-mode .tc-highlight { font-size: 1.8rem !important; text-shadow: none !important; color: var(--brand-light) !important; } 
 .export-mode .tc-stamp { font-size: 2.2rem !important; bottom: 30px !important; right: 40px !important; }
 .export-mode .tc-watermark { font-size: 100px !important; }
 .export-mode .tc-logo { width: 30px !important; margin-right: 15px !important; }
-.export-mode .tc-full-scan { display: none !important; } /* Hide moving scan line in photo */
+.export-mode .tc-full-scan { display: none !important; } 
 
-/* --- REDESIGNED CYBERPUNK CARD --- */
-.twitter-card { 
-    width: 100%; background: #070707; position: relative; overflow: hidden; 
-    border: 2px solid rgba(82, 53, 66, 0.8); 
-    box-shadow: 0 0 30px rgba(0,0,0,1), inset 0 0 40px rgba(82,53,66,0.5); 
-    display: flex; flex-direction: column; 
-}
-
-/* TECH CORNERS */
+/* REDESIGNED CYBERPUNK CARD */
+.twitter-card { width: 100%; background: #070707; position: relative; overflow: hidden; border: 2px solid rgba(82, 53, 66, 0.8); box-shadow: 0 0 30px rgba(0,0,0,1), inset 0 0 40px rgba(82,53,66,0.5); display: flex; flex-direction: column; }
 .tech-corner { position: absolute; width: 25px; height: 25px; border: 3px solid var(--brand-light); z-index: 20; box-shadow: 0 0 10px var(--brand-light); }
 .top-left { top: 8px; left: 8px; border-right: none; border-bottom: none; }
 .top-right { top: 8px; right: 8px; border-left: none; border-bottom: none; }
 .bottom-left { bottom: 8px; left: 8px; border-right: none; border-top: none; }
 .bottom-right { bottom: 8px; right: 8px; border-left: none; border-top: none; }
-
-/* FULL CARD SCANNER */
-.tc-full-scan { 
-    position: absolute; top: -100px; left: 0; width: 100%; height: 60px; 
-    background: linear-gradient(to bottom, transparent, rgba(122, 79, 99, 0.25), transparent); 
-    z-index: 5; pointer-events: none; 
-    animation: cardScanner 4s linear infinite; 
-}
+.tc-full-scan { position: absolute; top: -100px; left: 0; width: 100%; height: 60px; background: linear-gradient(to bottom, transparent, rgba(122, 79, 99, 0.25), transparent); z-index: 5; pointer-events: none; animation: cardScanner 4s linear infinite; }
 @keyframes cardScanner { 0% { top: -100px; } 100% { top: 100%; } }
 
 .tc-bg-texture { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 70% 30%, rgba(82,53,66,0.35) 0%, #000 100%); z-index: 1; pointer-events: none; }
@@ -162,14 +164,7 @@ body { background-color: var(--bg-color); color: var(--primary-color); font-fami
 
 .tc-watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-10deg); font-size: 5rem; color: rgba(255,255,255,0.02); font-weight: bold; white-space: nowrap; z-index: 3; letter-spacing: 8px; pointer-events: none; text-shadow: 0 0 20px rgba(255,255,255,0.02); }
 
-/* GRADIENT HEADER */
-.tc-header { 
-    position: relative; z-index: 10; 
-    background: linear-gradient(90deg, rgba(82,53,66,0.9) 0%, rgba(20,10,15,0.8) 100%); 
-    padding: 15px 25px; display: flex; align-items: center; 
-    border-bottom: 2px solid var(--brand-light); color: #fff; font-weight: bold; 
-    letter-spacing: 2px; font-size: 1rem; flex-wrap: wrap; gap: 10px; 
-}
+.tc-header { position: relative; z-index: 10; background: linear-gradient(90deg, rgba(82,53,66,0.9) 0%, rgba(20,10,15,0.8) 100%); padding: 15px 25px; display: flex; align-items: center; border-bottom: 2px solid var(--brand-light); color: #fff; font-weight: bold; letter-spacing: 2px; font-size: 1rem; flex-wrap: wrap; gap: 10px; }
 .tc-logo { width: 24px; height: auto; margin-right: 12px; flex-shrink: 0; filter: drop-shadow(0 0 6px rgba(255,255,255,0.8)); }
 .tc-date { margin-left: auto; color: #eee; font-size: 0.85rem; }
 
@@ -185,14 +180,7 @@ body { background-color: var(--bg-color); color: var(--primary-color); font-fami
 .tc-data-row { display: flex; flex-direction: column; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px; }
 .tc-label { font-size: 0.8rem; color: #888; letter-spacing: 2px; margin-bottom: 4px; }
 .tc-value { font-size: 1.3rem; color: #fff; font-weight: bold; letter-spacing: 1px; }
-
-/* NEON GLOW FOR HIGHLIGHTS */
-.tc-highlight { 
-    color: #fff; 
-    text-shadow: 0 0 10px var(--brand-light), 0 0 20px var(--brand-light); 
-    font-size: 1.5rem; 
-}
-
+.tc-highlight { color: #fff; text-shadow: 0 0 10px var(--brand-light), 0 0 20px var(--brand-light); font-size: 1.5rem; }
 .tc-score-wrap { display: flex; align-items: center; gap: 15px; width: 100%; }
 .tc-bar-bg { flex-grow: 1; height: 6px; background: #222; border-radius: 3px; overflow: hidden; }
 .tc-bar-fill { height: 100%; background: var(--brand-light); width: 0%; transition: width 1s ease-out; box-shadow: 0 0 10px var(--brand-light); }
@@ -215,8 +203,8 @@ body { background-color: var(--bg-color); color: var(--primary-color); font-fami
 .bar:nth-child(4) { transition-delay: 0.15s; } .bar:nth-child(5) { transition-delay: 0.05s; } .bar:nth-child(6) { transition-delay: 0.25s; }
 
 .fade-element { transition: opacity 0.4s ease; opacity: 1; }
-@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
+/* Responsive adjustments */
 @media (max-width: 650px) {
     .screen { padding: 30px 10px; }
     .identity-form { padding: 30px 20px; }
@@ -227,4 +215,8 @@ body { background-color: var(--bg-color); color: var(--primary-color); font-fami
     
     .endgame-actions { flex-direction: column; gap: 15px; width: 90%; max-width: 350px; }
     .endgame-actions button { width: 100%; padding: 16px; }
+}
+/* Hide specific elements on very small screens to keep top bar clean */
+@media (max-width: 500px) {
+    .hide-on-mobile { display: none !important; }
 }
