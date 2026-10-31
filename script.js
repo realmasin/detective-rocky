@@ -206,17 +206,15 @@
         glitchOverlay.classList.add('flash-glitch');
     }
 
-    // Dynamic Transition (Fast for Q-to-Q, Heavy for Endgame)
     async function transitionScreen(fromElement, toElement, loadingText = "> SYSTEM_PROCESSING...", waitTime = 1200, isHeavy = false) {
         if(transText) transText.textContent = loadingText;
         
-        // Hide/Show heavy elements (progress bar) based on transition type
         if(isHeavy) {
             transProgress.style.display = "block";
-            transSpinner.style.display = "block";
+            transSpinner.style.display = "flex";
         } else {
             transProgress.style.display = "none";
-            transSpinner.style.display = "block"; // Keep spinner for fast transitions
+            transSpinner.style.display = "flex"; 
         }
 
         transitionOverlay.classList.add('transition-active');
@@ -414,24 +412,19 @@
         timerReq = requestAnimationFrame(update);
     }
 
-    // NEW: Suspense Logic inside Answer Handler
     async function handleAnswer(clickedBtn, selectedText, encodedCorrectAnswer) {
         cancelAnimationFrame(timerReq);
         optionBtns.forEach(btn => btn.disabled = true);
 
-        // 1. Processing / Suspense Phase
+        // SILENT SUSPENSE PHASE (Visual Only)
         if(clickedBtn) {
             clickedBtn.classList.add('selected-processing');
-            sfx.typing.play(); // Fake "calculating" sound
         }
 
-        // Wait 1.5 seconds for suspense
+        // Wait 1.5 seconds in pure suspense (no keyboard noise)
         await new Promise(r => setTimeout(r, 1500)); 
 
-        // 2. Reveal Phase
         if(clickedBtn) {
-            sfx.typing.pause();
-            sfx.typing.currentTime = 0;
             clickedBtn.classList.remove('selected-processing');
         }
 
@@ -443,6 +436,7 @@
             else clickedBtn.classList.add('selected-wrong');
         }
 
+        // Reveal Sound
         if (isCorrect) {
             score++;
             playSfx('correct');
@@ -451,14 +445,13 @@
             triggerFlash(); 
         }
 
-        // Give player 1.5 seconds to see the red/green result
-        await new Promise(r => setTimeout(r, 1500)); 
+        await new Promise(r => setTimeout(r, 1200)); 
         
         currentQuestionIndex++;
         
         if (currentQuestionIndex < activeQuestions.length) {
-            // Fast transition between questions (isHeavy = false)
-            await transitionScreen(interrogationScreen, interrogationScreen, "> DECRYPTING_NEXT_NODE...", 800, false);
+            // Light, fast transition
+            await transitionScreen(interrogationScreen, interrogationScreen, "> DECRYPTING_NODE...", 800, false);
             loadQuestion();
         } else {
             triggerEndgame(); 
@@ -468,16 +461,16 @@
     async function triggerEndgame() {
         clearInterval(lightGlitchInterval);
         
-        // Heavy transition for Endgame (isHeavy = true)
-        if(transText) transText.textContent = "> ANALYZING_INTERROGATION_DATA...";
+        // Heavy, dramatic transition
+        if(transText) transText.textContent = "> ANALYZING_DATA...";
         transitionOverlay.classList.add('transition-active');
-        transSpinner.style.display = "block";
+        transSpinner.style.display = "flex";
         transProgress.style.display = "block";
         
         await new Promise(r => setTimeout(r, 1500));
-        if(transText) transText.textContent = "> CALCULATING_THREAT_LEVEL...";
+        if(transText) transText.textContent = "> CALCULATING_THREAT...";
         await new Promise(r => setTimeout(r, 1500));
-        if(transText) transText.textContent = "> GENERATING_OFFICIAL_DOSSIER...";
+        if(transText) transText.textContent = "> GENERATING_DOSSIER...";
         await new Promise(r => setTimeout(r, 1200));
         
         bgElement.classList.remove('bg-heavy-blur');
