@@ -3,18 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> DETECTIVE ROCKY</title>
+    <title>DETECTIVE ROCKY</title>
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     
-    <!-- NEW: Clean Cyberpunk Transition Overlay -->
+    <!-- RESTORED & IMPROVED TRANSITION OVERLAY -->
     <div id="transition-overlay">
+        <div class="trans-matrix-bg"></div>
         <div class="transition-ui">
+            <div class="trans-spinner" id="trans-spinner"></div>
             <div class="trans-text-box">
                 <span id="trans-text">> LOADING_PROTOCOL...</span><span class="blinking-cursor">_</span>
+            </div>
+            <div class="trans-progress" id="trans-progress">
+                <div class="trans-progress-fill"></div>
             </div>
         </div>
     </div>
@@ -78,8 +83,9 @@
         <div id="dialogue-screen" class="screen hidden">
             <div class="cinematic-subtitle">
                 <span class="bracket">[</span>
-                <div class="dialogue-wrapper">
-                    <p id="rocky-dialogue"></p><span class="type-cursor">_</span>
+                <!-- FIXED INLINE WRAPPER FOR CURSOR -->
+                <div class="inline-dialogue-wrapper">
+                    <span id="rocky-dialogue"></span><span class="type-cursor">_</span>
                 </div>
                 <span class="bracket">]</span>
             </div>
