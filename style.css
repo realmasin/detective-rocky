@@ -14,13 +14,21 @@
 body { background-color: var(--bg-color); color: var(--primary-color); font-family: 'Share Tech Mono', monospace; overflow: hidden; user-select: none; }
 #game-container { position: relative; width: 100vw; height: 100vh; display: flex; justify-content: center; align-items: center; background-color: #000; }
 
-/* RESTORED TRANSITIONS */
 #transition-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(3, 3, 3, 0.95); z-index: 9999; pointer-events: none; opacity: 0; transition: opacity 0.5s ease-in-out; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(15px); }
 .transition-active { opacity: 1 !important; pointer-events: all !important; }
 .trans-matrix-bg { position: absolute; top:0; left:0; width: 100%; height: 100%; background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(82,53,66,0.05) 2px, rgba(82,53,66,0.05) 4px); z-index: 1; pointer-events: none; }
 .transition-ui { display: flex; flex-direction: column; align-items: center; gap: 25px; width: 90%; max-width: 400px; position: relative; z-index: 2; }
-.trans-spinner { width: 60px; height: 60px; border: 3px solid rgba(82,53,66,0.3); border-top: 3px solid var(--brand-light); border-radius: 50%; animation: spin 1s linear infinite; box-shadow: 0 0 15px rgba(82,53,66,0.5); }
-@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+/* NEW: Cyberpunk Block Spinner (Replacing Circular Spinner) */
+.trans-spinner { display: flex; gap: 8px; margin-bottom: 10px; }
+.trans-spinner .block { width: 22px; height: 22px; background-color: transparent; border: 2px solid var(--brand-light); animation: dataLoad 1s infinite alternate; }
+.trans-spinner .block:nth-child(2) { animation-delay: 0.2s; }
+.trans-spinner .block:nth-child(3) { animation-delay: 0.4s; }
+@keyframes dataLoad {
+    0% { background-color: transparent; box-shadow: none; }
+    100% { background-color: var(--brand-light); box-shadow: 0 0 12px var(--brand-light); }
+}
+
 .trans-text-box { font-size: 1.1rem; color: #fff; letter-spacing: 2px; text-align: center; text-shadow: 0 0 10px rgba(255,255,255,0.5); }
 .trans-progress { width: 100%; height: 3px; background: #222; border-radius: 2px; position: relative; overflow: hidden; }
 .trans-progress-fill { position: absolute; top: 0; left: 0; height: 100%; width: 30%; background: var(--brand-light); animation: cyberLoad 1.5s infinite ease-in-out alternate; box-shadow: 0 0 10px var(--brand-light); }
@@ -90,8 +98,6 @@ body { background-color: var(--bg-color); color: var(--primary-color); font-fami
 
 .cinematic-subtitle { width: 100%; max-width: 800px; padding: 30px 20px; text-align: center; background: linear-gradient(90deg, transparent, rgba(5,5,5,0.98), transparent); border-top: 1px solid rgba(82,53,66,0.3); border-bottom: 1px solid rgba(82,53,66,0.3); display: flex; justify-content: center; align-items: center; gap: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
 .bracket { color: var(--brand-light); font-size: 2rem; font-weight: bold; opacity: 0.3; }
-
-/* FIXED CURSOR: Perfectly inline */
 .inline-dialogue-wrapper { display: inline; text-align: center; }
 #rocky-dialogue { font-size: 1.25rem; display: inline; color: #fff; letter-spacing: 1px; text-shadow: 0 0 10px rgba(0,0,0,0.8); line-height: 1.6; }
 .type-cursor { display: inline-block; font-size: 1.5rem; animation: terminalBlink 0.8s step-end infinite; color: var(--brand-light); font-weight: bold; margin-left: 3px; vertical-align: text-bottom; }
@@ -113,9 +119,16 @@ body { background-color: var(--bg-color); color: var(--primary-color); font-fami
 .option-btn { padding: 15px; font-size: 0.95rem; border-bottom: 2px solid var(--brand-color); min-height: 65px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #ddd; transition: all 0.2s ease; letter-spacing: 1px; }
 .cyber-hover:hover { background: rgba(82,53,66,0.5); border-color: #fff; color: #fff; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
 
-/* NEW: Suspense State for Button */
-.option-btn.selected-processing { background: #fff !important; color: #000 !important; border-color: #fff !important; font-weight: bold; box-shadow: 0 0 20px #fff; animation: processBlink 0.3s infinite alternate; pointer-events: none; }
-@keyframes processBlink { from { opacity: 1; } to { opacity: 0.7; } }
+/* NEW: Muted/Semi-Transparent Suspense State */
+.option-btn.selected-processing { 
+    background: rgba(255, 255, 255, 0.15) !important; 
+    color: #fff !important; 
+    border-color: rgba(255, 255, 255, 0.5) !important; 
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.2); 
+    animation: processPulse 0.4s infinite alternate; 
+    pointer-events: none; 
+}
+@keyframes processPulse { from { opacity: 1; } to { opacity: 0.5; } }
 
 .option-btn.selected-correct { background: var(--success-color) !important; color: #000 !important; border-color: var(--success-color) !important; font-weight: bold; box-shadow: 0 0 20px rgba(0,255,102,0.3) !important; }
 .option-btn.selected-wrong { background: var(--danger-color) !important; color: #fff !important; border-color: var(--danger-color) !important; font-weight: bold; box-shadow: 0 0 20px rgba(255,42,42,0.3) !important; }
@@ -157,7 +170,6 @@ body { background-color: var(--bg-color); color: var(--primary-color); font-fami
 .tc-bg-texture { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 70% 30%, rgba(82,53,66,0.35) 0%, #000 100%); z-index: 1; pointer-events: none; }
 .tc-radar-grid { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px); background-size: 40px 40px; z-index: 2; pointer-events: none; animation: radarScroll 20s linear infinite; }
 @keyframes radarScroll { 0% { background-position: 0px 0px; } 100% { background-position: -40px -40px; } }
-
 .tc-watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-10deg); font-size: 5rem; color: rgba(255,255,255,0.02); font-weight: bold; white-space: nowrap; z-index: 3; letter-spacing: 8px; pointer-events: none; text-shadow: 0 0 20px rgba(255,255,255,0.02); }
 
 .tc-header { position: relative; z-index: 10; background: linear-gradient(90deg, rgba(82,53,66,0.9) 0%, rgba(20,10,15,0.8) 100%); padding: 15px 25px; display: flex; align-items: center; border-bottom: 2px solid var(--brand-light); color: #fff; font-weight: bold; letter-spacing: 2px; font-size: 1rem; flex-wrap: wrap; gap: 10px; }
