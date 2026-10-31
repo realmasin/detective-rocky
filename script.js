@@ -9,6 +9,9 @@
     
     const startOverlay = document.getElementById('start-overlay');
     const startGameBtn = document.getElementById('start-game-btn');
+    
+    // NEW: Audio Toggle Button
+    const audioToggleBtn = document.getElementById('audio-toggle-btn');
 
     const introScreen = document.getElementById('intro-screen');
     const storyTextContainer = document.getElementById('story-text-container');
@@ -30,6 +33,9 @@
     const imageWrapper = document.getElementById('image-wrapper');
     const questionImage = document.getElementById('question-image');
     const questionText = document.getElementById('question-text');
+    // NEW: Reaction Log
+    const reactionLog = document.getElementById('reaction-log');
+    
     const optionBtns = document.querySelectorAll('.option-btn');
     const digitalTimer = document.getElementById('digital-timer');
     
@@ -61,10 +67,11 @@
     let playerName = "UNKNOWN";
     let playerPfpSrc = "images/rocky-normal.jpg"; 
     let isSpyTweetStatus = ""; 
+    let isBgmPlaying = true; // Track audio state
     
     const TIME_PER_QUESTION_MS = 15000; 
 
-        const audioPath = 'audio/';
+    const audioPath = 'audio/';
     const sfx = {
         bgm: new Audio(audioPath + 'bgm.mp3'),
         typing: new Audio(audioPath + 'typing.mp3'),
@@ -81,8 +88,6 @@
     sfx.typing.loop = true;
     sfx.typing.volume = 0.6;
     sfx.wrong.volume = 0.3; 
-    
-    
     sfx.stamp.volume = 0.4; 
 
     function playSfx(name) {
@@ -91,7 +96,6 @@
         sound.volume = sfx[name].volume || 1;
         sound.play().catch(e => console.log('Audio play blocked:', e));
     }
-
 
     function stopTypingSound() {
         sfx.typing.pause();
@@ -102,9 +106,21 @@
         btn.addEventListener('mouseenter', () => playSfx('hover'));
         btn.addEventListener('click', () => playSfx('click'));
     });
+    
+    // NEW: Audio Toggle Logic
+    audioToggleBtn.addEventListener('click', () => {
+        isBgmPlaying = !isBgmPlaying;
+        if(isBgmPlaying) {
+            sfx.bgm.play();
+            audioToggleBtn.innerHTML = "[ AUDIO: <span class='success-text'>ON</span> ]";
+        } else {
+            sfx.bgm.pause();
+            audioToggleBtn.innerHTML = "[ AUDIO: <span class='danger-text'>OFF</span> ]";
+        }
+    });
 
     startGameBtn.addEventListener('click', () => {
-        sfx.bgm.play().catch(e => console.log('BGM blocked:', e));
+        if(isBgmPlaying) sfx.bgm.play().catch(e => console.log('BGM blocked:', e));
         startOverlay.classList.remove('active');
         startOverlay.classList.add('hidden');
         introScreen.classList.remove('hidden');
@@ -168,7 +184,7 @@
         { q: "Members whose work is shared in the spotlight channel receive which role?", img: "", opts: ["Seismic Artist", "Art Creator", "They don't receive any role", "Neurocreative"], ans: "VGhleSBkb24ndCByZWNlaXZlIGFueSByb2xl" },
         { q: "How many questions are in the Seismic quiz?", img: "images/quiz.jpg", opts: ["10", "15", "8", "12"], ans: "MTA=" },
         { q: "What is Seismic's handle on X?", img: "images/handle.jpg", opts: ["SeismicSys", "SeismicSmc", "SeismicHQ", "Seismic_Xyz"], ans: "U2Vpc21pY1N5cw==" },
-        { q: "What was the theme/title of the SEISCREAT #2 event?", img: "images/seiscreat.jpg", opts: ["IMAGINE SEISMIC", "DRAW SEISMIC", "SEISMIC, YOUR WAY", "DRAW ROCKY"], ans: "SU1BR0lORSBTRUlTTUlD" },
+        { q: "What was the name/title of the SEISCREAT #2 event?", img: "images/seiscreat.jpg", opts: ["IMAGINE SEISMIC", "DRAW SEISMIC", "SEISMIC, YOUR WAY", "DRAW ROCKY"], ans: "SU1BR0lORSBTRUlTTUlD" },
         { q: "What type of content is required to start the Magnitude journey?", img: "", opts: ["Reposting official Seismic announcements", "Sharing original content about Seismic", "Inviting new members to Discord", "Completing daily community tasks"], ans: "U2hhcmluZyBvcmlnaW5hbCBjb250ZW50IGFib3V0IFNlaXNtaWM=" },
         { q: "Where should members submit their X posts to apply for Mag1?", img: "images/join.jpg", opts: ["#general", "#community-events", "#join-magnitude", "#announcements"], ans: "I2pvaW4tbWFnbml0dWRl" },
         { q: "Who evaluates Mag1-3 roles?", img: "", opts: ["Moderators", "Community members", "Leaders", "Project developers"], ans: "TGVhZGVycw==" },
@@ -219,6 +235,7 @@
         await new Promise(r => setTimeout(r, 600)); 
     }
 
+    // NEW: Updated TypeWriter Effect that keeps the cursor inside the text dynamically
     function typeWriterEffect(element, text, speed, onComplete) {
         isTyping = true;
         element.innerHTML = ''; 
@@ -232,13 +249,14 @@
             if (i < text.length) {
                 let char = text.charAt(i);
                 currentText += char;
-                element.innerHTML = currentText;
+                element.innerHTML = currentText + '<span class="type-cursor">_</span>';
                 if(char === '<') isTag = true;
                 if(char === '>') isTag = false;
                 if(!isTag) i++; else i++;
             } else {
                 clearInterval(typingInterval);
                 isTyping = false;
+                element.innerHTML = currentText + '<span class="type-cursor">_</span>';
                 stopTypingSound(); 
                 if(onComplete) onComplete();
             }
@@ -325,7 +343,7 @@
         if (isTyping) {
             clearInterval(typingInterval);
             stopTypingSound();
-            rockyDialogue.textContent = rulesLines[currentLineIndex];
+            rockyDialogue.innerHTML = rulesLines[currentLineIndex] + '<span class="type-cursor">_</span>';
             isTyping = false;
         } else {
             currentLineIndex++;
@@ -349,8 +367,13 @@
             return;
         }
         
-        // إبقاء الضبابية الكثيفة مستمرة بدون تغيير طيلة طرح الأسئلة
         bgElement.classList.add('bg-heavy-blur');
+        
+        // Reset reaction log & question opacity for the new question
+        questionText.classList.remove('question-fade');
+        reactionLog.classList.remove('active-log');
+        reactionLog.classList.add('hidden');
+        reactionLog.innerHTML = "";
         
         const currentQ = activeQuestions[currentQuestionIndex];
         safeInjectText(questionText, currentQ.q);
@@ -428,15 +451,25 @@
         let reactionPool = isCorrect ? correctReactions[phase] : wrongReactions[phase];
         let chosenReaction = reactionPool[Math.floor(Math.random() * reactionPool.length)];
 
+        // NEW: Fade question and show reaction log
+        questionText.classList.add('question-fade');
+        reactionLog.classList.remove('hidden');
+        reactionLog.classList.add('active-log');
+
         if (isCorrect) {
             score++;
             playSfx('correct');
-            safeInjectText(questionText, chosenReaction);
+            reactionLog.style.color = "var(--success-color)";
+            reactionLog.style.textShadow = "0 0 8px var(--success-color)";
         } else {
             playSfx('wrong');
-            safeInjectText(questionText, chosenReaction);
             triggerFlash(); 
+            reactionLog.style.color = "var(--danger-color)";
+            reactionLog.style.textShadow = "0 0 8px var(--danger-color)";
         }
+
+        // Type out the reaction log
+        typeWriterEffect(reactionLog, chosenReaction, 30);
 
         await new Promise(r => setTimeout(r, 2200)); 
         
@@ -461,7 +494,6 @@
         if(transText) transText.textContent = "> GENERATING_OFFICIAL_DOSSIER...";
         await new Promise(r => setTimeout(r, 1200));
         
-        // إزالة الضبابية الكثيفة للتمهيد لظهور البطاقة بشكل واضح
         bgElement.classList.remove('bg-heavy-blur');
 
         interrogationScreen.classList.remove('active');
