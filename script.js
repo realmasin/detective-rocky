@@ -33,9 +33,6 @@
     const optionBtns = document.querySelectorAll('.option-btn');
     const digitalTimer = document.getElementById('digital-timer');
     
-    // NEW: Target the Rocky Camera Feed Image
-    const rockyAvatar = document.getElementById('rocky-avatar');
-    
     const endgameScreen = document.getElementById('endgame-screen');
     const cardScaleWrapper = document.getElementById('card-scale-wrapper');
     const resultCard = document.getElementById('result-card');
@@ -110,7 +107,6 @@
         introScreen.classList.add('active');
         startIntro(); 
     });
-
 
     const introLines = [
         "> INITIALIZING SEISMIC KERNEL V9.4...",
@@ -192,13 +188,6 @@
             [array[i], array[j]] = [array[j], array[i]];
         }
         return array;
-    }
-
-    // UPDATED: Now changes the source of the camera frame image instead of background
-    function changeRockyImage(state) {
-        if(rockyAvatar) {
-            rockyAvatar.src = `images/rocky-${state}.jpg`;
-        }
     }
 
     function generateAgentID() { return "SMC-" + Math.floor(10000 + Math.random() * 90000); }
@@ -322,7 +311,6 @@
             playerPfpSrc = e.target.result;
             submitIdentityBtn.classList.add('processing');
             await transitionScreen(identityScreen, dialogueScreen, "> ENCRYPTING_BIOMETRICS...", 1800);
-            changeRockyImage('reading');
             playNextDialogueLine();
             startLightGlitches(); 
         }
@@ -341,7 +329,6 @@
                 playNextDialogueLine();
             } else {
                 await transitionScreen(dialogueScreen, interrogationScreen, "> INITIALIZING_INTERROGATION...", 1500);
-                changeRockyImage('normal');
                 activeQuestions = shuffleArray([...questionsDatabase]).slice(0, 8);
                 currentQuestionIndex = 0;
                 score = 0;
@@ -357,6 +344,9 @@
             triggerEndgame();
             return;
         }
+        
+        // إبقاء الضبابية الكثيفة مستمرة بدون تغيير طيلة طرح الأسئلة
+        bgElement.classList.add('bg-heavy-blur');
         
         const currentQ = activeQuestions[currentQuestionIndex];
         safeInjectText(questionText, currentQ.q);
@@ -378,7 +368,6 @@
         });
 
         digitalTimer.classList.remove('timer-danger');
-        changeRockyImage('normal');
         startDigitalTimer();
     }
 
@@ -438,11 +427,9 @@
         if (isCorrect) {
             score++;
             playSfx('correct');
-            changeRockyImage('smiling');
             safeInjectText(questionText, chosenReaction);
         } else {
             playSfx('wrong');
-            changeRockyImage('angry');
             safeInjectText(questionText, chosenReaction);
             triggerFlash(); 
         }
@@ -470,6 +457,9 @@
         if(transText) transText.textContent = "> GENERATING_OFFICIAL_DOSSIER...";
         await new Promise(r => setTimeout(r, 1200));
         
+        // إزالة الضبابية الكثيفة للتمهيد لظهور البطاقة بشكل واضح
+        bgElement.classList.remove('bg-heavy-blur');
+
         interrogationScreen.classList.remove('active');
         interrogationScreen.classList.add('hidden');
         endgameScreen.classList.remove('hidden');
