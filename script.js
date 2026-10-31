@@ -134,57 +134,78 @@
         "The timer is absolute. Do not lie to me."
     ];
 
+    // --- DYNAMIC REACTIONS (4 PHASES) ---
     const correctReactions = {
         start: [
-            "LOG: Data accepted. Do not get comfortable yet.",
-            "LOG: Signature verified. But I am still watching you.",
-            "LOG: Acceptable. Let's see if it was just luck."
+            "LOG: Lucky guess. Do not get comfortable yet.",
+            "LOG: First layer breached. But I am still watching you."
         ],
-        mid: [
+        earlyMid: [
+            "LOG: Acceptable. Let's see if it was just luck.",
+            "Hmm... You know basic history. Next fragment."
+        ],
+        lateMid: [
             "LOG: Intel matches our database. You might actually belong here.",
-            "Hmm... You know your Seismic history. Next fragment.",
-            "LOG: Correct. You are surviving... for now."
+            "LOG: Correct. You are surviving the interrogation... for now."
         ],
         end: [
-            "LOG: Final fragment processed. Compiling your dossier...",
-            "LOG: Interrogation complete. Calculating your threat level..."
+            "LOG: Final fragment processed. Compiling your official dossier..."
         ]
     };
 
     const wrongReactions = {
         start: [
             "WARNING: Deception detected. You are digging your own grave.",
-            "WARNING: Contradiction found. A real member wouldn't miss this.",
             "WARNING: A pathetic attempt at a lie. Strike marked."
         ],
-        mid: [
+        earlyMid: [
+            "WARNING: Contradiction found. A real member wouldn't miss this.",
+            "Are you even trying? You are starting to look like a spy."
+        ],
+        lateMid: [
             "WARNING: Your cover is slipping. That was completely wrong.",
-            "Are you even trying? You are starting to look like a spy.",
             "Wrong. A real Seismic member would never miss that."
         ],
         end: [
-            "WARNING: Critical failure on the final step. Preparing dossier...",
-            "WARNING: Interrogation complete. Locking down final verdict..."
+            "WARNING: Critical failure on the final step. Preparing dossier..."
         ]
     };
 
+    // --- 32 QUESTIONS DATABASE (ENCRYPTED ANSWERS) ---
     const questionsDatabase = [
-        {
-            q: "Identify this target:",
-            img: "images/founder.jpg",
-            opts: ["Founder of Seismic", "Leader", "Unknown Entity", "System Admin"],
-            ans: "Rm91bmRlciBvZiBTZWlzbWlj"
-        }
+        { q: "On which day is the poker tournament usually held?", img: "images/poker.jpg", opts: ["Thursday", "Friday", "Wednesday", "Monday"], ans: "RnJpZGF5" },
+        { q: "What is this person's role in the Seismic community?", img: "images/xealist.jpg", opts: ["Leader", "Admin", "Not part of Seismic", "Seismic Founder"], ans: "QWRtaW4=" },
+        { q: "Who is this person?", img: "images/noxx.jpg", opts: ["Xealist", "Noxx", "Heathcliff", "Lyron"], ans: "Tm94eA==" },
+        { q: "Zella is known for hosting which event?", img: "images/zella.jpg", opts: ["Karaoke", "Drawing", "Cooking", "Shark Tank"], ans: "S2FyYW9rZQ==" },
+        { q: "What is the name of Seismic's mascot?", img: "images/mascot.jpg", opts: ["Rocky", "Mochi", "Ricky", "Rin"], ans: "Um9ja3k=" },
+        { q: "Who is this person?", img: "images/lyron.jpg", opts: ["Founder of Seismic", "Leader in Seismic", "Not part of Seismic", "Regional Assistant"], ans: "Rm91bmRlciBvZiBTZWlzbWlj" },
+        { q: "In which month does Seismic celebrate its anniversary?", img: "", opts: ["February", "March", "June", "January"], ans: "TWFyY2g=" },
+        { q: "What is the requirement to unlock the Magnitude channel in the Seismic Discord?", img: "", opts: ["Mag 4 and above", "Mag 6 and above", "Being a developer", "Mag 1 and above"], ans: "TWFnIDEgYW5kIGFib3Zl" },
+        { q: "Who is this person in the picture?", img: "images/heathcliff.jpg", opts: ["Heathcliff", "Noxx", "Xealist", "K2S"], ans: "SGVhdGhjbGlmZg==" },
+        { q: "How many Magnitude levels are there in the Seismic Discord promotion system?", img: "", opts: ["4", "7", "9", "8"], ans: "OQ==" },
+        { q: "On which day of the week are promotions usually distributed to eligible members in Discord?", img: "", opts: ["Wednesday", "Sunday", "Friday", "Monday"], ans: "RnJpZGF5" },
+        { q: "How many anniversaries has the Seismic community celebrated so far?", img: "", opts: ["1", "2", "3", "4"], ans: "MQ==" },
+        { q: "Who is responsible for organizing the Poker and Chess events?", img: "", opts: ["Heathcliff", "Noxx", "DZ", "Haziq"], ans: "SGVhdGhjbGlmZg==" },
+        { q: "Where is Seismic's headquarters located?", img: "", opts: ["New York City", "Istanbul", "New Delhi", "Jakarta"], ans: "TmV3IFlvcmsgQ2l0eQ==" },
+        { q: "What is the special greeting used by Seismic community members?", img: "", opts: ["Gmic", "Gmc", "Gsmc", "Gsmic"], ans: "R21pYw==" },
+        { q: "Which of these phrases is correct?", img: "", opts: ["Magnitude is the key", "Magnitude is the future", "Magnitude is the goal", "Magnitude is the way"], ans: "TWFnbml0dWRlIGlzIHRoZSBrZXk=" },
+        { q: "Which of these projects does NOT belong to the Seismic ecosystem?", img: "", opts: ["Brookwell", "Via", "Blend", "Antseed"], ans: "QW50c2VlZA==" },
+        { q: "Members whose work is shared in the spotlight channel receive which role?", img: "", opts: ["Seismic Artist", "Art Creator", "They don't receive any role", "Neurocreative"], ans: "VGhleSBkb24ndCByZWNlaXZlIGFueSByb2xl" },
+        { q: "How many questions are in the Seismic quiz?", img: "images/quiz.jpg", opts: ["10", "15", "8", "12"], ans: "MTA=" },
+        { q: "What is Seismic's handle on X?", img: "images/handle.jpg", opts: ["SeismicSys", "SeismicSmc", "SeismicHQ", "Seismic_Xyz"], ans: "U2Vpc21pY1N5cw==" },
+        { q: "What was the theme/title of the SEISCREAT #2 event?", img: "images/seiscreat.jpg", opts: ["IMAGINE SEISMIC", "DRAW SEISMIC", "SEISMIC, YOUR WAY", "DRAW ROCKY"], ans: "SU1BR0lORSBTRUlTTUlD" },
+        { q: "What type of content is required to start the Magnitude journey?", img: "", opts: ["Reposting official Seismic announcements", "Sharing original content about Seismic", "Inviting new members to Discord", "Completing daily community tasks"], ans: "U2hhcmluZyBvcmlnaW5hbCBjb250ZW50IGFib3V0IFNlaXNtaWM=" },
+        { q: "Where should members submit their X posts to apply for Mag1?", img: "images/join.jpg", opts: ["#general", "#community-events", "#join-magnitude", "#announcements"], ans: "I2pvaW4tbWFnbml0dWRl" },
+        { q: "Who evaluates Mag1-3 roles?", img: "", opts: ["Moderators", "Community members", "Leaders", "Project developers"], ans: "TGVhZGVycw==" },
+        { q: "What matters more during Magnitude evaluation?", img: "", opts: ["Number of posts", "Number of followers", "Quality of contributions", "Account activity"], ans: "UXVhbGl0eSBvZiBjb250cmlidXRpb25z" },
+        { q: "Are fully AI-generated posts accepted for Magnitude evaluation?", img: "", opts: ["Yes, without restrictions", "Only for Mag1", "Only for higher levels", "No"], ans: "Tm8=" },
+        { q: "How often can Mag1 be granted?", img: "images/mag1.jpg", opts: ["Every Friday", "Every 2-3 weeks", "Every 5-7 weeks", "At any time"], ans: "QXQgYW55IHRpbWU=" },
+        { q: "What is the promotion schedule for Mag2-4?", img: "images/mag2-4.jpg", opts: ["Every 2-3 weeks", "Every 5-7 weeks", "Every 8-10 weeks", "Once every month"], ans: "RXZlcnkgMi0zIHdlZWtz" },
+        { q: "What happens to the roles of long-term inactive members?", img: "", opts: ["They are automatically deleted", "They may be adjusted downward", "They are permanently frozen", "They are automatically promoted"], ans: "VGhleSBtYXkgYmUgYWRqdXN0ZWQgZG93bndhcmQ=" },
+        { q: "What level of responsibility is associated with Mag7 and above?", img: "", opts: ["Event participation only", "Leadership-level responsibility", "Content creation only", "Community recruitment"], ans: "TGVhZGVyc2hpcC1sZXZlbCByZXNwb25zaWJpbGl0eQ==" },
+        { q: "What are the main factors considered when assigning Magnitude roles?", img: "", opts: ["Followers and account age", "Originality, quality, effort and community contribution", "Daily messages and server invitations", "Number of reactions and reposts"], ans: "T3JpZ2luYWxpdHksIHF1YWxpdHksIGVmZm9ydCBhbmQgY29tbXVuaXR5IGNvbnRyaWJ1dGlvbg==" },
+        { q: "How often are Mag8-9 promotions scheduled?", img: "", opts: ["Every 2-3 weeks", "Every 5-7 weeks", "Every 8-10 weeks", "Every 12-15 weeks"], ans: "RXZlcnkgOC0xMCB3ZWVrcw==" }
     ];
-
-    for(let i = 2; i <= 8; i++) {
-        questionsDatabase.push({
-            q: `DATA FRAGMENT #${i} REQUIRED. SELECT OPTION 1.`,
-            img: "", 
-            opts: ["Option 1", "Option 2", "Option 3", "Option 4"],
-            ans: "T3B0aW9uIDE="
-        });
-    }
 
     let activeQuestions = [];
     let isIntroTyping = false;
@@ -362,6 +383,7 @@
             } else {
                 await transitionScreen(dialogueScreen, interrogationScreen, "> INITIALIZING_INTERROGATION...", 1500);
                 changeRockyImage('normal');
+                // Select 8 random questions from the database
                 activeQuestions = shuffleArray([...questionsDatabase]).slice(0, 8);
                 currentQuestionIndex = 0;
                 score = 0;
@@ -449,9 +471,17 @@
 
         await new Promise(r => setTimeout(r, 600)); 
 
-        let phase = "start";
-        if (currentQuestionIndex === activeQuestions.length - 1) phase = "end"; 
-        else if (currentQuestionIndex >= 3) phase = "mid"; 
+        // SMART REACTION LOGIC (4 PHASES)
+        let phase = "";
+        if (currentQuestionIndex === 0) {
+            phase = "start";
+        } else if (currentQuestionIndex > 0 && currentQuestionIndex < 4) {
+            phase = "earlyMid";
+        } else if (currentQuestionIndex >= 4 && currentQuestionIndex < 7) {
+            phase = "lateMid";
+        } else {
+            phase = "end"; // The 8th question
+        }
 
         let reactionPool = isCorrect ? correctReactions[phase] : wrongReactions[phase];
         let chosenReaction = reactionPool[Math.floor(Math.random() * reactionPool.length)];
