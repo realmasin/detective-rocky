@@ -206,7 +206,8 @@
         glitchOverlay.classList.add('flash-glitch');
     }
 
-    async function transitionScreen(fromElement, toElement, loadingText = "> SYSTEM_PROCESSING...", waitTime = 1200, isHeavy = false) {
+    // UPDATED AND REVOLUTIONIZED TRANSITION SYSTEM (Fixes the visual glitch entirely)
+    async function transitionScreen(fromElement, toElement, loadingText = "> SYSTEM_PROCESSING...", waitTime = 1200, isHeavy = false, onMidTransition = null) {
         if(transText) transText.textContent = loadingText;
         
         if(isHeavy) {
@@ -217,12 +218,32 @@
             transSpinner.style.display = "flex"; 
         }
 
+        // 1. Fade the black overlay IN
         transitionOverlay.classList.add('transition-active');
-        await new Promise(r => setTimeout(r, waitTime)); 
+        
+        // Wait exactly 500ms for the CSS fade-in to cover the screen 100%
+        await new Promise(r => setTimeout(r, 500)); 
+        
+        // --- WE ARE IN THE DARK NOW ---
+        
+        // Swap screens while everything is pitch black
         fromElement.classList.remove('active');
         fromElement.classList.add('hidden');
         toElement.classList.remove('hidden');
         toElement.classList.add('active');
+        
+        // ** CRITICAL FIX **: Execute DOM changes (loading next question) safely behind the black screen!
+        if(onMidTransition) {
+            onMidTransition();
+        }
+
+        // Wait the remaining required loading time
+        let remainingTime = waitTime - 500;
+        if(remainingTime > 0) {
+            await new Promise(r => setTimeout(r, remainingTime)); 
+        }
+        
+        // 2. Fade the black overlay OUT smoothly to reveal perfectly updated data
         transitionOverlay.classList.remove('transition-active');
         await new Promise(r => setTimeout(r, 600)); 
     }
@@ -322,7 +343,9 @@
         reader.onload = async function(e) {
             playerPfpSrc = e.target.result;
             submitIdentityBtn.classList.add('processing');
-            await transitionScreen(identityScreen, dialogueScreen, "> ENCRYPTING_BIOMETRICS...", 1800, true);
+            await transitionScreen(identityScreen, dialogueScreen, "> ENCRYPTING_BIOMETRICS...", 1800, true, () => {
+                // Done instantly while hidden
+            });
             playNextDialogueLine();
             startLightGlitches(); 
         }
@@ -340,11 +363,13 @@
             if (currentLineIndex < rulesLines.length) {
                 playNextDialogueLine();
             } else {
-                await transitionScreen(dialogueScreen, interrogationScreen, "> INITIALIZING_INTERROGATION...", 1600, true);
-                activeQuestions = shuffleArray([...questionsDatabase]).slice(0, 8);
-                currentQuestionIndex = 0;
-                score = 0;
-                loadQuestion();
+                // Load first question SAFELY while transition is pitch black!
+                await transitionScreen(dialogueScreen, interrogationScreen, "> INITIALIZING_INTERROGATION...", 1600, true, () => {
+                    activeQuestions = shuffleArray([...questionsDatabase]).slice(0, 8);
+                    currentQuestionIndex = 0;
+                    score = 0;
+                    loadQuestion();
+                });
             }
         }
     });
@@ -416,12 +441,12 @@
         cancelAnimationFrame(timerReq);
         optionBtns.forEach(btn => btn.disabled = true);
 
-        // SILENT SUSPENSE PHASE (Visual Only)
+        // SILENT SUSPENSE PHASE 
         if(clickedBtn) {
             clickedBtn.classList.add('selected-processing');
         }
 
-        // Wait 1.5 seconds in pure suspense (no keyboard noise)
+        // Wait 1.5 seconds in pure suspense
         await new Promise(r => setTimeout(r, 1500)); 
 
         if(clickedBtn) {
@@ -450,9 +475,10 @@
         currentQuestionIndex++;
         
         if (currentQuestionIndex < activeQuestions.length) {
-            // Light, fast transition
-            await transitionScreen(interrogationScreen, interrogationScreen, "> DECRYPTING_NODE...", 800, false);
-            loadQuestion();
+            // Load next question SAFELY behind the black transition screen (Fixes the flash bug)
+            await transitionScreen(interrogationScreen, interrogationScreen, "> DECRYPTING_NODE...", 1000, false, () => {
+                loadQuestion();
+            });
         } else {
             triggerEndgame(); 
         }
@@ -461,7 +487,7 @@
     async function triggerEndgame() {
         clearInterval(lightGlitchInterval);
         
-        // Heavy, dramatic transition
+        // Heavy, dramatic transition for Endgame
         if(transText) transText.textContent = "> ANALYZING_DATA...";
         transitionOverlay.classList.add('transition-active');
         transSpinner.style.display = "flex";
@@ -479,14 +505,15 @@
         interrogationScreen.classList.add('hidden');
         endgameScreen.classList.remove('hidden');
         endgameScreen.classList.add('active');
-        transitionOverlay.classList.remove('transition-active');
         
+        // Apply final stats
         cardPfp.src = playerPfpSrc;
         cardName.textContent = playerName.toUpperCase();
         finalScoreEl.textContent = `${score}/8`;
-        
         let percentage = (score / 8) * 100;
         scoreProgress.style.width = `${percentage}%`;
+        
+        transitionOverlay.classList.remove('transition-active');
         
         await new Promise(r => setTimeout(r, 600));
         cardScaleWrapper.classList.remove('hidden');
