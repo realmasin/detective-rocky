@@ -3,22 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Seismic Interrogation</title>
+    <title> DETECTIVE ROCKY</title>
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     
+    <!-- NEW: Clean Cyberpunk Transition Overlay -->
     <div id="transition-overlay">
-        <div class="trans-matrix-bg"></div>
         <div class="transition-ui">
-            <div class="trans-spinner"></div>
             <div class="trans-text-box">
                 <span id="trans-text">> LOADING_PROTOCOL...</span><span class="blinking-cursor">_</span>
-            </div>
-            <div class="trans-progress">
-                <div class="trans-progress-fill"></div>
             </div>
         </div>
     </div>
@@ -31,9 +27,7 @@
 
         <div id="top-status-bar">
             <span>SEISMIC_OS // KERNEL_V9.4</span>
-            <!-- Hidden on mobile to make space for Audio Button -->
             <span id="random-hash" class="hide-on-mobile">NODE: 0x0000</span>
-            <!-- Audio Toggle Button -->
             <span id="audio-toggle-btn">[ AUDIO: <span class="success-text">ON</span> ]</span>
         </div>
 
@@ -84,7 +78,9 @@
         <div id="dialogue-screen" class="screen hidden">
             <div class="cinematic-subtitle">
                 <span class="bracket">[</span>
-                <p id="rocky-dialogue"></p>
+                <div class="dialogue-wrapper">
+                    <p id="rocky-dialogue"></p><span class="type-cursor">_</span>
+                </div>
                 <span class="bracket">]</span>
             </div>
         </div>
@@ -96,15 +92,12 @@
                         <span class="timer-label">ENCRYPTION_DECAY: </span>
                         <span id="digital-timer">00:15:00</span>
                     </div>
-                    
                     <div class="question-box hud-panel">
                         <p id="question-text"></p>
                         <div id="image-wrapper" class="hidden">
                             <img id="question-image" src="" alt="Classified Intel">
                             <div class="scanner-line"></div>
                         </div>
-                        <!-- NEW: Rocky's Separate Reaction Log -->
-                        <p id="reaction-log" class="hidden"></p>
                     </div>
                 </div>
                 
