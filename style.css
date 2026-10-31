@@ -30,15 +30,12 @@ body { background-color: var(--bg-color); color: var(--primary-color); font-fami
 .blinking-dot { animation: blink 1.5s infinite; color: var(--brand-light); font-weight: bold; }
 #copyright-footer { position: fixed; bottom: 10px; width: 100%; text-align: center; color: rgba(255, 255, 255, 0.2); font-size: 0.75rem; letter-spacing: 3px; z-index: 100; pointer-events: none; }
 
-/* NEW STATIC CYBER BACKGROUND */
-#background { 
-    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
-    background: radial-gradient(circle at center, #11090d 0%, #000 100%), 
-                repeating-linear-gradient(0deg, transparent, transparent 40px, rgba(82,53,66,0.03) 40px, rgba(82,53,66,0.03) 41px),
-                repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(82,53,66,0.03) 40px, rgba(82,53,66,0.03) 41px);
-    z-index: 1; transition: filter 1s ease;
-}
-.bg-victory { filter: sepia(0.3) hue-rotate(-15deg) brightness(1.2) !important; }
+/* Dynamic Background Blurring */
+#background { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-image: url('images/rocky-normal.jpg'); background-size: cover; background-position: center; transform-origin: center; transition: filter 0.6s ease; animation: breatheEffect 20s infinite alternate ease-in-out; z-index: 1; }
+.bg-blur { filter: blur(8px) brightness(0.4); } /* Used during reactions/intro */
+.bg-heavy-blur { filter: blur(25px) brightness(0.25); } /* Extreme blur during questions */
+.bg-victory { filter: blur(6px) brightness(0.6) sepia(0.3) hue-rotate(-15deg) !important; }
+@keyframes breatheEffect { 0% { transform: scale(1); } 100% { transform: scale(1.05); } }
 
 .crt-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.15) 50%), linear-gradient(90deg, rgba(255,0,0,0.03), rgba(0,255,0,0.01), rgba(0,0,255,0.03)); background-size: 100% 4px, 6px 100%; pointer-events: none; z-index: 99; animation: crtFlicker 0.15s infinite; }
 @keyframes crtFlicker { 0% { opacity: 0.95; } 100% { opacity: 1; } }
@@ -93,31 +90,20 @@ body { background-color: var(--bg-color); color: var(--primary-color); font-fami
 #rocky-dialogue { font-size: 1.25rem; line-height: 1.6; display: inline; color: #fff; letter-spacing: 1px; text-shadow: 0 0 10px rgba(0,0,0,0.8); }
 .type-cursor { font-size: 1.5rem; animation: blink 1s infinite; color: var(--brand-light); }
 
-
-/* --- NEW: INTERROGATION SPLIT LAYOUT --- */
-.interrogation-layout { display: flex; flex-direction: row-reverse; gap: 25px; width: 100%; max-width: 1100px; align-items: stretch; justify-content: center; }
-.main-panel { flex: 2; display: flex; flex-direction: column; gap: 20px; justify-content: space-between; }
-.side-panel { flex: 1; display: flex; flex-direction: column; gap: 20px; min-width: 280px; max-width: 320px; }
-
-.timer-container { padding: 15px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid var(--brand-color); }
-.timer-label { font-size: 0.85rem; color: #aaa; letter-spacing: 1px; }
-.timer-value { font-size: 1.4rem; font-weight: bold; letter-spacing: 2px; }
+/* ORIGINAL INTERROGATION LAYOUT */
+.interrogation-wrapper { display: flex; flex-direction: column; gap: 20px; width: 100%; max-width: 800px; }
+.timer-container { width: 100%; padding: 10px 20px; display: flex; justify-content: space-between; border-bottom: 2px solid var(--brand-color); margin-bottom: 15px; background: rgba(82,53,66,0.15); border-radius: 2px; }
+#digital-timer { font-size: 1.4rem; font-weight: bold; letter-spacing: 3px; }
 .timer-danger { color: var(--danger-color); text-shadow: 0 0 12px var(--danger-color); animation: blink 0.5s infinite; }
-
-.rocky-cam-wrapper { padding: 12px; display: flex; flex-direction: column; gap: 10px; border-top: 4px solid var(--brand-color); }
-.cam-header { font-size: 0.8rem; color: #888; letter-spacing: 2px; display: flex; align-items: center; gap: 10px; }
-.cam-frame { width: 100%; height: 200px; background: #000; border: 1px solid #333; position: relative; overflow: hidden; box-shadow: inset 0 0 20px rgba(0,0,0,0.8); }
-.cam-frame img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(10%) contrast(110%); transition: opacity 0.3s; }
-
-.question-box { padding: 25px; text-align: center; border-left: 4px solid var(--brand-color); display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 150px; }
-#question-text { font-size: 1.2rem; letter-spacing: 1px; margin-bottom: 15px; line-height: 1.6; color: #fff; }
-#image-wrapper { position: relative; display: inline-block; border: 1px solid var(--brand-color); padding: 2px; background: #000; margin-top: 10px; }
-#question-image { max-height: 150px; display: block; }
+.question-box { padding: 20px; text-align: center; border-left: 4px solid var(--brand-color); }
+#question-text { font-size: 1.15rem; letter-spacing: 1px; margin-bottom: 15px; line-height: 1.5; color: #fff; }
+#image-wrapper { position: relative; display: inline-block; border: 1px solid var(--brand-color); padding: 2px; background: #000; }
+#question-image { max-height: 120px; display: block; }
 .scanner-line { position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px #fff; animation: scan 2s linear infinite; }
 @keyframes scan { 0% { top: -10%; } 100% { top: 110%; } }
 
 .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-.option-btn { padding: 15px; font-size: 0.95rem; border-bottom: 2px solid var(--brand-color); min-height: 70px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #ddd; transition: all 0.2s ease; letter-spacing: 1px; }
+.option-btn { padding: 15px; font-size: 0.95rem; border-bottom: 2px solid var(--brand-color); min-height: 65px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #ddd; transition: all 0.2s ease; letter-spacing: 1px; }
 .cyber-hover:hover { background: rgba(82,53,66,0.5); border-color: #fff; color: #fff; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
 .option-btn.selected-correct { background: var(--success-color); color: #000; border-color: var(--success-color); font-weight: bold; box-shadow: 0 0 20px rgba(0,255,102,0.3); }
 .option-btn.selected-wrong { background: var(--danger-color); color: #fff; border-color: var(--danger-color); font-weight: bold; box-shadow: 0 0 20px rgba(255,42,42,0.3); }
@@ -189,20 +175,13 @@ body { background-color: var(--bg-color); color: var(--primary-color); font-fami
 
 .fade-element { transition: opacity 0.4s ease; opacity: 1; }
 
-/* Responsive adjustments for the new layout */
-@media (max-width: 800px) {
-    .interrogation-layout { flex-direction: column; } /* Timer & Cam on top, Question below */
-    .side-panel { max-width: 100%; }
-    .cam-frame { height: 160px; }
-}
-
 @media (max-width: 650px) {
     .screen { padding: 30px 10px; }
     .identity-form { padding: 30px 20px; }
-    .interrogation-layout { gap: 15px; }
+    .interrogation-wrapper { gap: 15px; }
     .options-grid { grid-template-columns: 1fr; gap: 10px; }
     .option-btn { min-height: 55px; padding: 12px; }
-    #question-image { max-height: 120px; }
+    #question-image { max-height: 100px; }
     
     .endgame-actions { flex-direction: column; gap: 15px; width: 90%; max-width: 350px; }
     .endgame-actions button { width: 100%; padding: 16px; }
