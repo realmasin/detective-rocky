@@ -2,6 +2,8 @@
     
     const transitionOverlay = document.getElementById('transition-overlay');
     const transText = document.getElementById('trans-text');
+    const transSpinner = document.getElementById('trans-spinner');
+    const transProgress = document.getElementById('trans-progress');
     
     const bgElement = document.getElementById('background');
     const randomHash = document.getElementById('random-hash');
@@ -204,9 +206,19 @@
         glitchOverlay.classList.add('flash-glitch');
     }
 
-    // UPDATED: Slower transition time to make it feel natural and deliberate
-    async function transitionScreen(fromElement, toElement, loadingText = "> SYSTEM_PROCESSING...", waitTime = 1600) {
+    // Dynamic Transition (Fast for Q-to-Q, Heavy for Endgame)
+    async function transitionScreen(fromElement, toElement, loadingText = "> SYSTEM_PROCESSING...", waitTime = 1200, isHeavy = false) {
         if(transText) transText.textContent = loadingText;
+        
+        // Hide/Show heavy elements (progress bar) based on transition type
+        if(isHeavy) {
+            transProgress.style.display = "block";
+            transSpinner.style.display = "block";
+        } else {
+            transProgress.style.display = "none";
+            transSpinner.style.display = "block"; // Keep spinner for fast transitions
+        }
+
         transitionOverlay.classList.add('transition-active');
         await new Promise(r => setTimeout(r, waitTime)); 
         fromElement.classList.remove('active');
@@ -217,7 +229,6 @@
         await new Promise(r => setTimeout(r, 600)); 
     }
 
-    // ORIGINAL CLEAN TYPING FUNCTION (Cursor is now handled by CSS ::after or inline flex, no spamming DOM)
     function typeWriterEffect(element, text, speed, onComplete) {
         isTyping = true;
         element.innerHTML = ''; 
@@ -294,7 +305,7 @@
 
     readyBtn.addEventListener('click', async () => {
         readyBtn.classList.add('processing');
-        await transitionScreen(introScreen, identityScreen, "> ESTABLISHING_SECURE_LINK...", 1600);
+        await transitionScreen(introScreen, identityScreen, "> ESTABLISHING_SECURE_LINK...", 1500, true);
     });
 
     submitIdentityBtn.addEventListener('click', async () => {
@@ -313,7 +324,7 @@
         reader.onload = async function(e) {
             playerPfpSrc = e.target.result;
             submitIdentityBtn.classList.add('processing');
-            await transitionScreen(identityScreen, dialogueScreen, "> ENCRYPTING_BIOMETRICS...", 1800);
+            await transitionScreen(identityScreen, dialogueScreen, "> ENCRYPTING_BIOMETRICS...", 1800, true);
             playNextDialogueLine();
             startLightGlitches(); 
         }
@@ -331,7 +342,7 @@
             if (currentLineIndex < rulesLines.length) {
                 playNextDialogueLine();
             } else {
-                await transitionScreen(dialogueScreen, interrogationScreen, "> INITIALIZING_INTERROGATION...", 1600);
+                await transitionScreen(dialogueScreen, interrogationScreen, "> INITIALIZING_INTERROGATION...", 1600, true);
                 activeQuestions = shuffleArray([...questionsDatabase]).slice(0, 8);
                 currentQuestionIndex = 0;
                 score = 0;
@@ -403,9 +414,26 @@
         timerReq = requestAnimationFrame(update);
     }
 
+    // NEW: Suspense Logic inside Answer Handler
     async function handleAnswer(clickedBtn, selectedText, encodedCorrectAnswer) {
         cancelAnimationFrame(timerReq);
         optionBtns.forEach(btn => btn.disabled = true);
+
+        // 1. Processing / Suspense Phase
+        if(clickedBtn) {
+            clickedBtn.classList.add('selected-processing');
+            sfx.typing.play(); // Fake "calculating" sound
+        }
+
+        // Wait 1.5 seconds for suspense
+        await new Promise(r => setTimeout(r, 1500)); 
+
+        // 2. Reveal Phase
+        if(clickedBtn) {
+            sfx.typing.pause();
+            sfx.typing.currentTime = 0;
+            clickedBtn.classList.remove('selected-processing');
+        }
 
         const decodedCorrect = atob(encodedCorrectAnswer);
         let isCorrect = (selectedText === decodedCorrect);
@@ -415,7 +443,6 @@
             else clickedBtn.classList.add('selected-wrong');
         }
 
-        // NEW: Removed Rocky's text reactions entirely. Just Sounds and Button Highlight.
         if (isCorrect) {
             score++;
             playSfx('correct');
@@ -424,12 +451,14 @@
             triggerFlash(); 
         }
 
-        await new Promise(r => setTimeout(r, 1200)); 
+        // Give player 1.5 seconds to see the red/green result
+        await new Promise(r => setTimeout(r, 1500)); 
         
         currentQuestionIndex++;
         
         if (currentQuestionIndex < activeQuestions.length) {
-            await transitionScreen(interrogationScreen, interrogationScreen, "> DECRYPTING_NEXT_NODE...", 1200);
+            // Fast transition between questions (isHeavy = false)
+            await transitionScreen(interrogationScreen, interrogationScreen, "> DECRYPTING_NEXT_NODE...", 800, false);
             loadQuestion();
         } else {
             triggerEndgame(); 
@@ -439,8 +468,25 @@
     async function triggerEndgame() {
         clearInterval(lightGlitchInterval);
         
-        await transitionScreen(interrogationScreen, endgameScreen, "> ANALYZING_THREAT_LEVEL...", 2000);
+        // Heavy transition for Endgame (isHeavy = true)
+        if(transText) transText.textContent = "> ANALYZING_INTERROGATION_DATA...";
+        transitionOverlay.classList.add('transition-active');
+        transSpinner.style.display = "block";
+        transProgress.style.display = "block";
+        
+        await new Promise(r => setTimeout(r, 1500));
+        if(transText) transText.textContent = "> CALCULATING_THREAT_LEVEL...";
+        await new Promise(r => setTimeout(r, 1500));
+        if(transText) transText.textContent = "> GENERATING_OFFICIAL_DOSSIER...";
+        await new Promise(r => setTimeout(r, 1200));
+        
         bgElement.classList.remove('bg-heavy-blur');
+
+        interrogationScreen.classList.remove('active');
+        interrogationScreen.classList.add('hidden');
+        endgameScreen.classList.remove('hidden');
+        endgameScreen.classList.add('active');
+        transitionOverlay.classList.remove('transition-active');
         
         cardPfp.src = playerPfpSrc;
         cardName.textContent = playerName.toUpperCase();
